@@ -14,7 +14,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - [x] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
 - [x] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
 - [x] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
-- [ ] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
+- [x] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
 - [ ] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
 
 ## Phase Details
@@ -108,7 +108,7 @@ Plans:
 - [x] 05-01: CLAUDE.md import resolver (@import chain parsing, dependency tree, broken import detection)
 - [x] 05-02: Config health score (completeness scoring algorithm, gap detection, recommendations)
 - [x] 05-03: Cross-project comparison (multi-project scanning, side-by-side comparison, diff view)
-- [ ] 05-04: Dashboard integration (health page, import chain view, projects page)
+- [x] 05-04: Dashboard integration (health page, import chain view, projects page)
 
 ### Phase 6: Polish + Launch
 **Goal**: Production-ready open source release on npm
@@ -137,5 +137,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Settings + CLAUDE.md | 3/3 | Complete | 2026-02-22 |
 | 3. MCP + Hooks + Permissions | 3/3 | Complete | 2026-02-22 |
 | 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
-| 5. Advanced Features | 3/4 | In progress | — |
+| 5. Advanced Features | 4/4 | Complete | 2026-02-22 |
 | 6. Polish + Launch | 0/2 | Not started | — |
