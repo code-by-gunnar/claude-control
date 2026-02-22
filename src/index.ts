@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { commandsCommand } from "./commands/commands.js";
+import { hooksCommand } from "./commands/hooks.js";
 import { mcpCommand } from "./commands/mcp.js";
 import { memoryCommand } from "./commands/memory.js";
 import { scanCommand } from "./commands/scan.js";
@@ -16,6 +18,8 @@ program
   .option("--json", "Output results as JSON", false);
 
 // Register commands
+commandsCommand(program);
+hooksCommand(program);
 mcpCommand(program);
 memoryCommand(program);
 scanCommand(program);

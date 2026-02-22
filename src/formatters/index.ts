@@ -1,6 +1,8 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import type { CommandsResult, HooksResult } from "../hooks/types.js";
 import type { McpResult } from "../mcp/types.js";
 import type { SettingsResult } from "../settings/types.js";
+import { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
 import { formatMcpJson, formatMcpTable } from "./mcp.js";
 import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
@@ -86,7 +88,42 @@ export function formatMcp(
     : formatMcpTable(result, projectDir);
 }
 
+/**
+ * Format hooks extraction results for display.
+ *
+ * @param result - The hooks extraction result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatHooks(
+  result: HooksResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatHooksJson(result)
+    : formatHooksTable(result, projectDir);
+}
+
+/**
+ * Format commands extraction results for display.
+ *
+ * @param result - The commands extraction result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatCommands(
+  result: CommandsResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatCommandsJson(result)
+    : formatCommandsTable(result, projectDir);
+}
+
 // Re-export individual formatters for direct access
+export { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
 export { formatMcpJson, formatMcpTable } from "./mcp.js";
 export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
