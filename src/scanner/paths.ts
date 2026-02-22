@@ -32,6 +32,33 @@ export function getGlobalClaudeDir(): string {
 }
 
 /**
+ * Get the system-wide managed settings path (enterprise/organization-managed).
+ *
+ * Managed settings are installed by enterprise admins and apply system-wide.
+ * Path follows platform conventions for system-level application config.
+ */
+function getManagedSettingsPath(): string {
+  switch (process.platform) {
+    case "win32":
+      return path.join(
+        process.env.PROGRAMDATA || "C:\\ProgramData",
+        "claude",
+        "settings.json"
+      );
+    case "darwin":
+      return path.join(
+        "/Library",
+        "Application Support",
+        "claude",
+        "settings.json"
+      );
+    default:
+      // Linux and other Unix-like
+      return path.join("/etc", "claude", "settings.json");
+  }
+}
+
+/**
  * Returns all expected Claude Code configuration file locations.
  *
  * When called without a projectDir, returns only global (user-level) paths.
@@ -43,6 +70,15 @@ export function getGlobalClaudeDir(): string {
 export function getConfigPaths(projectDir?: string): ConfigFileExpectation[] {
   const globalClaudeDir = getGlobalClaudeDir();
   const expectations: ConfigFileExpectation[] = [];
+
+  // --- Managed (enterprise) paths ---
+
+  expectations.push({
+    scope: "managed",
+    type: "settings",
+    expectedPath: getManagedSettingsPath(),
+    description: "Enterprise/organization-managed settings (system-wide)",
+  });
 
   // --- Global (user-level) paths ---
 
