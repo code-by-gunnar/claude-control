@@ -16,17 +16,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Settings & Configuration
 
-- [ ] **CONF-01**: User can view settings.json values from all scope levels (managed, user, project, local)
-- [ ] **CONF-02**: Each setting shows its source file path and scope level
-- [ ] **CONF-03**: User can see which scope level "wins" for each setting with override chain
+- [x] **CONF-01**: User can view settings.json values from all scope levels (managed, user, project, local)
+- [x] **CONF-02**: Each setting shows its source file path and scope level
+- [x] **CONF-03**: User can see which scope level "wins" for each setting with override chain
 - [x] **CONF-04**: User can see which expected config files exist and which are missing
 - [ ] **CONF-05**: User can see a config health/completeness score for the current project
 - [ ] **CONF-06**: User can compare configuration across multiple projects
 
 ### CLAUDE.md Files
 
-- [ ] **CLMD-01**: User can list all CLAUDE.md files with their scope and file path
-- [ ] **CLMD-02**: User can preview the content of any CLAUDE.md file
+- [x] **CLMD-01**: User can list all CLAUDE.md files with their scope and file path
+- [x] **CLMD-02**: User can preview the content of any CLAUDE.md file
 - [ ] **CLMD-03**: User can see @import dependency chains with broken import detection
 
 ### MCP Servers
@@ -99,14 +99,14 @@ Which phases cover which requirements. Updated by create-roadmap.
 | SCAN-02 | Phase 1 | Complete |
 | SCAN-03 | Phase 1 | Complete |
 | SCAN-04 | Phase 1 | Complete |
-| CONF-01 | Phase 2 | Pending |
-| CONF-02 | Phase 2 | Pending |
-| CONF-03 | Phase 2 | Pending |
+| CONF-01 | Phase 2 | Complete |
+| CONF-02 | Phase 2 | Complete |
+| CONF-03 | Phase 2 | Complete |
 | CONF-04 | Phase 1 | Complete |
 | CONF-05 | Phase 5 | Pending |
 | CONF-06 | Phase 5 | Pending |
-| CLMD-01 | Phase 2 | Pending |
-| CLMD-02 | Phase 2 | Pending |
+| CLMD-01 | Phase 2 | Complete |
+| CLMD-02 | Phase 2 | Complete |
 | CLMD-03 | Phase 5 | Pending |
 | MCP-01 | Phase 3 | Pending |
 | MCP-02 | Phase 3 | Pending |

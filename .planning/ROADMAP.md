@@ -11,7 +11,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation** — Core scanning engine + CLI framework + file discovery
-- [ ] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
+- [x] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
 - [ ] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
 - [ ] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [ ] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
@@ -50,8 +50,9 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [x] 02-01: Settings viewer (settings.json parsing across all scopes, resolver for override chain, scope display)
-- [ ] 02-02: CLAUDE.md viewer (file listing, content preview, scope tagging)
+- [x] 02-01: Settings resolver TDD (vitest setup, ScopedSettings/ResolvedSetting types, resolveSettings with scope-priority merge, 9 test cases)
+- [x] 02-02: CLAUDE.md viewer (user-level CLAUDE.md discovery, memory command with list/--show modes, table/JSON formatters)
+- [x] 02-03: Settings command + formatters (settings command with --key filter, override chain display with box-drawing chars)
 
 ### Phase 3: Config Viewers — MCP + Hooks + Permissions
 **Goal**: Complete config visibility across all remaining config types
@@ -131,7 +132,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-02-22 |
-| 2. Settings + CLAUDE.md | 1/2 | In progress | — |
+| 2. Settings + CLAUDE.md | 3/3 | Complete | 2026-02-22 |
 | 3. MCP + Hooks + Permissions | 0/3 | Not started | — |
 | 4. Web Dashboard | 0/4 | Not started | — |
 | 5. Advanced Features | 0/3 | Not started | — |
