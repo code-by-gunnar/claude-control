@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 3 in progress — MCP server viewer complete, hooks and permissions viewers next
+**Current focus:** Phase 3 in progress — MCP and hooks viewers complete, permissions viewer next
 
 ## Current Position
 
 Phase: 3 of 6 (Config Viewers — MCP + Hooks + Permissions) — IN PROGRESS
-Plan: 03-01 complete, 03-02 and 03-03 remaining
-Status: Plan 03-01 (MCP Server Viewer) complete
-Last activity: 2026-02-22 — Plan 03-01 complete with `claude-ctl mcp` command
+Plan: 2 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-22 — Completed 03-02-PLAN.md
 
-Progress: ████░░░░░░ 35% (6 of 17 plans)
+Progress: █████░░░░░ 41% (7 of 17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: ~1 session
-- Total execution time: 6 sessions
+- Total execution time: 7 sessions
 
 **By Phase:**
 
@@ -29,13 +29,13 @@ Progress: ████░░░░░░ 35% (6 of 17 plans)
 |-------|-------|----------|--------|
 | 1. Foundation | 2 | 2 | Complete |
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
-| 3. MCP + Hooks + Permissions | 3 | 1 | In progress |
+| 3. MCP + Hooks + Permissions | 3 | 2 | In progress |
 | 4. Web Dashboard | 4 | 0 | Not started |
 | 5. Advanced Features | 3 | 0 | Not started |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
-- Last 5 plans: 01-02, 02-01, 02-02, 02-03, 03-01
+- Last 5 plans: 02-01, 02-02, 02-03, 03-01, 03-02
 - Trend: Steady
 
 ## Accumulated Context
@@ -70,6 +70,9 @@ Recent decisions affecting current work:
 - MCP servers extracted from both .mcp.json files and settings.json mcpServers key
 - Servers sorted by scope priority (project first), then alphabetically by name
 - Duplicates detected across files, not within same file
+- Known hook events hardcoded as constant array (6 events), easy to update when new events added
+- Skill directories use colon-separated naming (dirname:filename) matching Claude Code convention
+- extractCommands is async (filesystem access), extractHooks is sync (works on parsed settings content)
 
 ### Key Files Established
 
@@ -77,13 +80,13 @@ Recent decisions affecting current work:
 - `src/scanner/types.ts` — ConfigScope, ConfigFileType, ConfigFile, ScanResult
 - `src/scanner/paths.ts` — `getConfigPaths()` for cross-platform path resolution (all 4 scopes), includes user-level CLAUDE.md and project-level .mcp.json
 - `src/scanner/parser.ts` — `parseJsonc()` and `readMarkdown()`
-- `src/index.ts` — CLI entry point with Commander.js, registers scan + status + memory + settings + mcp commands
+- `src/index.ts` — CLI entry point with Commander.js, registers scan + status + memory + settings + mcp + hooks + commands
 - `src/commands/scan.ts` — `scanCommand()` registers scan subcommand
 - `src/commands/status.ts` — `statusCommand()` registers status subcommand
 - `src/commands/memory.ts` — `memoryCommand()` registers memory subcommand with list and --show modes
 - `src/commands/settings.ts` — `settingsCommand()` registers settings subcommand with --key filter
 - `src/commands/mcp.ts` — `mcpCommand()` registers mcp subcommand listing MCP servers
-- `src/formatters/index.ts` — `formatScan()`, `formatStatus()`, `formatMemory()`, `formatMemoryContent()`, `formatSettings()`, `formatMcp()` dispatch functions
+- `src/formatters/index.ts` — `formatScan()`, `formatStatus()`, `formatMemory()`, `formatMemoryContent()`, `formatSettings()`, `formatMcp()`, `formatHooks()`, `formatCommands()` dispatch functions
 - `src/formatters/table.ts` — Human-readable table output with chalk colors, memory/settings table formatters
 - `src/formatters/json.ts` — JSON output with credential sanitization, memory/settings JSON formatters
 - `src/formatters/mcp.ts` — MCP-specific table and JSON formatters with secret masking display
@@ -92,6 +95,11 @@ Recent decisions affecting current work:
 - `src/settings/resolver.test.ts` — 9 test cases for settings resolution
 - `src/mcp/types.ts` — McpServer, McpDuplicate, McpResult type definitions
 - `src/mcp/resolver.ts` — extractMcpServers() with secret masking and duplicate detection
+- `src/hooks/types.ts` — HookEntry, HookMatcher, HookEvent, CommandEntry, HooksResult, CommandsResult
+- `src/hooks/resolver.ts` — extractHooks() and extractCommands() resolver functions
+- `src/commands/hooks.ts` — `hooksCommand()` registers hooks subcommand with event catalog
+- `src/commands/commands.ts` — `commandsCommand()` registers commands subcommand
+- `src/formatters/hooks.ts` — Hooks and commands table/JSON formatters
 
 ### Pending Todos
 
@@ -104,5 +112,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Plan 03-01 complete. MCP server viewer working. Ready for plan 03-02 (hooks viewer).
-Resume file: .planning/phases/03-config-viewers-mcp-hooks-permissions/03-01-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md. Hooks and commands viewers working. Ready for plan 03-03 (permissions audit).
+Resume file: .planning/phases/03-config-viewers-mcp-hooks-permissions/03-02-SUMMARY.md
