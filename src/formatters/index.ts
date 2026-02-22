@@ -1,6 +1,8 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import type { McpResult } from "../mcp/types.js";
 import type { SettingsResult } from "../settings/types.js";
 import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+import { formatMcpJson, formatMcpTable } from "./mcp.js";
 import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 
 /**
@@ -67,6 +69,24 @@ export function formatSettings(
     : formatSettingsTable(result, projectDir);
 }
 
+/**
+ * Format MCP server extraction results for display.
+ *
+ * @param result - The MCP extraction result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatMcp(
+  result: McpResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatMcpJson(result)
+    : formatMcpTable(result, projectDir);
+}
+
 // Re-export individual formatters for direct access
 export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+export { formatMcpJson, formatMcpTable } from "./mcp.js";
 export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";

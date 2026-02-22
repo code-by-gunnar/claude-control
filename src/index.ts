@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { mcpCommand } from "./commands/mcp.js";
 import { memoryCommand } from "./commands/memory.js";
 import { scanCommand } from "./commands/scan.js";
 import { settingsCommand } from "./commands/settings.js";
@@ -15,6 +16,7 @@ program
   .option("--json", "Output results as JSON", false);
 
 // Register commands
+mcpCommand(program);
 memoryCommand(program);
 scanCommand(program);
 settingsCommand(program);
