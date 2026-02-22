@@ -105,6 +105,13 @@ export function getConfigPaths(projectDir?: string): ConfigFileExpectation[] {
 
   expectations.push({
     scope: "user",
+    type: "claude-md",
+    expectedPath: path.join(globalClaudeDir, "CLAUDE.md"),
+    description: "User-level CLAUDE.md memory file",
+  });
+
+  expectations.push({
+    scope: "user",
     type: "commands-dir",
     expectedPath: path.join(globalClaudeDir, "commands"),
     description: "User-level custom commands directory",

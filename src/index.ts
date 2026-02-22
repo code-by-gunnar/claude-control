@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { memoryCommand } from "./commands/memory.js";
 import { scanCommand } from "./commands/scan.js";
 import { statusCommand } from "./commands/status.js";
 
@@ -13,6 +14,7 @@ program
   .option("--json", "Output results as JSON", false);
 
 // Register commands
+memoryCommand(program);
 scanCommand(program);
 statusCommand(program);
 
