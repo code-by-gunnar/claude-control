@@ -1,10 +1,10 @@
 {
   "name": "claude-control",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A unified dashboard and CLI tool for discovering, viewing, and managing Claude Code configuration",
   "type": "module",
   "bin": {
-    "claude-ctl": "dist/index.js"
+    "claude-ctl": "./dist/index.js"
   },
   "scripts": {
     "build": "tsup && vite build --config dashboard/vite.config.ts",
