@@ -293,6 +293,25 @@ export async function fetchProjects(dir: string): Promise<WorkspaceScan> {
   return response.json() as Promise<WorkspaceScan>;
 }
 
+export async function removePermission(
+  sourcePath: string,
+  rule: "allow" | "deny" | "ask",
+  raw: string
+): Promise<{ success: boolean }> {
+  const response = await fetch("/api/permissions/remove", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sourcePath, rule, raw }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error ?? `API error: ${response.status}`
+    );
+  }
+  return response.json() as Promise<{ success: boolean }>;
+}
+
 export async function fetchCompare(projectPaths: string[]): Promise<ComparisonResult> {
   const query = projectPaths.map((p) => encodeURIComponent(p)).join(",");
   const response = await fetch(`/api/compare?projects=${query}`);

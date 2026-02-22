@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   fetchPermissions,
+  removePermission,
   type PermissionsResult,
   type EffectivePermission,
 } from "../lib/api";
@@ -67,11 +68,42 @@ function winReason(permission: EffectivePermission): string {
 
 function PermissionRow({
   permission,
+  onRemoved,
 }: {
   permission: EffectivePermission;
+  onRemoved: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [confirmIdx, setConfirmIdx] = useState<number | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const hasOverrides = permission.overrides.length > 1;
+
+  async function handleRemove(override: {
+    sourcePath: string;
+    rule: string;
+    raw: string;
+  }) {
+    setRemoving(true);
+    setFeedback(null);
+    try {
+      await removePermission(
+        override.sourcePath,
+        override.rule as "allow" | "deny" | "ask",
+        override.raw
+      );
+      setFeedback({ type: "success", msg: "Removed" });
+      setConfirmIdx(null);
+      setTimeout(() => onRemoved(), 600);
+    } catch (err) {
+      setFeedback({
+        type: "error",
+        msg: err instanceof Error ? err.message : "Failed to remove",
+      });
+    } finally {
+      setRemoving(false);
+    }
+  }
 
   return (
     <div className="border-b border-slate-100 last:border-b-0">
@@ -113,6 +145,8 @@ function PermissionRow({
               const isWinner =
                 override.scope === permission.effectiveScope &&
                 override.rule === permission.effectiveRule;
+              const canRemove = override.scope !== "managed";
+              const isConfirming = confirmIdx === i;
               return (
                 <div
                   key={`${override.scope}-${override.sourcePath}-${i}`}
@@ -145,10 +179,63 @@ function PermissionRow({
                   >
                     {shortenPath(override.sourcePath)}
                   </span>
+                  {canRemove && (
+                    isConfirming ? (
+                      <span className="flex items-center gap-1 shrink-0">
+                        <span className="text-xs text-red-600">Remove?</span>
+                        <button
+                          type="button"
+                          disabled={removing}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemove(override);
+                          }}
+                          className="text-xs text-red-700 font-medium hover:text-red-900 disabled:opacity-50 px-1"
+                        >
+                          Yes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConfirmIdx(null);
+                          }}
+                          className="text-xs text-slate-500 hover:text-slate-700 px-1"
+                        >
+                          No
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmIdx(i);
+                        }}
+                        className="text-red-400 hover:text-red-600 shrink-0 p-0.5"
+                        title="Remove permission"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )
+                  )}
                 </div>
               );
             })}
           </div>
+
+          {/* Inline feedback */}
+          {feedback && (
+            <p
+              className={`text-xs mt-2 ${
+                feedback.type === "success" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {feedback.msg}
+            </p>
+          )}
 
           {/* Why winner won */}
           {hasOverrides && (
@@ -167,10 +254,23 @@ export function PermissionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PermissionsResult | null>(null);
 
+  async function loadData() {
+    try {
+      const result = await fetchPermissions();
+      setData(result);
+      setLoading(false);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load permissions"
+      );
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
-    async function loadData() {
+    async function initialLoad() {
       try {
         const result = await fetchPermissions();
         if (cancelled) return;
@@ -185,7 +285,7 @@ export function PermissionsPage() {
       }
     }
 
-    loadData();
+    initialLoad();
     return () => {
       cancelled = true;
     };
@@ -284,6 +384,7 @@ export function PermissionsPage() {
               <PermissionRow
                 key={`${perm.tool}-${perm.pattern ?? "*"}`}
                 permission={perm}
+                onRemoved={loadData}
               />
             ))}
           </div>

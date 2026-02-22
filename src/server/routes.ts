@@ -8,6 +8,7 @@ import { extractPlugins } from "../plugins/resolver.js";
 import { extractHooks, extractCommands } from "../hooks/resolver.js";
 import { resolveMemoryImports } from "../memory/resolver.js";
 import { resolvePermissions } from "../permissions/resolver.js";
+import { removePermission } from "../permissions/writer.js";
 import { discoverProjects } from "../workspace/discovery.js";
 import { compareProjects } from "../workspace/comparison.js";
 import type { ScopedSettings } from "../settings/types.js";
@@ -148,6 +149,44 @@ apiRoutes.get("/api/permissions", async (c) => {
   const result = await scan(projectDir);
   const permissionsResult = resolvePermissions(result.files);
   return c.json(permissionsResult);
+});
+
+/**
+ * POST /api/permissions/remove
+ * Removes a single permission entry from a settings file.
+ */
+apiRoutes.post("/api/permissions/remove", async (c) => {
+  try {
+    const body = await c.req.json<{
+      sourcePath?: string;
+      rule?: string;
+      raw?: string;
+    }>();
+
+    const { sourcePath, rule, raw } = body;
+
+    if (!sourcePath || !rule || !raw) {
+      return c.json(
+        { error: "Missing required fields: sourcePath, rule, raw" },
+        400
+      );
+    }
+
+    if (rule !== "allow" && rule !== "deny" && rule !== "ask") {
+      return c.json(
+        { error: 'Invalid rule: must be "allow", "deny", or "ask"' },
+        400
+      );
+    }
+
+    const result = await removePermission(sourcePath, rule, raw);
+    return c.json(result);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to remove permission";
+    const status = message.includes("managed") ? 403 : 500;
+    return c.json({ error: message }, status);
+  }
 });
 
 /**
