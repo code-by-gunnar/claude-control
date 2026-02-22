@@ -50,7 +50,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: Settings viewer (settings.json parsing across all scopes, resolver for override chain, scope display)
+- [x] 02-01: Settings viewer (settings.json parsing across all scopes, resolver for override chain, scope display)
 - [ ] 02-02: CLAUDE.md viewer (file listing, content preview, scope tagging)
 
 ### Phase 3: Config Viewers — MCP + Hooks + Permissions
@@ -131,7 +131,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-02-22 |
-| 2. Settings + CLAUDE.md | 0/2 | Not started | — |
+| 2. Settings + CLAUDE.md | 1/2 | In progress | — |
 | 3. MCP + Hooks + Permissions | 0/3 | Not started | — |
 | 4. Web Dashboard | 0/4 | Not started | — |
 | 5. Advanced Features | 0/3 | Not started | — |
