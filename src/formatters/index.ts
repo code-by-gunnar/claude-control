@@ -1,10 +1,12 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
 import type { CommandsResult, HooksResult } from "../hooks/types.js";
 import type { McpResult } from "../mcp/types.js";
+import type { PermissionsResult } from "../permissions/types.js";
 import type { SettingsResult } from "../settings/types.js";
 import { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
 import { formatMcpJson, formatMcpTable } from "./mcp.js";
+import { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
 import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 
 /**
@@ -122,8 +124,26 @@ export function formatCommands(
     : formatCommandsTable(result, projectDir);
 }
 
+/**
+ * Format permissions resolution results for display.
+ *
+ * @param result - The resolved permissions result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatPermissions(
+  result: PermissionsResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatPermissionsJson(result)
+    : formatPermissionsTable(result, projectDir);
+}
+
 // Re-export individual formatters for direct access
 export { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
 export { formatMcpJson, formatMcpTable } from "./mcp.js";
+export { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
 export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
