@@ -20,14 +20,14 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CONF-02**: Each setting shows its source file path and scope level
 - [x] **CONF-03**: User can see which scope level "wins" for each setting with override chain
 - [x] **CONF-04**: User can see which expected config files exist and which are missing
-- [ ] **CONF-05**: User can see a config health/completeness score for the current project
-- [ ] **CONF-06**: User can compare configuration across multiple projects
+- [x] **CONF-05**: User can see a config health/completeness score for the current project
+- [x] **CONF-06**: User can compare configuration across multiple projects
 
 ### CLAUDE.md Files
 
 - [x] **CLMD-01**: User can list all CLAUDE.md files with their scope and file path
 - [x] **CLMD-02**: User can preview the content of any CLAUDE.md file
-- [ ] **CLMD-03**: User can see @import dependency chains with broken import detection
+- [x] **CLMD-03**: User can see @import dependency chains with broken import detection
 
 ### MCP Servers
 
@@ -103,11 +103,11 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CONF-02 | Phase 2 | Complete |
 | CONF-03 | Phase 2 | Complete |
 | CONF-04 | Phase 1 | Complete |
-| CONF-05 | Phase 5 | Pending |
-| CONF-06 | Phase 5 | Pending |
+| CONF-05 | Phase 5 | Complete |
+| CONF-06 | Phase 5 | Complete |
 | CLMD-01 | Phase 2 | Complete |
 | CLMD-02 | Phase 2 | Complete |
-| CLMD-03 | Phase 5 | Pending |
+| CLMD-03 | Phase 5 | Complete |
 | MCP-01 | Phase 3 | Complete |
 | MCP-02 | Phase 3 | Complete |
 | MCP-03 | Phase 3 | Complete |
