@@ -122,7 +122,7 @@ export function HealthPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">Health</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">Health</h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           <p className="font-medium">Error loading health data</p>
           <p className="text-sm mt-1">{error}</p>
@@ -133,8 +133,41 @@ export function HealthPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-1">Health</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Health</h1>
       <p className="text-sm text-slate-500 mb-6">Configuration health score and recommendations</p>
+
+      {/* Explainer */}
+      {!loading && health && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+          <p className="mb-2">
+            <strong>Health score</strong> evaluates your Claude Code setup
+            against recommended best practices. Each category checks for
+            specific configuration patterns:
+          </p>
+          <ul className="list-disc pl-5 space-y-1 mb-2">
+            <li>
+              <strong>CLAUDE.md</strong> &mdash; do you have project instructions to guide Claude?
+            </li>
+            <li>
+              <strong>MCP servers</strong> &mdash; are tools configured for Claude to use?
+            </li>
+            <li>
+              <strong>Permissions</strong> &mdash; are tool permissions explicitly defined?
+            </li>
+            <li>
+              <strong>Settings</strong> &mdash; are key behaviors configured?
+            </li>
+            <li>
+              <strong>Hooks</strong> &mdash; are lifecycle hooks set up for automation?
+            </li>
+          </ul>
+          <p className="text-blue-700 text-xs">
+            A perfect score isn&rsquo;t required &mdash; the checks highlight
+            areas where adding configuration could improve your Claude Code
+            experience. Focus on the recommendations below.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="space-y-6">
@@ -169,7 +202,7 @@ export function HealthPage() {
 
           {/* Category breakdown */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800 mb-4">Category Breakdown</h2>
+            <h2 className="text-xl font-semibold text-slate-800 mb-4">Category Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {health.categories.map((cat) => (
                 <CategoryCard key={cat.name} category={cat} />
@@ -180,7 +213,7 @@ export function HealthPage() {
           {/* Recommendations */}
           {health.recommendations.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-800 mb-4">Recommendations</h2>
+              <h2 className="text-xl font-semibold text-slate-800 mb-4">Recommendations</h2>
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">
                 {health.recommendations.map((rec, i) => (
                   <div key={i} className="flex items-start gap-3 px-5 py-3">

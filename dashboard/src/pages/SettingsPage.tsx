@@ -177,7 +177,7 @@ export function SettingsPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Settings
         </h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -188,9 +188,94 @@ export function SettingsPage() {
     );
   }
 
+  // Count how many settings have overrides (defined in more than one scope)
+  const overriddenCount = data
+    ? data.settings.filter((s) => s.overrides.length > 1).length
+    : 0;
+
+  // Count unique scopes that contribute settings
+  const activeScopes = data
+    ? [...new Set(data.settings.map((s) => s.effectiveScope))]
+    : [];
+
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-6">Settings</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Settings</h1>
+      <p className="text-sm text-slate-500 mb-6">
+        Resolved configuration from settings.json files
+        {!loading && data && (
+          <span className="ml-1 text-slate-400">
+            ({data.settings.length} setting{data.settings.length !== 1 ? "s" : ""}
+            {overriddenCount > 0 && (
+              <span>
+                , {overriddenCount} overridden
+              </span>
+            )}
+            {activeScopes.length > 0 && (
+              <span>
+                , {activeScopes.length} scope{activeScopes.length !== 1 ? "s" : ""}
+              </span>
+            )}
+            )
+          </span>
+        )}
+      </p>
+
+      {/* Explainer */}
+      {!loading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+          <p className="mb-2">
+            <strong>Settings</strong> control Claude Code behavior — model
+            preferences, allowed tools, editor integration, and more. They
+            are defined in{" "}
+            <code className="font-mono text-xs bg-blue-100 px-1 rounded">
+              settings.json
+            </code>{" "}
+            files at different scope levels:
+          </p>
+          <ul className="list-disc pl-5 space-y-1 mb-2">
+            <li>
+              <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-200 text-slate-700">
+                managed
+              </span>{" "}
+              &mdash; organization defaults set by your admin
+            </li>
+            <li>
+              <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700">
+                user
+              </span>{" "}
+              &mdash; your personal preferences in{" "}
+              <code className="font-mono text-xs bg-blue-100 px-1 rounded">
+                ~/.claude/settings.json
+              </code>
+            </li>
+            <li>
+              <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700">
+                project
+              </span>{" "}
+              &mdash; shared team settings in{" "}
+              <code className="font-mono text-xs bg-blue-100 px-1 rounded">
+                .claude/settings.json
+              </code>
+            </li>
+            <li>
+              <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700">
+                local
+              </span>{" "}
+              &mdash; your local overrides in{" "}
+              <code className="font-mono text-xs bg-blue-100 px-1 rounded">
+                .claude/settings.local.json
+              </code>
+            </li>
+          </ul>
+          <p className="text-blue-700 text-xs">
+            Higher scopes override lower ones (local &gt; project &gt; user &gt;
+            managed). Click a row with the{" "}
+            <span className="text-slate-500">{"\u25B6"}</span> indicator to see
+            its full override chain.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">

@@ -121,7 +121,7 @@ export function OverviewPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Overview
         </h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -134,7 +134,29 @@ export function OverviewPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-6">Overview</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Overview</h1>
+      <p className="text-sm text-slate-500 mb-6">
+        At-a-glance summary of your Claude Code configuration
+        {!loading && scanResult && (
+          <span className="ml-1 text-slate-400">
+            &mdash; {scanResult.projectDir}
+          </span>
+        )}
+      </p>
+
+      {/* Explainer */}
+      {!loading && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+          <p>
+            <strong>Claude Code</strong> is configured through multiple files
+            spread across different scope levels. This dashboard scans all
+            config paths and resolves your effective settings, MCP servers,
+            hooks, and permissions. Click any card below to explore that
+            area in detail, or expand{" "}
+            <strong>Config Files</strong> to see every path that was scanned.
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -271,7 +271,7 @@ export function ProjectsPage() {
   if (comparison) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-1">Projects</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
         <p className="text-sm text-slate-500 mb-6">
           Cross-project configuration comparison
         </p>
@@ -286,10 +286,35 @@ export function ProjectsPage() {
   // Discovery mode (default)
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-1">Projects</h1>
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
       <p className="text-sm text-slate-500 mb-6">
         Discover and compare Claude Code configurations across projects
       </p>
+
+      {/* Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+        <p className="mb-2">
+          <strong>Project discovery</strong> scans a parent directory to find
+          all projects with Claude Code configuration. You can then select
+          multiple projects to compare their setups side-by-side.
+        </p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>
+            Projects are detected by the presence of{" "}
+            <code className="font-mono text-xs bg-blue-100 px-1 rounded">CLAUDE.md</code>,{" "}
+            <code className="font-mono text-xs bg-blue-100 px-1 rounded">.claude/</code>, or{" "}
+            <code className="font-mono text-xs bg-blue-100 px-1 rounded">.mcp.json</code>
+          </li>
+          <li>
+            Select 2+ projects and click <strong>Compare</strong> to see
+            differences in settings, MCP servers, hooks, and permissions
+          </li>
+          <li>
+            Rows highlighted in yellow have values that differ across the
+            selected projects
+          </li>
+        </ul>
+      </div>
 
       {/* Directory input */}
       <div className="flex gap-2 mb-6">
