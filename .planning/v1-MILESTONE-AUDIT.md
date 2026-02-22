@@ -29,7 +29,6 @@ tech_debt:
       - "Orphan empty directory .planning/phases/03-config-viewers-extended/ should be removed"
   - phase: testing
     items:
-      - "No resolver tests for mcp/resolver.ts or hooks/resolver.ts"
       - "No component or integration tests for the React dashboard"
 ---
 
@@ -148,7 +147,7 @@ All 12 cross-phase integration points verified correct:
 | `npm run build` (tsup + Vite) | PASS |
 | `npm run typecheck` (tsc --noEmit) | PASS — zero errors |
 | Dashboard typecheck | PASS — zero errors |
-| `npm test` (vitest) | PASS — 4 files, 45 tests |
+| `npm test` (vitest) | PASS — 6 files, 77 tests |
 
 ## Tech Debt
 
@@ -162,7 +161,6 @@ Non-critical items. No blockers.
 - Empty orphan directory `.planning/phases/03-config-viewers-extended/` exists with no content (should be removed)
 
 ### Testing (Minor)
-- No resolver tests for `src/mcp/resolver.ts` or `src/hooks/resolver.ts` (4 other resolver/scanner test files exist with 45 tests total)
 - No component or integration tests for the React dashboard
 
 ---
