@@ -13,7 +13,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - [x] **Phase 1: Foundation** — Core scanning engine + CLI framework + file discovery
 - [x] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
 - [x] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
-- [ ] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
+- [x] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [ ] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
 - [ ] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
 
@@ -86,10 +86,10 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Web server + REST API (Hono setup, API routes exposing core engine data)
-- [ ] 04-02: Dashboard UI — layout + navigation (React SPA scaffolding, sidebar nav, overview page)
-- [ ] 04-03: Dashboard UI — config panels (settings, CLAUDE.md, MCP, hooks, permissions views)
-- [ ] 04-04: Dashboard polish (syntax highlighting, responsive design, drill-down interactions)
+- [x] 04-01: Web server + REST API (Hono setup, API routes exposing core engine data)
+- [x] 04-02: Dashboard UI — layout + navigation (React SPA scaffolding, sidebar nav, overview page)
+- [x] 04-03: Dashboard UI — config panels (settings, CLAUDE.md, MCP, hooks, permissions views)
+- [x] 04-04: Dashboard polish (SVG icons, responsive design, MCP plugin discovery, drill-down interactions)
 
 ### Phase 5: Advanced Features
 **Goal**: Differentiating features — gap analysis, comparison, import tracing
@@ -134,6 +134,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/2 | Complete | 2026-02-22 |
 | 2. Settings + CLAUDE.md | 3/3 | Complete | 2026-02-22 |
 | 3. MCP + Hooks + Permissions | 3/3 | Complete | 2026-02-22 |
-| 4. Web Dashboard | 0/4 | Not started | — |
+| 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
 | 5. Advanced Features | 0/3 | Not started | — |
 | 6. Polish + Launch | 0/2 | Not started | — |

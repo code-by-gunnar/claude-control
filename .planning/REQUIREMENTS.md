@@ -53,9 +53,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Web Dashboard
 
-- [ ] **WEB-01**: User can launch a local web dashboard via `claude-ctl dashboard`
-- [ ] **WEB-02**: Dashboard shows all config areas with visual browsing
-- [ ] **WEB-03**: Dashboard supports drill-down into specific configurations
+- [x] **WEB-01**: User can launch a local web dashboard via `claude-ctl dashboard`
+- [x] **WEB-02**: Dashboard shows all config areas with visual browsing
+- [x] **WEB-03**: Dashboard supports drill-down into specific configurations
 
 ## v2 Requirements
 
@@ -118,9 +118,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CLI-01 | Phase 1 | Complete |
 | CLI-02 | Phase 1 | Complete |
 | CLI-03 | Phase 1 | Complete |
-| WEB-01 | Phase 4 | Pending |
-| WEB-02 | Phase 4 | Pending |
-| WEB-03 | Phase 4 | Pending |
+| WEB-01 | Phase 4 | Complete |
+| WEB-02 | Phase 4 | Complete |
+| WEB-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total

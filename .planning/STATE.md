@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 4 in progress — Settings, Memory, and MCP viewer pages complete. Next: Hooks and Permissions pages to finish the dashboard.
+**Current focus:** Phase 4 complete — Full web dashboard with all config viewer panels, responsive design, and MCP plugin discovery. Ready for Phase 5 (Advanced Features).
 
 ## Current Position
 
-Phase: 4 of 6 (Web Dashboard) — IN PROGRESS
-Plan: 3 of 4 in current phase — COMPLETE
-Status: Plan 04-03 complete (Settings, Memory, and MCP viewer pages with expandable details)
-Last activity: 2026-02-22 — Three config viewer pages built and verified
+Phase: 4 of 6 (Web Dashboard) — COMPLETE
+Plan: 4 of 4 in current phase — COMPLETE
+Status: All Phase 4 plans complete — dashboard fully functional with 6 pages, responsive sidebar, plugin MCP discovery
+Last activity: 2026-02-22 — Phase 4 verified (6/6 must-haves passed)
 
-Progress: ██████░░░░ 65% (11 of 17 plans)
+Progress: ████████░░ 76% (15 of 17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 15
 - Average duration: ~1 session
-- Total execution time: 11 sessions
+- Total execution time: 15 sessions
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: ██████░░░░ 65% (11 of 17 plans)
 | 1. Foundation | 2 | 2 | Complete |
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
-| 4. Web Dashboard | 4 | 3 | In progress |
+| 4. Web Dashboard | 4 | 4 | Complete |
 | 5. Advanced Features | 3 | 0 | Not started |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
-- Last 5 plans: 03-02, 03-03, 04-01, 04-02, 04-03
+- Last 5 plans: 04-01, 04-02, 04-03, 04-04
 - Trend: Steady
 
 ## Accumulated Context
@@ -67,7 +67,7 @@ Recent decisions affecting current work:
 - Override chain uses Unicode box-drawing characters with green winner / dim overridden
 - Two MCP config formats supported: direct (keys at root) and wrapped (under mcpServers key)
 - Headers masked if containing ${, starting with sk-, or starting with Bearer; env values always masked
-- MCP servers extracted from both .mcp.json files and settings.json mcpServers key
+- MCP servers extracted from .mcp.json files, settings.json mcpServers key, AND enabled plugins
 - Servers sorted by scope priority (project first), then alphabetically by name
 - Duplicates detected across files, not within same file
 - Known hook events hardcoded as constant array (6 events), easy to update when new events added
@@ -86,12 +86,13 @@ Recent decisions affecting current work:
 - Tailwind v4 with `@tailwindcss/vite` plugin — no postcss.config or tailwind.config needed
 - Build order: tsup (clean:true wipes dist/) then vite (adds dist/dashboard/) — order is critical
 - API types in frontend match actual server response shapes — discovered through live testing
-- Unicode characters for sidebar icons — avoids icon library dependency
+- Inline SVG Heroicons for sidebar nav — avoids icon library dependency, consistent rendering
 - Dark sidebar (slate-900) + light content (slate-50) + blue accents for active nav
 - ScopeBadge component duplicated across pages — simple enough to inline, avoids premature abstraction
 - Object values show `{...}` in table, full JSON only when expanded — keeps table scannable
 - Memory content rendered in `<pre>` with `whitespace-pre-wrap` — preserves markdown without full renderer
 - MCP type badges: command=amber, http=cyan — distinct from scope badge colors
+- Plugin MCP discovery: reads enabledPlugins from settings, resolves .mcp.json from ~/.claude/plugins/marketplaces/
 
 ### Key Files Established
 
@@ -114,7 +115,7 @@ Recent decisions affecting current work:
 - `src/settings/resolver.ts` — resolveSettings() with scope-priority merge logic
 - `src/settings/resolver.test.ts` — 9 test cases for settings resolution
 - `src/mcp/types.ts` — McpServer, McpDuplicate, McpResult type definitions
-- `src/mcp/resolver.ts` — extractMcpServers() with secret masking and duplicate detection
+- `src/mcp/resolver.ts` — extractMcpServers() async with secret masking, duplicate detection, and plugin discovery
 - `src/hooks/types.ts` — HookEntry, HookMatcher, HookEvent, CommandEntry, HooksResult, CommandsResult
 - `src/hooks/resolver.ts` — extractHooks() and extractCommands() resolver functions
 - `src/commands/hooks.ts` — `hooksCommand()` registers hooks subcommand with event catalog
@@ -127,13 +128,15 @@ Recent decisions affecting current work:
 - `src/server/index.ts` — Hono server setup with CORS, static file serving, SPA fallback
 - `src/server/routes.ts` — REST API route handlers (8 endpoints) calling existing resolvers
 - `dashboard/vite.config.ts` — Vite config with React + Tailwind v4 plugins, build to dist/dashboard
-- `dashboard/src/App.tsx` — React app root with BrowserRouter and routes (Settings, Memory, MCP wired)
+- `dashboard/src/App.tsx` — React app root with BrowserRouter and routes for all 6 pages
 - `dashboard/src/components/Layout.tsx` — Dashboard shell with sidebar and content area
-- `dashboard/src/components/Sidebar.tsx` — Navigation sidebar with 6 NavLink items
+- `dashboard/src/components/Sidebar.tsx` — Navigation sidebar with SVG Heroicons, responsive hamburger menu
 - `dashboard/src/pages/OverviewPage.tsx` — Overview page with 6 live summary cards
 - `dashboard/src/pages/SettingsPage.tsx` — Settings viewer with expandable override chains and filter
 - `dashboard/src/pages/MemoryPage.tsx` — CLAUDE.md file list with expandable content viewer
 - `dashboard/src/pages/McpPage.tsx` — MCP servers list with expandable details and duplicate warnings
+- `dashboard/src/pages/HooksPage.tsx` — Hooks event catalog with configured/unconfigured status, commands section
+- `dashboard/src/pages/PermissionsPage.tsx` — Permissions viewer with rule badges and override chains
 - `dashboard/src/lib/api.ts` — Typed API client for all server endpoints
 
 ### Pending Todos
@@ -147,5 +150,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Phase 4 plan 03 complete. Settings, Memory, and MCP viewer pages working with live data. Ready for plan 04-04.
-Resume file: .planning/phases/04-web-dashboard/04-03-SUMMARY.md
+Stopped at: Phase 4 complete and verified. All 4 plans executed, 6/6 must-haves passed. Dashboard running on port 3737.
+Resume file: .planning/phases/04-web-dashboard/04-04-SUMMARY.md
