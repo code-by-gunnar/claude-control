@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 4 complete — Full web dashboard with all config viewer panels, responsive design, and MCP plugin discovery. Ready for Phase 5 (Advanced Features).
+**Current focus:** Phase 5 in progress — Advanced Features (import tracing, health score, cross-project comparison).
 
 ## Current Position
 
-Phase: 4 of 6 (Web Dashboard) — COMPLETE
-Plan: 4 of 4 in current phase — COMPLETE
-Status: All Phase 4 plans complete — dashboard fully functional with 6 pages, responsive sidebar, plugin MCP discovery
-Last activity: 2026-02-22 — Phase 4 verified (6/6 must-haves passed)
+Phase: 5 of 6 (Advanced Features)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-22 — Completed 05-01-PLAN.md
 
-Progress: ████████░░ 76% (15 of 17 plans)
+Progress: █████████░ 72% (13 of 18 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 13
 - Average duration: ~1 session
-- Total execution time: 15 sessions
+- Total execution time: 13 sessions
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: ████████░░ 76% (15 of 17 plans)
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
 | 4. Web Dashboard | 4 | 4 | Complete |
-| 5. Advanced Features | 3 | 0 | Not started |
+| 5. Advanced Features | 4 | 1 | In progress |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
-- Last 5 plans: 04-01, 04-02, 04-03, 04-04
+- Last 5 plans: 04-03, 04-04, 05-01
 - Trend: Steady
 
 ## Accumulated Context
@@ -93,6 +93,9 @@ Recent decisions affecting current work:
 - Memory content rendered in `<pre>` with `whitespace-pre-wrap` — preserves markdown without full renderer
 - MCP type badges: command=amber, http=cyan — distinct from scope badge colors
 - Plugin MCP discovery: reads enabledPlugins from settings, resolves .mcp.json from ~/.claude/plugins/marketplaces/
+- @import pattern matches @path.md outside code blocks, skipping email-like references
+- Import chain traversal limited to 5 levels (matches Claude Code limit)
+- Imported file content not read into result — only paths and existence tracked
 
 ### Key Files Established
 
@@ -103,14 +106,15 @@ Recent decisions affecting current work:
 - `src/index.ts` — CLI entry point with Commander.js, registers scan + status + memory + settings + mcp + hooks + commands + permissions + dashboard
 - `src/commands/scan.ts` — `scanCommand()` registers scan subcommand
 - `src/commands/status.ts` — `statusCommand()` registers status subcommand
-- `src/commands/memory.ts` — `memoryCommand()` registers memory subcommand with list and --show modes
+- `src/commands/memory.ts` — `memoryCommand()` registers memory subcommand with list, --show, and --imports modes
 - `src/commands/settings.ts` — `settingsCommand()` registers settings subcommand with --key filter
 - `src/commands/mcp.ts` — `mcpCommand()` registers mcp subcommand listing MCP servers
 - `src/commands/dashboard.ts` — `dashboardCommand()` registers dashboard subcommand with --port and --no-open
-- `src/formatters/index.ts` — `formatScan()`, `formatStatus()`, `formatMemory()`, `formatMemoryContent()`, `formatSettings()`, `formatMcp()`, `formatHooks()`, `formatCommands()`, `formatPermissions()` dispatch functions
+- `src/formatters/index.ts` — `formatScan()`, `formatStatus()`, `formatMemory()`, `formatMemoryContent()`, `formatSettings()`, `formatMcp()`, `formatHooks()`, `formatCommands()`, `formatPermissions()`, `formatMemoryImports()` dispatch functions
 - `src/formatters/table.ts` — Human-readable table output with chalk colors, memory/settings table formatters
 - `src/formatters/json.ts` — JSON output with credential sanitization, memory/settings JSON formatters
 - `src/formatters/mcp.ts` — MCP-specific table and JSON formatters with secret masking display
+- `src/formatters/memory.ts` — Memory import table and JSON formatters with chain depth and broken import display
 - `src/settings/types.ts` — ScopedSettings, ResolvedSetting, OverrideEntry, SettingsResult
 - `src/settings/resolver.ts` — resolveSettings() with scope-priority merge logic
 - `src/settings/resolver.test.ts` — 9 test cases for settings resolution
@@ -125,8 +129,10 @@ Recent decisions affecting current work:
 - `src/permissions/resolver.ts` — resolvePermissions() with deny > ask > allow priority merge
 - `src/commands/permissions.ts` — `permissionsCommand()` registers permissions subcommand with --tool filter
 - `src/formatters/permissions.ts` — Permissions table and JSON formatters with override chain display
+- `src/memory/types.ts` — MemoryImport, ResolvedMemoryFile, MemoryImportResult type definitions
+- `src/memory/resolver.ts` — resolveMemoryImports() with @import parsing, path resolution, chain traversal, circular detection
 - `src/server/index.ts` — Hono server setup with CORS, static file serving, SPA fallback
-- `src/server/routes.ts` — REST API route handlers (8 endpoints) calling existing resolvers
+- `src/server/routes.ts` — REST API route handlers (9+ endpoints) calling existing resolvers
 - `dashboard/vite.config.ts` — Vite config with React + Tailwind v4 plugins, build to dist/dashboard
 - `dashboard/src/App.tsx` — React app root with BrowserRouter and routes for all 6 pages
 - `dashboard/src/components/Layout.tsx` — Dashboard shell with sidebar and content area
@@ -150,5 +156,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Phase 4 complete and verified. All 4 plans executed, 6/6 must-haves passed. Dashboard running on port 3737.
-Resume file: .planning/phases/04-web-dashboard/04-04-SUMMARY.md
+Stopped at: Completed 05-01-PLAN.md (CLAUDE.md import resolver)
+Resume file: .planning/phases/05-advanced-features/05-01-SUMMARY.md
