@@ -1,4 +1,8 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import type { ConfigFile } from "../scanner/types.js";
+import { getGlobalClaudeDir } from "../scanner/paths.js";
+import { parseJsonc } from "../scanner/parser.js";
 import type { McpDuplicate, McpResult, McpServer } from "./types.js";
 
 /**
@@ -149,7 +153,7 @@ function extractFromContent(
  * @param files - All scanned configuration files from a scan() call
  * @returns McpResult with servers and duplicates
  */
-export function extractMcpServers(files: ConfigFile[]): McpResult {
+export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult> {
   const allServers: McpServer[] = [];
 
   // 1. Extract from .mcp.json files
@@ -199,7 +203,52 @@ export function extractMcpServers(files: ConfigFile[]): McpResult {
     }
   }
 
-  // 3. Sort by scope priority (project first), then by name
+  // 3. Extract from enabled Claude Code plugins
+  // Plugins store .mcp.json in ~/.claude/plugins/marketplaces/{marketplace}/external_plugins/{name}/
+  for (const file of settingsFiles) {
+    const content = file.content as Record<string, unknown>;
+    if (content.enabledPlugins && typeof content.enabledPlugins === "object") {
+      const enabledPlugins = content.enabledPlugins as Record<string, boolean>;
+      const globalDir = getGlobalClaudeDir();
+
+      const pluginPromises = Object.entries(enabledPlugins)
+        .filter(([, enabled]) => enabled)
+        .map(async ([pluginKey]) => {
+          // pluginKey format: "name@marketplace" e.g., "context7@claude-plugins-official"
+          const atIndex = pluginKey.lastIndexOf("@");
+          if (atIndex <= 0) return [];
+          const name = pluginKey.slice(0, atIndex);
+          const marketplace = pluginKey.slice(atIndex + 1);
+
+          const pluginMcpPath = path.join(
+            globalDir, "plugins", "marketplaces", marketplace,
+            "external_plugins", name, ".mcp.json"
+          );
+
+          try {
+            await fs.access(pluginMcpPath);
+            const { data } = await parseJsonc(pluginMcpPath);
+            if (data && typeof data === "object") {
+              return extractFromContent(
+                data as Record<string, unknown>,
+                "user",
+                pluginMcpPath
+              );
+            }
+          } catch {
+            // Plugin .mcp.json not found — skip
+          }
+          return [];
+        });
+
+      const pluginResults = await Promise.all(pluginPromises);
+      for (const servers of pluginResults) {
+        allServers.push(...servers);
+      }
+    }
+  }
+
+  // 4. Sort by scope priority (project first), then by name
   allServers.sort((a, b) => {
     const aPriority = SCOPE_PRIORITY[a.scope] ?? 99;
     const bPriority = SCOPE_PRIORITY[b.scope] ?? 99;

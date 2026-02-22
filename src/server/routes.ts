@@ -100,7 +100,7 @@ apiRoutes.get("/api/memory", async (c) => {
  */
 apiRoutes.get("/api/mcp", async (c) => {
   const result = await scan(projectDir);
-  const mcpResult = extractMcpServers(result.files);
+  const mcpResult = await extractMcpServers(result.files);
   return c.json(mcpResult);
 });
 

@@ -23,7 +23,7 @@ export function mcpCommand(program: Command): void {
       const json = program.opts().json === true;
 
       const result = await scan(dir);
-      const mcpResult = extractMcpServers(result.files);
+      const mcpResult = await extractMcpServers(result.files);
 
       const output = formatMcp(mcpResult, result.projectDir, json);
       process.stdout.write(output + "\n");
