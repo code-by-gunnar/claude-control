@@ -42,19 +42,19 @@ function getManagedSettingsPath(): string {
     case "win32":
       return path.join(
         process.env.PROGRAMDATA || "C:\\ProgramData",
-        "claude",
+        ".claude",
         "settings.json"
       );
     case "darwin":
       return path.join(
         "/Library",
         "Application Support",
-        "claude",
+        ".claude",
         "settings.json"
       );
     default:
       // Linux and other Unix-like
-      return path.join("/etc", "claude", "settings.json");
+      return path.join("/etc", ".claude", "settings.json");
   }
 }
 
