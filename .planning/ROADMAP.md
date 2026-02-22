@@ -16,6 +16,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - [x] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [x] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
 - [x] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
+- [ ] **Phase 7: Dashboard Type Fixes** — Fix api.ts type mismatches causing MCP/Hooks/Commands rendering bugs
 
 ## Phase Details
 
@@ -126,10 +127,25 @@ Plans:
 - [x] 06-01: Cross-platform testing + CI (test matrix, GitHub Actions, Windows/macOS/Linux)
 - [x] 06-02: Documentation + npm publish (README, usage docs, npm package prep, publish)
 
+### Phase 7: Dashboard Type Fixes
+**Goal**: Fix dashboard type mismatches that cause MCP, Hooks, and Commands pages to render incorrectly
+**Depends on**: Phase 6
+**Requirements**: WEB-03 (partial — drill-down broken for MCP/Hooks/Commands)
+**Gap Closure**: Closes 4 integration gaps + 3 flow gaps from v1 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Dashboard MCP page shows server source path and duplicate warnings render without crashing
+  2. Dashboard Hooks page renders hook details with correct matchers/patterns structure
+  3. Dashboard Commands/Skills sections correctly split by name format (`:` = skill)
+  4. All dashboard types in api.ts match actual server response shapes
+**Research**: None (fix known mismatches)
+
+Plans:
+- [ ] 07-01: Fix dashboard types and page components (api.ts, McpPage.tsx, HooksPage.tsx)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -139,3 +155,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
 | 5. Advanced Features | 4/4 | Complete | 2026-02-22 |
 | 6. Polish + Launch | 2/2 | Complete | 2026-02-22 |
+| 7. Dashboard Type Fixes | 0/1 | Planned | — |
