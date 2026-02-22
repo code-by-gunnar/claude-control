@@ -108,6 +108,7 @@ Plans:
 - [x] 05-01: CLAUDE.md import resolver (@import chain parsing, dependency tree, broken import detection)
 - [x] 05-02: Config health score (completeness scoring algorithm, gap detection, recommendations)
 - [x] 05-03: Cross-project comparison (multi-project scanning, side-by-side comparison, diff view)
+- [ ] 05-04: Dashboard integration (health page, import chain view, projects page)
 
 ### Phase 6: Polish + Launch
 **Goal**: Production-ready open source release on npm

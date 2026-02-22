@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 5 in progress — Advanced Features (import tracing, health score, cross-project comparison).
+**Current focus:** Phase 5 in progress — Import tracing (05-01), health score (05-02), cross-project comparison (05-03) all complete. Dashboard integration (05-04) pending.
 
 ## Current Position
 
 Phase: 5 of 6 (Advanced Features)
-Plan: 3 of 4 in current phase
+Plan: 3 of 4 in current phase (05-01, 05-02, 05-03 complete; 05-04 pending)
 Status: In progress
-Last activity: 2026-02-22 — Completed 05-02-PLAN.md
+Last activity: 2026-02-22 — Completed 05-03-PLAN.md
 
-Progress: █████████░ 83% (15 of 18 plans)
+Progress: █████████░ 89% (16 of 18 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: ~1 session
-- Total execution time: 15 sessions
+- Total execution time: 16 sessions
 
 **By Phase:**
 
@@ -31,7 +31,7 @@ Progress: █████████░ 83% (15 of 18 plans)
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
 | 4. Web Dashboard | 4 | 4 | Complete |
-| 5. Advanced Features | 4 | 3 | In progress |
+| 5. Advanced Features | 4 | 3 (+05-03) | In progress |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
@@ -65,6 +65,10 @@ Recent decisions affecting current work:
 - Health category weights: Memory 30%, Settings 25%, MCP 20%, Hooks 15%, Permissions 10%
 - Health grade thresholds: A (90+), B (75-89), C (60-74), D (40-59), F (<40)
 - Health resolver works from ScanResult data — no additional file reads needed
+- Discovery is lightweight (file existence checks only) — full scan only runs during comparison
+- Max 10 projects for cross-project comparison to prevent memory issues
+- Comparison entries grouped by config type (setting, mcp, hook, permission, memory)
+- API endpoints for workspace features use query params since paths are user-provided
 
 ### Key Files Established
 
@@ -78,7 +82,12 @@ Recent decisions affecting current work:
 - `src/formatters/index.ts` — Dispatch functions for all formatters including formatHealth()
 - `src/memory/types.ts` — MemoryImport, ResolvedMemoryFile, MemoryImportResult type definitions
 - `src/memory/resolver.ts` — resolveMemoryImports() with @import parsing and chain traversal
-- `src/server/routes.ts` — REST API route handlers (10+ endpoints) including /api/health
+- `src/workspace/types.ts` — ProjectInfo, WorkspaceScan, ComparisonEntry, ComparisonResult
+- `src/workspace/discovery.ts` — discoverProjects() scans parent dir for Claude Code projects
+- `src/workspace/comparison.ts` — compareProjects() builds cross-project comparison matrix
+- `src/commands/compare.ts` — compareCommand() with --discover flag
+- `src/formatters/compare.ts` — Discovery table and comparison table formatters
+- `src/server/routes.ts` — REST API route handlers (12 endpoints) including /api/projects, /api/compare
 - `dashboard/src/App.tsx` — React app root with BrowserRouter and routes for all pages
 - `dashboard/src/lib/api.ts` — Typed API client for all server endpoints
 
@@ -93,5 +102,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-02-PLAN.md (config health score)
-Resume file: .planning/phases/05-advanced-features/05-02-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (cross-project comparison). 05-04 (dashboard integration) is next.
+Resume file: .planning/phases/05-advanced-features/05-03-SUMMARY.md
