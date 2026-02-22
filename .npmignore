@@ -1,0 +1,10 @@
+src/
+dashboard/
+.planning/
+.claude/
+.github/
+*.test.ts
+tsup.config.ts
+vitest.config.ts
+tsconfig.json
+node_modules/
