@@ -31,19 +31,19 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### MCP Servers
 
-- [ ] **MCP-01**: User can list all configured MCP servers from all config sources with scope
-- [ ] **MCP-02**: User can view server config details (command, args, env with secrets masked)
-- [ ] **MCP-03**: Tool flags duplicate server names across scopes
+- [x] **MCP-01**: User can list all configured MCP servers from all config sources with scope
+- [x] **MCP-02**: User can view server config details (command, args, env with secrets masked)
+- [x] **MCP-03**: Tool flags duplicate server names across scopes
 
 ### Hooks & Skills
 
-- [ ] **HOOK-01**: User can list all configured hooks with event types and matchers
-- [ ] **HOOK-02**: User can list all custom commands and skills with their locations
-- [ ] **HOOK-03**: User can see all available hook events with which ones are configured vs unconfigured
+- [x] **HOOK-01**: User can list all configured hooks with event types and matchers
+- [x] **HOOK-02**: User can list all custom commands and skills with their locations
+- [x] **HOOK-03**: User can see all available hook events with which ones are configured vs unconfigured
 
 ### Permissions
 
-- [ ] **PERM-01**: User can see merged permissions (deny > ask > allow) with origin tracking per tool
+- [x] **PERM-01**: User can see merged permissions (deny > ask > allow) with origin tracking per tool
 
 ### CLI Interface
 
@@ -108,13 +108,13 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CLMD-01 | Phase 2 | Complete |
 | CLMD-02 | Phase 2 | Complete |
 | CLMD-03 | Phase 5 | Pending |
-| MCP-01 | Phase 3 | Pending |
-| MCP-02 | Phase 3 | Pending |
-| MCP-03 | Phase 3 | Pending |
-| HOOK-01 | Phase 3 | Pending |
-| HOOK-02 | Phase 3 | Pending |
-| HOOK-03 | Phase 3 | Pending |
-| PERM-01 | Phase 3 | Pending |
+| MCP-01 | Phase 3 | Complete |
+| MCP-02 | Phase 3 | Complete |
+| MCP-03 | Phase 3 | Complete |
+| HOOK-01 | Phase 3 | Complete |
+| HOOK-02 | Phase 3 | Complete |
+| HOOK-03 | Phase 3 | Complete |
+| PERM-01 | Phase 3 | Complete |
 | CLI-01 | Phase 1 | Complete |
 | CLI-02 | Phase 1 | Complete |
 | CLI-03 | Phase 1 | Complete |

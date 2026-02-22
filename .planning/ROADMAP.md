@@ -12,7 +12,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 
 - [x] **Phase 1: Foundation** — Core scanning engine + CLI framework + file discovery
 - [x] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
-- [ ] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
+- [x] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
 - [ ] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [ ] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
 - [ ] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
@@ -71,7 +71,7 @@ Plans:
 Plans:
 - [x] 03-01: MCP server viewer (config parsing from all sources, details display, secret masking, duplicate detection)
 - [x] 03-02: Hooks + skills viewer (hook listing, event catalog, skills/commands listing)
-- [ ] 03-03: Permissions audit (merged permissions with origin tracking per tool)
+- [x] 03-03: Permissions audit (merged permissions with origin tracking per tool)
 
 ### Phase 4: Web Dashboard
 **Goal**: Visual dashboard for browsing all config in a browser
@@ -133,7 +133,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|---------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete | 2026-02-22 |
 | 2. Settings + CLAUDE.md | 3/3 | Complete | 2026-02-22 |
-| 3. MCP + Hooks + Permissions | 2/3 | In progress | — |
+| 3. MCP + Hooks + Permissions | 3/3 | Complete | 2026-02-22 |
 | 4. Web Dashboard | 0/4 | Not started | — |
 | 5. Advanced Features | 0/3 | Not started | — |
 | 6. Polish + Launch | 0/2 | Not started | — |
