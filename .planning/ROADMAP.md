@@ -16,7 +16,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - [x] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [x] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
 - [x] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
-- [ ] **Phase 7: Dashboard Type Fixes** — Fix api.ts type mismatches causing MCP/Hooks/Commands rendering bugs
+- [x] **Phase 7: Dashboard Type Fixes** — Fix api.ts type mismatches causing MCP/Hooks/Commands rendering bugs
 
 ## Phase Details
 
@@ -140,7 +140,7 @@ Plans:
 **Research**: None (fix known mismatches)
 
 Plans:
-- [ ] 07-01: Fix dashboard types and page components (api.ts, McpPage.tsx, HooksPage.tsx)
+- [x] 07-01: Fix dashboard types and page components (api.ts, McpPage.tsx, HooksPage.tsx)
 
 ## Progress
 
@@ -155,4 +155,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
 | 5. Advanced Features | 4/4 | Complete | 2026-02-22 |
 | 6. Polish + Launch | 2/2 | Complete | 2026-02-22 |
-| 7. Dashboard Type Fixes | 0/1 | Planned | — |
+| 7. Dashboard Type Fixes | 1/1 | Complete | 2026-02-22 |
