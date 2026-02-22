@@ -71,8 +71,29 @@ function DuplicateWarning({
   );
 }
 
+/** Check if a server comes from a plugin based on its source path */
+function getPluginName(sourcePath: string): string | null {
+  const normalized = sourcePath.replace(/\\/g, "/");
+  const match = normalized.match(
+    /\/plugins\/marketplaces\/[^/]+\/external_plugins\/([^/]+)\//
+  );
+  return match ? match[1] : null;
+}
+
+function PluginBadge({ name }: { name: string }) {
+  return (
+    <span
+      className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700"
+      title={`From plugin: ${name}`}
+    >
+      plugin
+    </span>
+  );
+}
+
 function ServerRow({ server }: { server: McpServer }) {
   const [expanded, setExpanded] = useState(false);
+  const pluginName = getPluginName(server.sourcePath);
 
   const hasDetails =
     server.command ||
@@ -94,9 +115,11 @@ function ServerRow({ server }: { server: McpServer }) {
         <span className="font-mono text-sm text-slate-900 font-medium min-w-[160px]">
           {server.name}
         </span>
-        <TypeBadge type={server.type} />
-        <span className="flex-1" />
-        <ScopeBadge scope={server.scope} />
+        <div className="flex items-center gap-2">
+          <TypeBadge type={server.type} />
+          {pluginName && <PluginBadge name={pluginName} />}
+          <ScopeBadge scope={server.scope} />
+        </div>
       </button>
 
       {expanded && (
@@ -116,14 +139,8 @@ function ServerRow({ server }: { server: McpServer }) {
                 <dt className="text-slate-500 font-medium w-24 shrink-0">
                   Args:
                 </dt>
-                <dd className="font-mono text-slate-800">
-                  <ul className="space-y-0.5">
-                    {server.args.map((arg, i) => (
-                      <li key={i} className="text-xs">
-                        {arg}
-                      </li>
-                    ))}
-                  </ul>
+                <dd className="font-mono text-xs text-slate-800 break-all">
+                  {server.args.join(" ")}
                 </dd>
               </div>
             )}
@@ -229,7 +246,7 @@ export function McpPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           MCP Servers
         </h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -242,10 +259,10 @@ export function McpPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-1">
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
         MCP Servers
       </h1>
-      <p className="text-sm text-slate-500 mb-6">
+      <p className="text-sm text-slate-500 mb-4">
         Model Context Protocol servers
         {!loading && (
           <span className="ml-1 text-slate-400">
@@ -253,6 +270,15 @@ export function McpPage() {
           </span>
         )}
       </p>
+
+      {/* Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+        <p>
+          <strong>MCP servers</strong> provide tools that Claude can use (file access, web search, databases, etc.).
+          They can come from <strong>plugins</strong>, or be configured directly in <code className="font-mono text-xs bg-blue-100 px-1 rounded">.mcp.json</code> and <code className="font-mono text-xs bg-blue-100 px-1 rounded">settings.json</code>.
+          Plugin-sourced servers are tagged with a <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700">plugin</span> badge.
+        </p>
+      </div>
 
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
@@ -283,9 +309,7 @@ export function McpPage() {
               <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
                 <span className="w-4" />
                 <span className="min-w-[160px]">Name</span>
-                <span className="w-16">Type</span>
-                <span className="flex-1" />
-                <span className="w-16">Scope</span>
+                <span>Tags</span>
               </div>
 
               {servers.map((server) => (

@@ -155,6 +155,28 @@ function checkSettings(files: ConfigFile[]): HealthCheck[] {
 }
 
 /**
+ * Check if any settings file has enabled plugins (which provide MCP servers).
+ */
+function hasEnabledPlugins(files: ConfigFile[]): boolean {
+  return files.some((f) => {
+    if (
+      f.type !== "settings" ||
+      !f.exists ||
+      !f.readable ||
+      f.content === undefined ||
+      f.content === null ||
+      typeof f.content !== "object"
+    ) {
+      return false;
+    }
+    const content = f.content as Record<string, unknown>;
+    const plugins = content.enabledPlugins;
+    if (plugins === undefined || plugins === null || typeof plugins !== "object") return false;
+    return Object.values(plugins as Record<string, unknown>).some((v) => v === true);
+  });
+}
+
+/**
  * Run all MCP category checks.
  */
 function checkMcp(files: ConfigFile[]): HealthCheck[] {
@@ -163,10 +185,10 @@ function checkMcp(files: ConfigFile[]): HealthCheck[] {
       id: "has-mcp-server",
       label: "At least one MCP server configured",
       category: "MCP",
-      passed: hasFile(files, "mcp"),
+      passed: hasFile(files, "mcp") || hasEnabledPlugins(files),
       weight: 2,
       recommendation:
-        "Configure MCP servers in .mcp.json to extend Claude's capabilities.",
+        "Configure MCP servers in .mcp.json or install plugins to extend Claude's capabilities.",
     },
     {
       id: "has-project-mcp",

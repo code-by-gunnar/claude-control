@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   fetchHooks,
-  fetchCommands,
   type HooksResult,
   type HookEvent,
-  type CommandsResult,
-  type CommandEntry,
 } from "../lib/api";
 
 /** Scope badge color mapping */
@@ -149,63 +146,19 @@ function EventRow({
   );
 }
 
-/** Type badge for command vs skill */
-const commandTypeColors: Record<string, string> = {
-  command: "bg-blue-100 text-blue-700",
-  skill: "bg-violet-100 text-violet-700",
-};
-
-function CommandTypeBadge({ type }: { type: string }) {
-  const colors = commandTypeColors[type] ?? "bg-slate-100 text-slate-600";
-  return (
-    <span
-      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colors}`}
-    >
-      {type}
-    </span>
-  );
-}
-
-function CommandRow({ command }: { command: CommandEntry }) {
-  const derivedType = command.name.includes(":") ? "skill" : "command";
-  return (
-    <div className="px-4 py-3 flex items-center gap-4 border-b border-slate-100 last:border-b-0">
-      <span className="font-mono text-sm text-slate-900 font-medium min-w-[160px]">
-        {command.name}
-      </span>
-      <CommandTypeBadge type={derivedType} />
-      <span className="flex-1" />
-      <ScopeBadge scope={command.scope} />
-      <span
-        className="text-xs text-slate-400 hidden lg:inline truncate max-w-[200px]"
-        title={command.path}
-      >
-        {shortenPath(command.path)}
-      </span>
-    </div>
-  );
-}
-
 export function HooksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hooksData, setHooksData] = useState<HooksResult | null>(null);
-  const [commandsData, setCommandsData] = useState<CommandsResult | null>(
-    null
-  );
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadData() {
       try {
-        const [hooks, commands] = await Promise.all([
-          fetchHooks(),
-          fetchCommands(),
-        ]);
+        const hooks = await fetchHooks();
         if (cancelled) return;
         setHooksData(hooks);
-        setCommandsData(commands);
         setLoading(false);
       } catch (err) {
         if (cancelled) return;
@@ -224,7 +177,6 @@ export function HooksPage() {
 
   const allEvents = hooksData?.availableEvents ?? [];
   const events = hooksData?.events ?? [];
-  const commands = commandsData?.commands ?? [];
 
   // Group hook entries by event name for easy lookup
   const eventEntries: Record<string, HookEvent[]> = {};
@@ -237,7 +189,7 @@ export function HooksPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">Hooks</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">Hooks</h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           <p className="font-medium">Error loading hooks data</p>
           <p className="text-sm mt-1">{error}</p>
@@ -255,15 +207,25 @@ export function HooksPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-1">Hooks</h1>
-      <p className="text-sm text-slate-500 mb-6">
-        Hook events and custom commands
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Hooks</h1>
+      <p className="text-sm text-slate-500 mb-4">
+        Hook event catalog
         {!loading && (
           <span className="ml-1 text-slate-400">
             ({configuredCount} of {allEvents.length} events configured)
           </span>
         )}
       </p>
+
+      {/* Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+        <p>
+          <strong>Hooks</strong> run shell commands in response to Claude events (e.g. before/after tool calls, notifications).
+          They are configured in <code className="font-mono text-xs bg-blue-100 px-1 rounded">settings.json</code> under
+          the <code className="font-mono text-xs bg-blue-100 px-1 rounded">hooks</code> key.
+          Green dots indicate events that have at least one hook configured.
+        </p>
+      </div>
 
       {loading ? (
         <div className="space-y-6">
@@ -281,106 +243,28 @@ export function HooksPage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
-          {/* Event Catalog */}
-          <section>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3">
-              Event Catalog
-            </h2>
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-              {/* Header */}
-              <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
-                <span className="w-4" />
-                <span className="w-3" />
-                <span className="flex-1">Event</span>
-                <span className="w-20 text-right">Sources</span>
-              </div>
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+          {/* Header */}
+          <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
+            <span className="w-4" />
+            <span className="w-3" />
+            <span className="flex-1">Event</span>
+            <span className="w-20 text-right">Sources</span>
+          </div>
 
-              {allEvents.length === 0 ? (
-                <div className="p-8 text-center text-slate-400">
-                  No hook events available
-                </div>
-              ) : (
-                allEvents.map((eventName) => (
-                  <EventRow
-                    key={eventName}
-                    eventName={eventName}
-                    entries={eventEntries[eventName] ?? []}
-                  />
-                ))
-              )}
+          {allEvents.length === 0 ? (
+            <div className="p-8 text-center text-slate-400">
+              No hook events available
             </div>
-          </section>
-
-          {/* Commands Section */}
-          <section>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3">
-              Custom Commands
-              {commands.filter((c) => !c.name.includes(":")).length > 0 && (
-                <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({commands.filter((c) => !c.name.includes(":")).length})
-                </span>
-              )}
-            </h2>
-            {commands.filter((c) => !c.name.includes(":")).length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-                No custom commands configured
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-                <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
-                  <span className="min-w-[160px]">Name</span>
-                  <span className="w-16">Type</span>
-                  <span className="flex-1" />
-                  <span className="w-16">Scope</span>
-                  <span className="hidden lg:inline w-[200px]">Location</span>
-                </div>
-                {commands
-                  .filter((c) => !c.name.includes(":"))
-                  .map((cmd) => (
-                    <CommandRow
-                      key={`${cmd.name}-${cmd.scope}-${cmd.path}`}
-                      command={cmd}
-                    />
-                  ))}
-              </div>
-            )}
-          </section>
-
-          {/* Skills Section */}
-          <section>
-            <h2 className="text-lg font-semibold text-slate-800 mb-3">
-              Skills
-              {commands.filter((c) => c.name.includes(":")).length > 0 && (
-                <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({commands.filter((c) => c.name.includes(":")).length})
-                </span>
-              )}
-            </h2>
-            {commands.filter((c) => c.name.includes(":")).length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-                No skills configured
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-                <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
-                  <span className="min-w-[160px]">Name</span>
-                  <span className="w-16">Type</span>
-                  <span className="flex-1" />
-                  <span className="w-16">Scope</span>
-                  <span className="hidden lg:inline w-[200px]">Location</span>
-                </div>
-                {commands
-                  .filter((c) => c.name.includes(":"))
-                  .map((cmd) => (
-                    <CommandRow
-                      key={`${cmd.name}-${cmd.scope}-${cmd.path}`}
-                      command={cmd}
-                    />
-                  ))}
-              </div>
-            )}
-          </section>
+          ) : (
+            allEvents.map((eventName) => (
+              <EventRow
+                key={eventName}
+                eventName={eventName}
+                entries={eventEntries[eventName] ?? []}
+              />
+            ))
+          )}
         </div>
       )}
     </div>

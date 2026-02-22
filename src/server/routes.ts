@@ -4,6 +4,7 @@ import { scan } from "../scanner/index.js";
 import { computeHealth } from "../health/resolver.js";
 import { resolveSettings } from "../settings/resolver.js";
 import { extractMcpServers } from "../mcp/resolver.js";
+import { extractPlugins } from "../plugins/resolver.js";
 import { extractHooks, extractCommands } from "../hooks/resolver.js";
 import { resolveMemoryImports } from "../memory/resolver.js";
 import { resolvePermissions } from "../permissions/resolver.js";
@@ -107,6 +108,16 @@ apiRoutes.get("/api/mcp", async (c) => {
   const result = await scan(projectDir);
   const mcpResult = await extractMcpServers(result.files);
   return c.json(mcpResult);
+});
+
+/**
+ * GET /api/plugins
+ * Returns all installed plugins with their contributions (MCP servers, etc.).
+ */
+apiRoutes.get("/api/plugins", async (c) => {
+  const result = await scan(projectDir);
+  const pluginsResult = await extractPlugins(result.files);
+  return c.json(pluginsResult);
 });
 
 /**

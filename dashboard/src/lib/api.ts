@@ -243,6 +243,31 @@ export async function fetchHooks(): Promise<HooksResult> {
   return fetchJson<HooksResult>("hooks");
 }
 
+// --- Plugin types ---
+
+export interface PluginInfo {
+  name: string;
+  marketplace: string;
+  key: string;
+  enabled: boolean;
+  scope: string;
+  sourcePath: string;
+  pluginDir: string;
+  installed: boolean;
+  mcpServers: string[];
+}
+
+export interface PluginsResult {
+  plugins: PluginInfo[];
+  totalCount: number;
+  enabledCount: number;
+  installedCount: number;
+}
+
+export async function fetchPlugins(): Promise<PluginsResult> {
+  return fetchJson<PluginsResult>("plugins");
+}
+
 export async function fetchCommands(): Promise<CommandsResult> {
   return fetchJson<CommandsResult>("commands");
 }

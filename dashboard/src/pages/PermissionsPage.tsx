@@ -78,22 +78,27 @@ function PermissionRow({
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-center gap-4 group"
+        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-start gap-3 group"
       >
-        <span className="text-slate-400 text-xs w-4 shrink-0">
+        <span className="text-slate-400 text-xs w-4 shrink-0 mt-1">
           {hasOverrides ? (expanded ? "\u25BC" : "\u25B6") : "\u00B7"}
         </span>
-        <span className="font-mono text-sm text-slate-900 font-medium min-w-[140px] shrink-0">
-          {permission.tool}
-        </span>
-        <span className="font-mono text-sm text-slate-500 min-w-[120px] shrink-0">
-          {permission.pattern || (
-            <span className="text-slate-300 italic">*</span>
+        <div className="flex-1 min-w-0">
+          <span className="font-mono text-sm text-slate-900 font-medium">
+            {permission.tool}
+          </span>
+          {permission.pattern ? (
+            <span className="font-mono text-sm text-slate-500 ml-2 break-all">
+              {permission.pattern}
+            </span>
+          ) : (
+            <span className="font-mono text-sm text-slate-300 italic ml-2">*</span>
           )}
-        </span>
-        <RuleBadge rule={permission.effectiveRule} />
-        <span className="flex-1" />
-        <ScopeBadge scope={permission.effectiveScope} />
+        </div>
+        <div className="flex items-center gap-2 shrink-0 mt-0.5">
+          <RuleBadge rule={permission.effectiveRule} />
+          <ScopeBadge scope={permission.effectiveScope} />
+        </div>
       </button>
 
       {expanded && (
@@ -202,7 +207,7 @@ export function PermissionsPage() {
   if (error) {
     return (
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Permissions
         </h1>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
@@ -222,10 +227,10 @@ export function PermissionsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900 mb-1">
+      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
         Permissions
       </h1>
-      <p className="text-sm text-slate-500 mb-6">
+      <p className="text-sm text-slate-500 mb-4">
         Tool permission rules (deny &gt; ask &gt; allow)
         {!loading && (
           <span className="ml-1 text-slate-400">
@@ -233,6 +238,17 @@ export function PermissionsPage() {
           </span>
         )}
       </p>
+
+      {/* Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
+        <p>
+          <strong>Permissions</strong> control which tools Claude can use and how.
+          Rules are defined in <code className="font-mono text-xs bg-blue-100 px-1 rounded">settings.json</code> under
+          {" "}<code className="font-mono text-xs bg-blue-100 px-1 rounded">permissions</code>.
+          When multiple scopes define a rule for the same tool, <strong>deny</strong> always wins,
+          then <strong>ask</strong> beats <strong>allow</strong>, regardless of scope level.
+        </p>
+      </div>
 
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
@@ -256,25 +272,20 @@ export function PermissionsPage() {
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-x-auto">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200">
             {/* Header */}
-            <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg min-w-[500px]">
+            <div className="px-4 py-2 flex gap-3 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
               <span className="w-4" />
-              <span className="min-w-[140px]">Tool</span>
-              <span className="min-w-[120px]">Pattern</span>
-              <span className="w-16">Rule</span>
-              <span className="flex-1" />
-              <span className="w-16">Scope</span>
+              <span className="flex-1">Tool / Pattern</span>
+              <span className="shrink-0">Rule / Scope</span>
             </div>
 
-            <div className="min-w-[500px]">
-              {permissions.map((perm) => (
-                <PermissionRow
-                  key={`${perm.tool}-${perm.pattern ?? "*"}`}
-                  permission={perm}
-                />
-              ))}
-            </div>
+            {permissions.map((perm) => (
+              <PermissionRow
+                key={`${perm.tool}-${perm.pattern ?? "*"}`}
+                permission={perm}
+              />
+            ))}
           </div>
 
           {/* Summary footer */}

@@ -59,7 +59,7 @@ export function dashboardCommand(program: Command): void {
         const __dirname = path.dirname(fileURLToPath(import.meta.url));
         const dashboardDir = path.join(__dirname, "dashboard");
 
-        const server = startServer({ port, projectDir: dir, dashboardDir });
+        const server = await startServer({ port, projectDir: dir, dashboardDir });
 
         const url = `http://localhost:${port}`;
         process.stderr.write(`Dashboard running at ${url}\n`);

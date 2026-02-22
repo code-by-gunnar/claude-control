@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import net from "node:net";
 import path from "node:path";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -30,8 +31,34 @@ export interface ServerOptions {
  * @param options - Server configuration
  * @returns The Node.js HTTP server instance for graceful shutdown
  */
-export function startServer(options: ServerOptions) {
+/**
+ * Check if a port is already in use.
+ */
+function isPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const tester = net.createServer()
+      .once("error", (err: NodeJS.ErrnoException) => {
+        resolve(err.code === "EADDRINUSE");
+      })
+      .once("listening", () => {
+        tester.close(() => resolve(false));
+      })
+      .listen(port);
+  });
+}
+
+export async function startServer(options: ServerOptions) {
   const { port, projectDir, dashboardDir } = options;
+
+  // Check if port is already in use
+  if (await isPortInUse(port)) {
+    process.stderr.write(
+      `\nError: Port ${port} is already in use.\n` +
+      `A previous dashboard instance may still be running.\n` +
+      `Stop it first or use a different port with --port <number>.\n\n`
+    );
+    process.exit(1);
+  }
 
   // Set project directory for API routes
   setProjectDir(projectDir);
