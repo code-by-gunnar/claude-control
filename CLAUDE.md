@@ -8,7 +8,7 @@ Project context for Claude Code when working in this repository.
 
 ## Tech Stack
 
-- **Runtime**: Node.js 18+ (ESM-only)
+- **Runtime**: Node.js 20+ (ESM-only)
 - **Language**: TypeScript (strict mode)
 - **CLI**: Commander.js
 - **Web server**: Hono + @hono/node-server
