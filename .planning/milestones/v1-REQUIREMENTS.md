@@ -1,11 +1,14 @@
-# Requirements: Claude Control
+# Requirements Archive: v1 Claude Control Initial Release
 
-**Defined:** 2026-02-22
-**Core Value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
+**Archived:** 2026-02-22
+**Status:** SHIPPED
+
+This is the archived requirements specification for v1.
+For current requirements, see `.planning/REQUIREMENTS.md` (created for next milestone).
+
+---
 
 ## v1 Requirements
-
-Requirements for initial release. Each maps to roadmap phases.
 
 ### Core Scanning
 
@@ -57,41 +60,16 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **WEB-02**: Dashboard shows all config areas with visual browsing
 - [x] **WEB-03**: Dashboard supports drill-down into specific configurations
 
-## v2 Requirements
-
-Deferred to future release. Tracked but not in current roadmap.
-
-### Editing
+## v2 Requirements (Deferred)
 
 - **EDIT-01**: User can edit config files through the dashboard
 - **EDIT-02**: User can toggle hooks on/off
-
-### MCP Management
-
 - **MCPM-01**: User can start/stop MCP servers
 - **MCPM-02**: User can see live MCP server health status
-
-### Advanced
-
 - **ADV-01**: Real-time file watching for config changes
 - **ADV-02**: Config validation/linting against Claude Code schema
 
-## Out of Scope
-
-Explicitly excluded. Documented to prevent scope creep.
-
-| Feature | Reason |
-|---------|--------|
-| Config sync across machines | Scope creep into dotfile manager territory — use chezmoi/stow |
-| Secret/credential display | Security risk — show "configured/missing" only |
-| MCP server lifecycle management | Belongs to Claude Code itself — avoid state desync |
-| Config validation/linting | Claude Code is authority on validity — avoid false positives |
-| Cloud/remote features | Local-only tool by design |
-| Claude API integration | Config inspector, not AI tool |
-
 ## Traceability
-
-Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -122,11 +100,13 @@ Which phases cover which requirements. Updated by create-roadmap.
 | WEB-02 | Phase 4 | Complete |
 | WEB-03 | Phase 4 | Complete |
 
-**Coverage:**
-- v1 requirements: 26 total
-- Mapped to phases: 26
-- Unmapped: 0 ✓
+---
+
+## Milestone Summary
+
+**Shipped:** 26 of 26 v1 requirements
+**Adjusted:** WEB-03 required Phase 7 gap closure to fully satisfy dashboard drill-down for MCP/Hooks/Commands
+**Dropped:** None
 
 ---
-*Requirements defined: 2026-02-22*
-*Last updated: 2026-02-22 after roadmap creation*
+*Archived: 2026-02-22 as part of v1 milestone completion*
