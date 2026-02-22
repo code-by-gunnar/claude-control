@@ -9,17 +9,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Core Scanning
 
-- [ ] **SCAN-01**: Tool discovers all Claude Code config files across global (~/.claude/) and project-level (.claude/) directories
-- [ ] **SCAN-02**: Tool handles cross-platform paths correctly on Windows, macOS, and Linux
-- [ ] **SCAN-03**: Tool parses JSONC files (JSON with comments and trailing commas)
-- [ ] **SCAN-04**: Tool handles missing files, permission denied, and malformed config gracefully with clear error messages
+- [x] **SCAN-01**: Tool discovers all Claude Code config files across global (~/.claude/) and project-level (.claude/) directories
+- [x] **SCAN-02**: Tool handles cross-platform paths correctly on Windows, macOS, and Linux
+- [x] **SCAN-03**: Tool parses JSONC files (JSON with comments and trailing commas)
+- [x] **SCAN-04**: Tool handles missing files, permission denied, and malformed config gracefully with clear error messages
 
 ### Settings & Configuration
 
 - [ ] **CONF-01**: User can view settings.json values from all scope levels (managed, user, project, local)
 - [ ] **CONF-02**: Each setting shows its source file path and scope level
 - [ ] **CONF-03**: User can see which scope level "wins" for each setting with override chain
-- [ ] **CONF-04**: User can see which expected config files exist and which are missing
+- [x] **CONF-04**: User can see which expected config files exist and which are missing
 - [ ] **CONF-05**: User can see a config health/completeness score for the current project
 - [ ] **CONF-06**: User can compare configuration across multiple projects
 
@@ -47,9 +47,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CLI Interface
 
-- [ ] **CLI-01**: Tool provides subcommands: status, settings, mcp, hooks, memory, commands, permissions
-- [ ] **CLI-02**: All commands support --json output for scripting
-- [ ] **CLI-03**: Output is pipe-friendly and machine-readable
+- [x] **CLI-01**: Tool provides subcommands: status, settings, mcp, hooks, memory, commands, permissions
+- [x] **CLI-02**: All commands support --json output for scripting
+- [x] **CLI-03**: Output is pipe-friendly and machine-readable
 
 ### Web Dashboard
 
@@ -95,14 +95,14 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAN-01 | Phase 1 | Pending |
-| SCAN-02 | Phase 1 | Pending |
-| SCAN-03 | Phase 1 | Pending |
-| SCAN-04 | Phase 1 | Pending |
+| SCAN-01 | Phase 1 | Complete |
+| SCAN-02 | Phase 1 | Complete |
+| SCAN-03 | Phase 1 | Complete |
+| SCAN-04 | Phase 1 | Complete |
 | CONF-01 | Phase 2 | Pending |
 | CONF-02 | Phase 2 | Pending |
 | CONF-03 | Phase 2 | Pending |
-| CONF-04 | Phase 1 | Pending |
+| CONF-04 | Phase 1 | Complete |
 | CONF-05 | Phase 5 | Pending |
 | CONF-06 | Phase 5 | Pending |
 | CLMD-01 | Phase 2 | Pending |
@@ -115,9 +115,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | HOOK-02 | Phase 3 | Pending |
 | HOOK-03 | Phase 3 | Pending |
 | PERM-01 | Phase 3 | Pending |
-| CLI-01 | Phase 1 | Pending |
-| CLI-02 | Phase 1 | Pending |
-| CLI-03 | Phase 1 | Pending |
+| CLI-01 | Phase 1 | Complete |
+| CLI-02 | Phase 1 | Complete |
+| CLI-03 | Phase 1 | Complete |
 | WEB-01 | Phase 4 | Pending |
 | WEB-02 | Phase 4 | Pending |
 | WEB-03 | Phase 4 | Pending |

@@ -10,7 +10,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation** — Core scanning engine + CLI framework + file discovery
+- [x] **Phase 1: Foundation** — Core scanning engine + CLI framework + file discovery
 - [ ] **Phase 2: Config Viewers — Settings + CLAUDE.md** — Settings viewer with scope/origin + CLAUDE.md listing/preview
 - [ ] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
 - [ ] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
@@ -34,9 +34,8 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 **Plans**: TBD
 
 Plans:
-- [ ] 01-01: Project scaffolding + build pipeline (package.json, tsup, TypeScript config, bin entry)
-- [ ] 01-02: Core scanning engine (file discovery, path handling, JSONC parsing, error handling)
-- [ ] 01-03: CLI framework + commands (Commander.js setup, scan/status commands, --json output, formatters)
+- [x] 01-01: Project scaffolding + core scanning engine (package.json, tsup, TypeScript, scanner, JSONC parser)
+- [x] 01-02: CLI framework + commands (Commander.js, scan/status commands, --json output, table/JSON formatters)
 
 ### Phase 2: Config Viewers — Settings + CLAUDE.md
 **Goal**: Users can inspect settings and CLAUDE.md files with full scope awareness
@@ -131,7 +130,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | — |
+| 1. Foundation | 2/2 | Complete | 2026-02-22 |
 | 2. Settings + CLAUDE.md | 0/2 | Not started | — |
 | 3. MCP + Hooks + Permissions | 0/3 | Not started | — |
 | 4. Web Dashboard | 0/4 | Not started | — |
