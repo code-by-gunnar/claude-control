@@ -3,7 +3,7 @@ import {
   fetchHooks,
   fetchCommands,
   type HooksResult,
-  type HookEntry,
+  type HookEvent,
   type CommandsResult,
   type CommandEntry,
 } from "../lib/api";
@@ -57,7 +57,7 @@ function EventRow({
   entries,
 }: {
   eventName: string;
-  entries: HookEntry[];
+  entries: HookEvent[];
 }) {
   const [expanded, setExpanded] = useState(false);
   const configured = entries.length > 0;
@@ -97,37 +97,41 @@ function EventRow({
           <div className="space-y-3">
             {entries.map((entry, entryIdx) => (
               <div
-                key={`${entry.scope}-${entry.source}-${entryIdx}`}
+                key={`${entry.scope}-${entry.sourcePath}-${entryIdx}`}
                 className="bg-white border border-slate-200 rounded-lg p-3"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <ScopeBadge scope={entry.scope} />
                   <span
                     className="text-xs text-slate-400 truncate"
-                    title={entry.source}
+                    title={entry.sourcePath}
                   >
-                    {shortenPath(entry.source)}
+                    {shortenPath(entry.sourcePath)}
                   </span>
                 </div>
 
-                {entry.hooks.length > 0 ? (
+                {entry.matchers.length > 0 ? (
                   <div className="space-y-1.5">
-                    {entry.hooks.map((hook, hookIdx) => (
-                      <div
-                        key={hookIdx}
-                        className="flex items-start gap-2 text-sm"
-                      >
-                        <span className="text-slate-400 text-xs mt-0.5 shrink-0">
-                          {"\u2192"}
-                        </span>
-                        {hook.pattern && (
-                          <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded shrink-0">
-                            {hook.pattern}
+                    {entry.matchers.map((matcherEntry, matcherIdx) => (
+                      <div key={matcherIdx} className="space-y-1">
+                        {matcherEntry.matcher && (
+                          <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded inline-block">
+                            {matcherEntry.matcher}
                           </span>
                         )}
-                        <span className="font-mono text-xs text-slate-800 break-all">
-                          {hook.command ?? hook.type}
-                        </span>
+                        {matcherEntry.hooks.map((hook, hookIdx) => (
+                          <div
+                            key={hookIdx}
+                            className="flex items-start gap-2 text-sm"
+                          >
+                            <span className="text-slate-400 text-xs mt-0.5 shrink-0">
+                              {"\u2192"}
+                            </span>
+                            <span className="font-mono text-xs text-slate-800 break-all">
+                              {hook.command}
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
@@ -163,12 +167,13 @@ function CommandTypeBadge({ type }: { type: string }) {
 }
 
 function CommandRow({ command }: { command: CommandEntry }) {
+  const derivedType = command.name.includes(":") ? "skill" : "command";
   return (
     <div className="px-4 py-3 flex items-center gap-4 border-b border-slate-100 last:border-b-0">
       <span className="font-mono text-sm text-slate-900 font-medium min-w-[160px]">
         {command.name}
       </span>
-      <CommandTypeBadge type={command.type} />
+      <CommandTypeBadge type={derivedType} />
       <span className="flex-1" />
       <ScopeBadge scope={command.scope} />
       <span
@@ -222,7 +227,7 @@ export function HooksPage() {
   const commands = commandsData?.commands ?? [];
 
   // Group hook entries by event name for easy lookup
-  const eventEntries: Record<string, HookEntry[]> = {};
+  const eventEntries: Record<string, HookEvent[]> = {};
   for (const event of allEvents) {
     eventEntries[event] = events.filter((e) => e.event === event);
   }
@@ -311,13 +316,13 @@ export function HooksPage() {
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Custom Commands
-              {commands.filter((c) => c.type === "command").length > 0 && (
+              {commands.filter((c) => !c.name.includes(":")).length > 0 && (
                 <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({commands.filter((c) => c.type === "command").length})
+                  ({commands.filter((c) => !c.name.includes(":")).length})
                 </span>
               )}
             </h2>
-            {commands.filter((c) => c.type === "command").length === 0 ? (
+            {commands.filter((c) => !c.name.includes(":")).length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
                 No custom commands configured
               </div>
@@ -331,7 +336,7 @@ export function HooksPage() {
                   <span className="hidden lg:inline w-[200px]">Location</span>
                 </div>
                 {commands
-                  .filter((c) => c.type === "command")
+                  .filter((c) => !c.name.includes(":"))
                   .map((cmd) => (
                     <CommandRow
                       key={`${cmd.name}-${cmd.scope}-${cmd.path}`}
@@ -346,13 +351,13 @@ export function HooksPage() {
           <section>
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
               Skills
-              {commands.filter((c) => c.type === "skill").length > 0 && (
+              {commands.filter((c) => c.name.includes(":")).length > 0 && (
                 <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({commands.filter((c) => c.type === "skill").length})
+                  ({commands.filter((c) => c.name.includes(":")).length})
                 </span>
               )}
             </h2>
-            {commands.filter((c) => c.type === "skill").length === 0 ? (
+            {commands.filter((c) => c.name.includes(":")).length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
                 No skills configured
               </div>
@@ -366,7 +371,7 @@ export function HooksPage() {
                   <span className="hidden lg:inline w-[200px]">Location</span>
                 </div>
                 {commands
-                  .filter((c) => c.type === "skill")
+                  .filter((c) => c.name.includes(":"))
                   .map((cmd) => (
                     <CommandRow
                       key={`${cmd.name}-${cmd.scope}-${cmd.path}`}

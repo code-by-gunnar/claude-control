@@ -59,7 +59,9 @@ function DuplicateWarning({
               <li key={dup.name} className="text-xs text-amber-700">
                 <span className="font-mono font-medium">{dup.name}</span>
                 {" defined in "}
-                {dup.sources.join(", ")}
+                {dup.locations
+                  .map((loc) => `${loc.scope}: ${loc.sourcePath}`)
+                  .join(", ")}
               </li>
             ))}
           </ul>
@@ -175,13 +177,13 @@ function ServerRow({ server }: { server: McpServer }) {
               </div>
             )}
 
-            {server.source && (
+            {server.sourcePath && (
               <div className="flex gap-2">
                 <dt className="text-slate-500 font-medium w-24 shrink-0">
                   Source:
                 </dt>
                 <dd className="font-mono text-xs text-slate-400">
-                  {server.source}
+                  {server.sourcePath}
                 </dd>
               </div>
             )}
@@ -288,7 +290,7 @@ export function McpPage() {
 
               {servers.map((server) => (
                 <ServerRow
-                  key={`${server.name}-${server.scope}-${server.source}`}
+                  key={`${server.name}-${server.scope}-${server.sourcePath}`}
                   server={server}
                 />
               ))}
