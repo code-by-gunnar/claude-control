@@ -1,6 +1,6 @@
 # claude-control
 
-[![CI](https://github.com/USER/claude-control/actions/workflows/ci.yml/badge.svg)](https://github.com/USER/claude-control/actions/workflows/ci.yml)
+[![CI](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml/badge.svg)](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml)
 
 CLI + web dashboard for inspecting Claude Code configuration across all scope levels.
 

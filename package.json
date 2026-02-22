@@ -35,11 +35,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/USER/claude-control.git"
+    "url": "https://github.com/code-by-gunnar/claude-control.git"
   },
-  "homepage": "https://github.com/USER/claude-control#readme",
+  "homepage": "https://github.com/code-by-gunnar/claude-control#readme",
   "bugs": {
-    "url": "https://github.com/USER/claude-control/issues"
+    "url": "https://github.com/code-by-gunnar/claude-control/issues"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",
