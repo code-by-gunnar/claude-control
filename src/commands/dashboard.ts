@@ -74,7 +74,7 @@ export function dashboardCommand(program: Command): void {
         // Graceful shutdown on SIGINT
         const shutdown = () => {
           process.stderr.write("\nDashboard stopped\n");
-          (server as ReturnType<typeof startServer>).close();
+          server.close();
           process.exit(0);
         };
 
