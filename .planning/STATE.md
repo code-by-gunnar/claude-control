@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 5 complete — all advanced features (import tracing, health score, cross-project comparison, dashboard integration) done. Phase 6 (Polish + Launch) is next.
+**Current focus:** Phase 6 in progress — tests and CI complete. Final polish/publish plan (06-02) is next.
 
 ## Current Position
 
-Phase: 5 of 6 (Advanced Features)
-Plan: 4 of 4 in current phase (all complete)
-Status: Phase complete
-Last activity: 2026-02-22 — Completed 05-04-PLAN.md
+Phase: 6 of 6 (Polish + Launch)
+Plan: 1 of 2 in current phase (06-01 complete)
+Status: In progress
+Last activity: 2026-02-22 — Completed 06-01-PLAN.md
 
-Progress: █████████░ 94% (17 of 18 plans)
+Progress: █████████░ 97% (18 of 19 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: ~1 session
-- Total execution time: 17 sessions
+- Total execution time: 18 sessions
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: █████████░ 94% (17 of 18 plans)
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
 | 4. Web Dashboard | 4 | 4 | Complete |
 | 5. Advanced Features | 4 | 4 | Complete |
-| 6. Polish + Launch | 2 | 0 | Not started |
+| 6. Polish + Launch | 2 | 1 | In progress |
 
 **Recent Trend:**
-- Last 5 plans: 05-01, 05-02, 05-03, 05-04
+- Last 5 plans: 05-02, 05-03, 05-04, 06-01
 - Trend: Steady
 
 ## Accumulated Context
@@ -72,6 +72,9 @@ Recent decisions affecting current work:
 - CSS-only circular gauge (conic-gradient) for health score display — no charting library
 - ProjectsPage uses discovery/comparison modes in a single page component
 - MemoryPage fetches imports alongside memory data in parallel
+- Test paths use path.join() for cross-platform normalization — string literals with / fail on Windows
+- CI matrix: 3 OS x 3 Node versions, fail-fast disabled, npm ci for reproducible builds
+- Test helpers create mock data inline (makeFile, makeSettingsFile, makeScanResult) — no external fixtures
 
 ### Key Files Established
 
@@ -95,6 +98,10 @@ Recent decisions affecting current work:
 - `dashboard/src/lib/api.ts` — Typed API client for all server endpoints
 - `dashboard/src/pages/HealthPage.tsx` — Health score gauge, category breakdown, recommendations
 - `dashboard/src/pages/ProjectsPage.tsx` — Project discovery and cross-project comparison
+- `src/scanner/paths.test.ts` — 14 tests for getConfigPaths() and getGlobalClaudeDir()
+- `src/permissions/resolver.test.ts` — 11 tests for resolvePermissions() merge logic
+- `src/health/resolver.test.ts` — 11 tests for computeHealth() scoring algorithm
+- `.github/workflows/ci.yml` — Cross-platform CI with 9-job matrix (3 OS x 3 Node)
 
 ### Pending Todos
 
@@ -107,5 +114,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 05-04-PLAN.md (dashboard integration). Phase 5 complete. Phase 6 (Polish + Launch) is next.
-Resume file: .planning/phases/05-advanced-features/05-04-SUMMARY.md
+Stopped at: Completed 06-01-PLAN.md (tests + CI). Phase 6 plan 1 of 2 complete. Plan 06-02 (final polish/publish) is next.
+Resume file: .planning/phases/06-polish-launch/06-01-SUMMARY.md
