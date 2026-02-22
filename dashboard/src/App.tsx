@@ -4,14 +4,8 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { MemoryPage } from "./pages/MemoryPage";
 import { McpPage } from "./pages/McpPage";
-
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="flex items-center justify-center h-full text-slate-400 text-lg">
-      {title} — Coming soon
-    </div>
-  );
-}
+import { HooksPage } from "./pages/HooksPage";
+import { PermissionsPage } from "./pages/PermissionsPage";
 
 export function App() {
   return (
@@ -22,11 +16,8 @@ export function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/memory" element={<MemoryPage />} />
           <Route path="/mcp" element={<McpPage />} />
-          <Route path="/hooks" element={<PlaceholderPage title="Hooks" />} />
-          <Route
-            path="/permissions"
-            element={<PlaceholderPage title="Permissions" />}
-          />
+          <Route path="/hooks" element={<HooksPage />} />
+          <Route path="/permissions" element={<PermissionsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
