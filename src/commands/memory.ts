@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import { scan } from "../scanner/index.js";
-import { formatMemory, formatMemoryContent } from "../formatters/index.js";
+import { formatMemory, formatMemoryContent, formatMemoryImports } from "../formatters/index.js";
+import { resolveMemoryImports } from "../memory/resolver.js";
 
 /**
  * Register the `memory` command on the Commander program.
@@ -21,11 +22,23 @@ export function memoryCommand(program: Command): void {
       "--show <path>",
       "Preview content of a specific CLAUDE.md file (path substring or 1-based index)"
     )
-    .action(async (projectDir?: string, options?: { show?: string }) => {
+    .option(
+      "--imports",
+      "Analyze @import directives and dependency chains in CLAUDE.md files"
+    )
+    .action(async (projectDir?: string, options?: { show?: string; imports?: boolean }) => {
       const dir = projectDir ?? process.cwd();
       const json = program.opts().json === true;
 
       const result = await scan(dir);
+
+      // --imports mode: analyze import directives
+      if (options?.imports) {
+        const importResult = await resolveMemoryImports(result.files);
+        const output = formatMemoryImports(importResult, result.projectDir, json);
+        process.stdout.write(output + "\n");
+        return;
+      }
 
       // Filter for claude-md type files that exist
       const memoryFiles = result.files.filter(

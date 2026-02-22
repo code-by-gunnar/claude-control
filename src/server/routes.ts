@@ -1,9 +1,14 @@
+import fs from "node:fs/promises";
 import { Hono } from "hono";
 import { scan } from "../scanner/index.js";
+import { computeHealth } from "../health/resolver.js";
 import { resolveSettings } from "../settings/resolver.js";
 import { extractMcpServers } from "../mcp/resolver.js";
 import { extractHooks, extractCommands } from "../hooks/resolver.js";
+import { resolveMemoryImports } from "../memory/resolver.js";
 import { resolvePermissions } from "../permissions/resolver.js";
+import { discoverProjects } from "../workspace/discovery.js";
+import { compareProjects } from "../workspace/comparison.js";
 import type { ScopedSettings } from "../settings/types.js";
 
 /**
@@ -132,4 +137,84 @@ apiRoutes.get("/api/permissions", async (c) => {
   const result = await scan(projectDir);
   const permissionsResult = resolvePermissions(result.files);
   return c.json(permissionsResult);
+});
+
+/**
+ * GET /api/memory/imports
+ * Returns @import directive analysis across all CLAUDE.md files.
+ */
+apiRoutes.get("/api/memory/imports", async (c) => {
+  const result = await scan(projectDir);
+  const importResult = await resolveMemoryImports(result.files);
+  return c.json(importResult);
+});
+
+/**
+ * GET /api/health
+ * Returns configuration health score with category breakdowns and recommendations.
+ */
+apiRoutes.get("/api/health", async (c) => {
+  const result = await scan(projectDir);
+  const healthResult = computeHealth(result);
+  return c.json(healthResult);
+});
+
+/**
+ * GET /api/projects?dir=<parent-dir>
+ * Discovers Claude Code projects under a parent directory.
+ * Returns a WorkspaceScan with all discovered projects.
+ */
+apiRoutes.get("/api/projects", async (c) => {
+  const dir = c.req.query("dir");
+  if (!dir) {
+    return c.json({ error: "Missing required query parameter: dir" }, 400);
+  }
+
+  try {
+    const stat = await fs.stat(dir);
+    if (!stat.isDirectory()) {
+      return c.json({ error: `Not a directory: ${dir}` }, 400);
+    }
+  } catch {
+    return c.json({ error: `Path does not exist: ${dir}` }, 400);
+  }
+
+  const result = await discoverProjects(dir);
+  return c.json(result);
+});
+
+/**
+ * GET /api/compare?projects=<path1>,<path2>,...
+ * Compares configurations across multiple projects.
+ * Returns a ComparisonResult with side-by-side diff data.
+ */
+apiRoutes.get("/api/compare", async (c) => {
+  const projectsParam = c.req.query("projects");
+  if (!projectsParam) {
+    return c.json(
+      { error: "Missing required query parameter: projects (comma-separated paths)" },
+      400
+    );
+  }
+
+  const paths = projectsParam.split(",").map((p) => p.trim()).filter(Boolean);
+
+  if (paths.length < 2) {
+    return c.json({ error: "Need at least 2 project paths to compare" }, 400);
+  }
+
+  // Validate all paths exist and are directories
+  for (const p of paths) {
+    try {
+      const stat = await fs.stat(p);
+      if (!stat.isDirectory()) {
+        return c.json({ error: `Not a directory: ${p}` }, 400);
+      }
+    } catch {
+      return c.json({ error: `Path does not exist: ${p}` }, 400);
+    }
+  }
+
+  const result = await compareProjects(paths);
+  return c.json(result);
 });
