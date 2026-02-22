@@ -1,6 +1,6 @@
-import type { ScanResult } from "../scanner/types.js";
-import { formatScanJson, formatStatusJson } from "./json.js";
-import { formatScanTable, formatStatusTable } from "./table.js";
+import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatStatusJson } from "./json.js";
+import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatStatusTable } from "./table.js";
 
 /**
  * Format a scan result for display.
@@ -22,6 +22,33 @@ export function formatStatus(result: ScanResult, json: boolean): string {
   return json ? formatStatusJson(result) : formatStatusTable(result);
 }
 
+/**
+ * Format CLAUDE.md memory files for display.
+ *
+ * @param files - Only claude-md type files that exist
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatMemory(
+  files: ConfigFile[],
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json ? formatMemoryJson(files) : formatMemoryTable(files, projectDir);
+}
+
+/**
+ * Format a single CLAUDE.md file's content for display.
+ *
+ * @param file - A single CLAUDE.md config file
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatMemoryContent(file: ConfigFile, json: boolean): string {
+  return json
+    ? formatMemoryContentJson(file)
+    : formatMemoryContentTable(file);
+}
+
 // Re-export individual formatters for direct access
-export { formatScanJson, formatStatusJson } from "./json.js";
-export { formatScanTable, formatStatusTable } from "./table.js";
+export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatStatusJson } from "./json.js";
+export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatStatusTable } from "./table.js";

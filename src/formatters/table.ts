@@ -117,6 +117,112 @@ export function formatScanTable(result: ScanResult): string {
 }
 
 /**
+ * Format a human-readable file size string.
+ */
+function formatSize(bytes: number | undefined): string {
+  if (bytes === undefined) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * Format CLAUDE.md memory files as a human-readable table.
+ *
+ * Shows all existing CLAUDE.md files with scope, path, and size.
+ *
+ * @param files - Only claude-md type files that exist
+ * @param projectDir - The project directory, or null for global-only scans
+ */
+export function formatMemoryTable(
+  files: ConfigFile[],
+  projectDir: string | null
+): string {
+  const lines: string[] = [];
+
+  lines.push(chalk.bold("CLAUDE.md Memory Files"));
+  lines.push(chalk.dim("=".repeat(22)));
+  lines.push("");
+
+  if (files.length === 0) {
+    lines.push("No CLAUDE.md files found.");
+    return lines.join("\n");
+  }
+
+  // Column headers
+  const headers = { scope: "Scope", path: "Path", size: "Size" };
+
+  // Calculate column widths
+  const scopeWidth = Math.max(
+    headers.scope.length,
+    ...files.map((f) => f.scope.length)
+  );
+  const pathWidth = Math.max(
+    headers.path.length,
+    ...files.map((f) => shortenPath(f.expectedPath, projectDir).length)
+  );
+
+  // Header row
+  lines.push(
+    `${pad(headers.scope, scopeWidth)}  ${pad(headers.path, pathWidth)}  ${headers.size}`
+  );
+
+  // Separator row
+  lines.push(
+    chalk.dim(
+      `${"\u2500".repeat(scopeWidth)}  ${"\u2500".repeat(pathWidth)}  ${"─".repeat(10)}`
+    )
+  );
+
+  // File rows
+  for (const file of files) {
+    const displayPath = shortenPath(file.expectedPath, projectDir);
+    const size = formatSize(file.sizeBytes);
+
+    lines.push(
+      `${pad(file.scope, scopeWidth)}  ${pad(displayPath, pathWidth)}  ${size}`
+    );
+  }
+
+  lines.push("");
+  lines.push(chalk.dim(`${files.length} memory file${files.length === 1 ? "" : "s"} found`));
+
+  return lines.join("\n");
+}
+
+/**
+ * Format a single CLAUDE.md file's content for display.
+ *
+ * Shows file header (scope, path) then content with horizontal rule separators.
+ *
+ * @param file - A single CLAUDE.md config file
+ */
+export function formatMemoryContentTable(file: ConfigFile): string {
+  const lines: string[] = [];
+
+  const scopeLabel = file.scope.charAt(0).toUpperCase() + file.scope.slice(1);
+
+  lines.push(chalk.bold(`${scopeLabel} CLAUDE.md`));
+  lines.push(chalk.dim(`Path: ${file.expectedPath}`));
+  lines.push(chalk.dim("─".repeat(40)));
+  lines.push("");
+
+  const content =
+    typeof file.content === "string" ? file.content : String(file.content ?? "");
+
+  if (content.trim().length === 0) {
+    lines.push(chalk.dim("(empty file)"));
+  } else {
+    lines.push(content);
+  }
+
+  lines.push("");
+  lines.push(chalk.dim("─".repeat(40)));
+
+  return lines.join("\n");
+}
+
+/**
  * Get a human-readable label for a config file type.
  */
 function getFileLabel(file: ConfigFile): string {
