@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { OverviewPage } from "./pages/OverviewPage";
+import { SettingsPage } from "./pages/SettingsPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -16,10 +17,7 @@ export function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<OverviewPage />} />
-          <Route
-            path="/settings"
-            element={<PlaceholderPage title="Settings" />}
-          />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/memory" element={<PlaceholderPage title="Memory" />} />
           <Route
             path="/mcp"
