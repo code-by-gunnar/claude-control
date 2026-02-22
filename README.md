@@ -4,6 +4,8 @@
 
 CLI + web dashboard for inspecting Claude Code configuration across all scope levels.
 
+![Dashboard Overview](docs/screenshots/overview.png)
+
 ## What It Does
 
 `claude-control` scans Claude Code configuration files across all four scope levels (managed, user, project, local), resolves settings with full override chains, and displays the effective merged state of your setup. It shows MCP servers with automatic secret masking, extracts hooks and permissions, discovers CLAUDE.md memory files with import chains, provides configuration health scoring, and supports cross-project comparison. Everything is available as a terminal CLI or an interactive web dashboard.
@@ -95,14 +97,50 @@ claude-ctl dashboard --port 8080
 
 The dashboard includes these pages:
 
-- **Overview** — Summary of all config files, their scopes, and existence status
-- **Settings** — Resolved settings table with scope origin tracking and override indicators
-- **Memory** — CLAUDE.md files with content preview and import chain visualization
-- **MCP Servers** — All configured MCP servers with environment variables and secrets masked
-- **Hooks** — Hook configurations and the full event catalog
-- **Permissions** — Permission rules with merged deny/ask/allow resolution
-- **Health** — Visual health score gauge with category breakdown and recommendations
-- **Projects** — Cross-project discovery and side-by-side configuration comparison
+### Settings
+Resolved settings table with scope origin tracking and override indicators.
+
+![Settings](docs/screenshots/settings.png)
+
+### Memory
+CLAUDE.md files with content preview and import chain visualization.
+
+![Memory](docs/screenshots/memory.png)
+
+### MCP Servers
+All configured MCP servers with environment variables and secrets masked.
+
+![MCP Servers](docs/screenshots/mcp-servers.png)
+
+### Plugins
+Installed plugin packages with their bundled MCP servers and skills.
+
+![Plugins](docs/screenshots/plugins.png)
+
+### Hooks
+Hook configurations and the full event catalog.
+
+![Hooks](docs/screenshots/hooks.png)
+
+### Commands & Skills
+Custom slash commands and plugin-provided skills.
+
+![Skills](docs/screenshots/skills.png)
+
+### Permissions
+Permission rules with merged deny/ask/allow resolution. Includes inline removal for non-managed entries.
+
+![Permissions](docs/screenshots/permissions.png)
+
+### Health
+Visual health score gauge with category breakdown and recommendations.
+
+![Health](docs/screenshots/health.png)
+
+### Projects
+Cross-project discovery and side-by-side configuration comparison.
+
+![Projects](docs/screenshots/projects.png)
 
 ## Config Scopes
 
