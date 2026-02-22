@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 4 in progress — React dashboard shell with sidebar and overview page complete. Next: detail pages for settings, memory, and other config sections.
+**Current focus:** Phase 4 in progress — Settings, Memory, and MCP viewer pages complete. Next: Hooks and Permissions pages to finish the dashboard.
 
 ## Current Position
 
 Phase: 4 of 6 (Web Dashboard) — IN PROGRESS
-Plan: 2 of 4 in current phase — COMPLETE
-Status: Plan 04-02 complete (React SPA with Vite + Tailwind, dashboard shell, overview page)
-Last activity: 2026-02-22 — Dashboard frontend foundation built and verified
+Plan: 3 of 4 in current phase — COMPLETE
+Status: Plan 04-03 complete (Settings, Memory, and MCP viewer pages with expandable details)
+Last activity: 2026-02-22 — Three config viewer pages built and verified
 
-Progress: ██████░░░░ 59% (10 of 17 plans)
+Progress: ██████░░░░ 65% (11 of 17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: ~1 session
-- Total execution time: 10 sessions
+- Total execution time: 11 sessions
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: ██████░░░░ 59% (10 of 17 plans)
 | 1. Foundation | 2 | 2 | Complete |
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
-| 4. Web Dashboard | 4 | 2 | In progress |
+| 4. Web Dashboard | 4 | 3 | In progress |
 | 5. Advanced Features | 3 | 0 | Not started |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 03-03, 04-01, 04-02
+- Last 5 plans: 03-02, 03-03, 04-01, 04-02, 04-03
 - Trend: Steady
 
 ## Accumulated Context
@@ -88,6 +88,10 @@ Recent decisions affecting current work:
 - API types in frontend match actual server response shapes — discovered through live testing
 - Unicode characters for sidebar icons — avoids icon library dependency
 - Dark sidebar (slate-900) + light content (slate-50) + blue accents for active nav
+- ScopeBadge component duplicated across pages — simple enough to inline, avoids premature abstraction
+- Object values show `{...}` in table, full JSON only when expanded — keeps table scannable
+- Memory content rendered in `<pre>` with `whitespace-pre-wrap` — preserves markdown without full renderer
+- MCP type badges: command=amber, http=cyan — distinct from scope badge colors
 
 ### Key Files Established
 
@@ -123,10 +127,13 @@ Recent decisions affecting current work:
 - `src/server/index.ts` — Hono server setup with CORS, static file serving, SPA fallback
 - `src/server/routes.ts` — REST API route handlers (8 endpoints) calling existing resolvers
 - `dashboard/vite.config.ts` — Vite config with React + Tailwind v4 plugins, build to dist/dashboard
-- `dashboard/src/App.tsx` — React app root with BrowserRouter and routes
+- `dashboard/src/App.tsx` — React app root with BrowserRouter and routes (Settings, Memory, MCP wired)
 - `dashboard/src/components/Layout.tsx` — Dashboard shell with sidebar and content area
 - `dashboard/src/components/Sidebar.tsx` — Navigation sidebar with 6 NavLink items
 - `dashboard/src/pages/OverviewPage.tsx` — Overview page with 6 live summary cards
+- `dashboard/src/pages/SettingsPage.tsx` — Settings viewer with expandable override chains and filter
+- `dashboard/src/pages/MemoryPage.tsx` — CLAUDE.md file list with expandable content viewer
+- `dashboard/src/pages/McpPage.tsx` — MCP servers list with expandable details and duplicate warnings
 - `dashboard/src/lib/api.ts` — Typed API client for all server endpoints
 
 ### Pending Todos
@@ -140,5 +147,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Phase 4 plan 02 complete. React dashboard shell with sidebar navigation and overview page working with live data. Ready for plan 04-03.
-Resume file: .planning/phases/04-web-dashboard/04-02-SUMMARY.md
+Stopped at: Phase 4 plan 03 complete. Settings, Memory, and MCP viewer pages working with live data. Ready for plan 04-04.
+Resume file: .planning/phases/04-web-dashboard/04-03-SUMMARY.md
