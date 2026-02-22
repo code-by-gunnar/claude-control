@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { memoryCommand } from "./commands/memory.js";
 import { scanCommand } from "./commands/scan.js";
+import { settingsCommand } from "./commands/settings.js";
 import { statusCommand } from "./commands/status.js";
 
 const program = new Command();
@@ -16,6 +17,7 @@ program
 // Register commands
 memoryCommand(program);
 scanCommand(program);
+settingsCommand(program);
 statusCommand(program);
 
 program.parse();
