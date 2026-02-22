@@ -15,7 +15,7 @@ Claude Control goes from zero to a published open-source npm package in 6 phases
 - [x] **Phase 3: Config Viewers — MCP + Hooks + Permissions** — MCP servers, hooks, skills, permissions audit
 - [x] **Phase 4: Web Dashboard** — Local React SPA with visual config browsing
 - [x] **Phase 5: Advanced Features** — Health score, cross-project comparison, import tracing
-- [ ] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
+- [x] **Phase 6: Polish + Launch** — Testing, docs, CI, npm publish
 
 ## Phase Details
 
@@ -123,8 +123,8 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Cross-platform testing + CI (test matrix, GitHub Actions, Windows/macOS/Linux)
-- [ ] 06-02: Documentation + npm publish (README, usage docs, npm package prep, publish)
+- [x] 06-01: Cross-platform testing + CI (test matrix, GitHub Actions, Windows/macOS/Linux)
+- [x] 06-02: Documentation + npm publish (README, usage docs, npm package prep, publish)
 
 ## Progress
 
@@ -138,4 +138,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. MCP + Hooks + Permissions | 3/3 | Complete | 2026-02-22 |
 | 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
 | 5. Advanced Features | 4/4 | Complete | 2026-02-22 |
-| 6. Polish + Launch | 0/2 | Not started | — |
+| 6. Polish + Launch | 2/2 | Complete | 2026-02-22 |
