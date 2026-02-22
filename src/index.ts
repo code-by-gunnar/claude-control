@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { commandsCommand } from "./commands/commands.js";
+import { dashboardCommand } from "./commands/dashboard.js";
 import { hooksCommand } from "./commands/hooks.js";
 import { mcpCommand } from "./commands/mcp.js";
 import { memoryCommand } from "./commands/memory.js";
@@ -20,6 +21,7 @@ program
 
 // Register commands
 commandsCommand(program);
+dashboardCommand(program);
 hooksCommand(program);
 mcpCommand(program);
 memoryCommand(program);
