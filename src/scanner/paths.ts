@@ -156,6 +156,13 @@ export function getConfigPaths(projectDir?: string): ConfigFileExpectation[] {
       expectedPath: path.join(projectClaudeDir, "commands"),
       description: "Project-level custom commands directory",
     });
+
+    expectations.push({
+      scope: "project",
+      type: "mcp",
+      expectedPath: path.join(projectDir, ".mcp.json"),
+      description: "Project-level MCP server configuration",
+    });
   }
 
   return expectations;
