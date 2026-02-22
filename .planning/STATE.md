@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** PROJECT COMPLETE. All 6 phases and 19 plans executed. Package ready for npm publish.
+**Current focus:** Gap closure phase complete. Dashboard types aligned with server response shapes.
 
 ## Current Position
 
-Phase: 6 of 6 (Polish + Launch) -- COMPLETE
-Plan: 2 of 2 in current phase (06-02 complete)
+Phase: 7 of 7 (Dashboard Type Fixes) -- COMPLETE
+Plan: 1 of 1 in current phase (07-01 complete)
 Status: Complete
-Last activity: 2026-02-22 — Completed 06-02-PLAN.md
+Last activity: 2026-02-22 — Completed 07-01-PLAN.md
 
-Progress: ██████████ 100% (19 of 19 plans)
+Progress: ██████████ 100% (20 of 20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: ~1 session
-- Total execution time: 19 sessions
+- Total execution time: 20 sessions
 
 **By Phase:**
 
@@ -33,10 +33,11 @@ Progress: ██████████ 100% (19 of 19 plans)
 | 4. Web Dashboard | 4 | 4 | Complete |
 | 5. Advanced Features | 4 | 4 | Complete |
 | 6. Polish + Launch | 2 | 2 | Complete |
+| 7. Dashboard Type Fixes | 1 | 1 | Complete |
 
 **Recent Trend:**
-- Last 5 plans: 05-03, 05-04, 06-01, 06-02
-- Trend: Steady, project complete
+- Last 5 plans: 05-04, 06-01, 06-02, 07-01
+- Trend: Steady, gap closure complete
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - .npmignore provides defense-in-depth alongside the files field
 - prepublishOnly script enforces build + test before any npm publish
 - Repository URLs use placeholder USER for owner to fill in after GitHub setup
+- Dashboard types must exactly match server-side types — api.ts is the bridge, not an independent schema
+- Command vs skill detection uses name.includes(":") — no type field needed on CommandEntry
 
 ### Key Files Established
 
@@ -121,5 +124,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: PROJECT COMPLETE. All 19 plans across 6 phases executed. Package ready for npm publish after user sets repository URL and author in package.json.
-Resume file: .planning/phases/06-polish-launch/06-02-SUMMARY.md
+Stopped at: Gap closure complete. All 20 plans across 7 phases executed. Dashboard types now match server response shapes.
+Resume file: .planning/phases/07-dashboard-type-fixes/07-01-SUMMARY.md
