@@ -159,7 +159,7 @@ Claude Code uses four configuration scope levels, listed from lowest to highest 
 
 ## Requirements
 
-- **Node.js 18** or later
+- **Node.js 20** or later
 
 ## Development
 
