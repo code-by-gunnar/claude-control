@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-22)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 3 complete — all config viewers (MCP, hooks, commands, permissions) implemented. Ready for Phase 4 (Web Dashboard).
+**Current focus:** Phase 4 in progress — API server and dashboard command implemented. Next: React dashboard frontend setup.
 
 ## Current Position
 
-Phase: 3 of 6 (Config Viewers — MCP + Hooks + Permissions) — COMPLETE
-Plan: 3 of 3 in current phase
-Status: Phase 3 verified (22/22 must-haves passed)
-Last activity: 2026-02-22 — Phase 3 complete, verification passed
+Phase: 4 of 6 (Web Dashboard) — IN PROGRESS
+Plan: 1 of 4 in current phase — COMPLETE
+Status: Plan 04-01 complete (all 8 API endpoints verified)
+Last activity: 2026-02-22 — API server + dashboard CLI command implemented
 
-Progress: █████░░░░░ 47% (8 of 17 plans)
+Progress: █████▌░░░░ 53% (9 of 17 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: ~1 session
-- Total execution time: 8 sessions
+- Total execution time: 9 sessions
 
 **By Phase:**
 
@@ -30,12 +30,12 @@ Progress: █████░░░░░ 47% (8 of 17 plans)
 | 1. Foundation | 2 | 2 | Complete |
 | 2. Settings + CLAUDE.md | 3 | 3 | Complete |
 | 3. MCP + Hooks + Permissions | 3 | 3 | Complete |
-| 4. Web Dashboard | 4 | 0 | Not started |
+| 4. Web Dashboard | 4 | 1 | In progress |
 | 5. Advanced Features | 3 | 0 | Not started |
 | 6. Polish + Launch | 2 | 0 | Not started |
 
 **Recent Trend:**
-- Last 5 plans: 02-02, 02-03, 03-01, 03-02, 03-03
+- Last 5 plans: 02-03, 03-01, 03-02, 03-03, 04-01
 - Trend: Steady
 
 ## Accumulated Context
@@ -77,6 +77,12 @@ Recent decisions affecting current work:
 - Within same rule priority, higher scope wins (local > project > user > managed)
 - Permission strings parsed with regex to extract tool name and optional pattern
 - --tool filter uses case-insensitive substring match (same pattern as settings --key)
+- Hono framework for HTTP server — lightweight, TypeScript-native, familiar API
+- Module-level `setProjectDir()` pattern for sharing project directory across API routes
+- SPA fallback pre-reads index.html at startup — avoids async reads per request
+- Dashboard static files resolved relative to dist entry point (`path.join(__dirname, 'dashboard')`)
+- Browser opening uses `child_process.exec` with platform detection — avoids adding `open` dependency
+- Server output goes to stderr; CORS enabled globally for development flexibility
 
 ### Key Files Established
 
@@ -84,12 +90,13 @@ Recent decisions affecting current work:
 - `src/scanner/types.ts` — ConfigScope, ConfigFileType, ConfigFile, ScanResult
 - `src/scanner/paths.ts` — `getConfigPaths()` for cross-platform path resolution (all 4 scopes), includes user-level CLAUDE.md and project-level .mcp.json
 - `src/scanner/parser.ts` — `parseJsonc()` and `readMarkdown()`
-- `src/index.ts` — CLI entry point with Commander.js, registers scan + status + memory + settings + mcp + hooks + commands + permissions
+- `src/index.ts` — CLI entry point with Commander.js, registers scan + status + memory + settings + mcp + hooks + commands + permissions + dashboard
 - `src/commands/scan.ts` — `scanCommand()` registers scan subcommand
 - `src/commands/status.ts` — `statusCommand()` registers status subcommand
 - `src/commands/memory.ts` — `memoryCommand()` registers memory subcommand with list and --show modes
 - `src/commands/settings.ts` — `settingsCommand()` registers settings subcommand with --key filter
 - `src/commands/mcp.ts` — `mcpCommand()` registers mcp subcommand listing MCP servers
+- `src/commands/dashboard.ts` — `dashboardCommand()` registers dashboard subcommand with --port and --no-open
 - `src/formatters/index.ts` — `formatScan()`, `formatStatus()`, `formatMemory()`, `formatMemoryContent()`, `formatSettings()`, `formatMcp()`, `formatHooks()`, `formatCommands()`, `formatPermissions()` dispatch functions
 - `src/formatters/table.ts` — Human-readable table output with chalk colors, memory/settings table formatters
 - `src/formatters/json.ts` — JSON output with credential sanitization, memory/settings JSON formatters
@@ -108,6 +115,8 @@ Recent decisions affecting current work:
 - `src/permissions/resolver.ts` — resolvePermissions() with deny > ask > allow priority merge
 - `src/commands/permissions.ts` — `permissionsCommand()` registers permissions subcommand with --tool filter
 - `src/formatters/permissions.ts` — Permissions table and JSON formatters with override chain display
+- `src/server/index.ts` — Hono server setup with CORS, static file serving, SPA fallback
+- `src/server/routes.ts` — REST API route handlers (8 endpoints) calling existing resolvers
 
 ### Pending Todos
 
@@ -120,5 +129,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Phase 3 complete. Verification passed 22/22. Ready for Phase 4 planning.
-Resume file: .planning/phases/03-config-viewers-mcp-hooks-permissions/03-VERIFICATION.md
+Stopped at: Phase 4 plan 01 complete. API server with 8 endpoints + dashboard CLI command implemented. Ready for plan 04-02.
+Resume file: .planning/phases/04-web-dashboard/04-01-SUMMARY.md
