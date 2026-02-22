@@ -1,0 +1,301 @@
+import { useEffect, useState } from "react";
+import { fetchMcp, type McpResult, type McpServer } from "../lib/api";
+
+/** Scope badge color mapping */
+const scopeColors: Record<string, string> = {
+  managed: "bg-slate-200 text-slate-700",
+  user: "bg-blue-100 text-blue-700",
+  project: "bg-green-100 text-green-700",
+  local: "bg-purple-100 text-purple-700",
+};
+
+function ScopeBadge({ scope }: { scope: string }) {
+  const colors = scopeColors[scope] ?? "bg-slate-100 text-slate-600";
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colors}`}
+    >
+      {scope}
+    </span>
+  );
+}
+
+/** Type badge color mapping */
+const typeColors: Record<string, string> = {
+  command: "bg-amber-100 text-amber-700",
+  http: "bg-cyan-100 text-cyan-700",
+};
+
+function TypeBadge({ type }: { type: string }) {
+  const colors = typeColors[type] ?? "bg-slate-100 text-slate-600";
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colors}`}
+    >
+      {type}
+    </span>
+  );
+}
+
+function DuplicateWarning({
+  duplicates,
+}: {
+  duplicates: McpResult["duplicates"];
+}) {
+  if (!duplicates || duplicates.length === 0) return null;
+
+  return (
+    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+      <div className="flex items-start gap-2">
+        <span className="text-amber-600 text-lg leading-none mt-0.5">
+          {"\u26A0"}
+        </span>
+        <div>
+          <p className="font-medium text-amber-800 text-sm">
+            Duplicate servers detected
+          </p>
+          <ul className="mt-1 space-y-1">
+            {duplicates.map((dup) => (
+              <li key={dup.name} className="text-xs text-amber-700">
+                <span className="font-mono font-medium">{dup.name}</span>
+                {" defined in "}
+                {dup.sources.join(", ")}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ServerRow({ server }: { server: McpServer }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const hasDetails =
+    server.command ||
+    server.url ||
+    (server.args && server.args.length > 0) ||
+    (server.env && Object.keys(server.env).length > 0) ||
+    (server.headers && Object.keys(server.headers).length > 0);
+
+  return (
+    <div className="border-b border-slate-100 last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors flex items-center gap-4"
+      >
+        <span className="text-slate-400 text-xs w-4 shrink-0">
+          {hasDetails ? (expanded ? "\u25BC" : "\u25B6") : "\u00B7"}
+        </span>
+        <span className="font-mono text-sm text-slate-900 font-medium min-w-[160px]">
+          {server.name}
+        </span>
+        <TypeBadge type={server.type} />
+        <span className="flex-1" />
+        <ScopeBadge scope={server.scope} />
+      </button>
+
+      {expanded && (
+        <div className="px-4 pb-4 pl-12 bg-slate-50/50">
+          <dl className="space-y-2 text-sm">
+            {server.command && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  Command:
+                </dt>
+                <dd className="font-mono text-slate-800">{server.command}</dd>
+              </div>
+            )}
+
+            {server.args && server.args.length > 0 && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  Args:
+                </dt>
+                <dd className="font-mono text-slate-800">
+                  <ul className="space-y-0.5">
+                    {server.args.map((arg, i) => (
+                      <li key={i} className="text-xs">
+                        {arg}
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )}
+
+            {server.url && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  URL:
+                </dt>
+                <dd className="font-mono text-slate-800 break-all">
+                  {server.url}
+                </dd>
+              </div>
+            )}
+
+            {server.env && Object.keys(server.env).length > 0 && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  Env:
+                </dt>
+                <dd>
+                  <ul className="space-y-0.5">
+                    {Object.entries(server.env).map(([key, value]) => (
+                      <li key={key} className="text-xs font-mono">
+                        <span className="text-slate-800">{key}</span>
+                        <span className="text-slate-400">=</span>
+                        <span className="text-slate-400 italic">{value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )}
+
+            {server.headers && Object.keys(server.headers).length > 0 && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  Headers:
+                </dt>
+                <dd>
+                  <ul className="space-y-0.5">
+                    {Object.entries(server.headers).map(([key, value]) => (
+                      <li key={key} className="text-xs font-mono">
+                        <span className="text-slate-800">{key}</span>
+                        <span className="text-slate-400">: </span>
+                        <span className="text-slate-400 italic">{value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )}
+
+            {server.source && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-24 shrink-0">
+                  Source:
+                </dt>
+                <dd className="font-mono text-xs text-slate-400">
+                  {server.source}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function McpPage() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<McpResult | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        const result = await fetchMcp();
+        if (cancelled) return;
+        setData(result);
+        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        setError(
+          err instanceof Error ? err.message : "Failed to load MCP data"
+        );
+        setLoading(false);
+      }
+    }
+
+    loadData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const servers = data?.servers ?? [];
+  const duplicates = data?.duplicates ?? [];
+
+  if (error) {
+    return (
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900 mb-6">
+          MCP Servers
+        </h1>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+          <p className="font-medium">Error loading MCP data</p>
+          <p className="text-sm mt-1">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold text-slate-900 mb-1">
+        MCP Servers
+      </h1>
+      <p className="text-sm text-slate-500 mb-6">
+        Model Context Protocol servers
+        {!loading && (
+          <span className="ml-1 text-slate-400">
+            ({servers.length} server{servers.length !== 1 ? "s" : ""})
+          </span>
+        )}
+      </p>
+
+      {loading ? (
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="px-4 py-3 border-b border-slate-100 animate-pulse flex gap-4"
+            >
+              <div className="h-4 bg-slate-200 rounded w-4" />
+              <div className="h-4 bg-slate-200 rounded w-32" />
+              <div className="h-4 bg-slate-100 rounded w-16" />
+              <div className="flex-1" />
+              <div className="h-4 bg-slate-200 rounded w-14" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <>
+          <DuplicateWarning duplicates={duplicates} />
+
+          {servers.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
+              No MCP servers configured
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+              {/* Header */}
+              <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
+                <span className="w-4" />
+                <span className="min-w-[160px]">Name</span>
+                <span className="w-16">Type</span>
+                <span className="flex-1" />
+                <span className="w-16">Scope</span>
+              </div>
+
+              {servers.map((server) => (
+                <ServerRow
+                  key={`${server.name}-${server.scope}-${server.source}`}
+                  server={server}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}

@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { OverviewPage } from "./pages/OverviewPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { MemoryPage } from "./pages/MemoryPage";
+import { McpPage } from "./pages/McpPage";
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -18,11 +20,8 @@ export function App() {
         <Route element={<Layout />}>
           <Route index element={<OverviewPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/memory" element={<PlaceholderPage title="Memory" />} />
-          <Route
-            path="/mcp"
-            element={<PlaceholderPage title="MCP Servers" />}
-          />
+          <Route path="/memory" element={<MemoryPage />} />
+          <Route path="/mcp" element={<McpPage />} />
           <Route path="/hooks" element={<PlaceholderPage title="Hooks" />} />
           <Route
             path="/permissions"
