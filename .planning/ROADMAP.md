@@ -100,7 +100,8 @@ Plans:
   2. User can compare configuration across multiple projects side-by-side
   3. User can see @import dependency chains in CLAUDE.md with broken import detection
 **Research**: Likely (needs definition of "recommended" Claude Code config for health scoring)
-**Research topics**: Community best practices for Claude Code config, recommended config baseline, scoring algorithm design, import chain resolution strategy
+**Research topics**: Community best practices for Claude Code config, recommended config baseline, scoring algorithm design, import chain resolution strategy, multi-project UX (project picker, parent-dir scanning, project switcher in dashboard)
+**Notes**: User wants cross-project comparison to support scanning a parent directory (e.g., `d:\git_repo`) and discovering all projects with `.claude/` configs underneath. Dashboard should support project selection/switching — determine best UX during planning.
 **Plans**: TBD
 
 Plans:

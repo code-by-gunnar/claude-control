@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   fetchStatus,
+  fetchScan,
   fetchSettings,
   fetchMemory,
   fetchMcp,
   fetchHooks,
   fetchPermissions,
   type StatusSummary,
+  type ScanResult,
   type SettingsResult,
   type MemoryFile,
   type McpResult,
@@ -19,21 +21,24 @@ interface CardData {
   label: string;
   value: number | string;
   detail: string;
-  link: string;
+  link: string | null;
 }
 
 export function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cards, setCards] = useState<CardData[]>([]);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [configExpanded, setConfigExpanded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadData() {
       try {
-        const [status, settings, memory, mcp, hooks, permissions] =
+        const [scan, status, settings, memory, mcp, hooks, permissions] =
           await Promise.all([
+            fetchScan(),
             fetchStatus(),
             fetchSettings(),
             fetchMemory(),
@@ -44,6 +49,7 @@ export function OverviewPage() {
 
         if (cancelled) return;
 
+        setScanResult(scan);
         const settingsCount = settings.settings?.length ?? 0;
         const memoryCount = memory?.length ?? 0;
         const serversCount = mcp.servers?.length ?? 0;
@@ -55,7 +61,7 @@ export function OverviewPage() {
             label: "Config Files",
             value: status.found,
             detail: `${status.found} found of ${status.total} paths`,
-            link: "/",
+            link: null,
           },
           {
             label: "Settings",
@@ -136,23 +142,74 @@ export function OverviewPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {cards.map((card) => (
-            <Link
-              key={card.label}
-              to={card.link}
-              className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-blue-200 transition-all group"
-            >
-              <p className="text-sm font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
-                {card.label}
-              </p>
-              <p className="text-3xl font-bold text-slate-900 mt-1">
-                {card.value}
-              </p>
-              <p className="text-xs text-slate-400 mt-1">{card.detail}</p>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cards.map((card) =>
+              card.link ? (
+                <Link
+                  key={card.label}
+                  to={card.link}
+                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-blue-200 transition-all group"
+                >
+                  <p className="text-sm font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
+                    {card.label}
+                  </p>
+                  <p className="text-3xl font-bold text-slate-900 mt-1">
+                    {card.value}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">{card.detail}</p>
+                </Link>
+              ) : (
+                <button
+                  key={card.label}
+                  type="button"
+                  onClick={() => setConfigExpanded(!configExpanded)}
+                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md hover:border-blue-200 transition-all group text-left cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
+                      {card.label}
+                    </p>
+                    <svg
+                      className={`w-4 h-4 text-slate-400 transition-transform ${configExpanded ? "rotate-180" : ""}`}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                    </svg>
+                  </div>
+                  <p className="text-3xl font-bold text-slate-900 mt-1">
+                    {card.value}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">{card.detail}</p>
+                </button>
+              )
+            )}
+          </div>
+
+          {configExpanded && scanResult && (
+            <div className="mt-4 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+              <div className="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                <h3 className="text-sm font-medium text-slate-700">
+                  All Config Paths ({scanResult.files.length})
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">Project: {scanResult.projectDir}</p>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {scanResult.files.map((file) => (
+                  <div key={file.expectedPath} className="px-4 py-2.5 flex items-center gap-3 text-sm">
+                    <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${file.exists ? "bg-emerald-500" : "bg-slate-300"}`} />
+                    <span className="text-xs font-medium text-slate-500 w-16 shrink-0">{file.scope}</span>
+                    <span className="text-xs text-slate-400 w-20 shrink-0">{file.type}</span>
+                    <span className="text-slate-700 font-mono text-xs truncate" title={file.expectedPath}>{file.expectedPath}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
