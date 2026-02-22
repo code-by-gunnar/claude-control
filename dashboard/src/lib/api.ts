@@ -49,7 +49,7 @@ export interface MemoryFile {
 export interface McpServer {
   name: string;
   scope: string;
-  source: string;
+  sourcePath: string;
   type: string;
   command?: string;
   args?: string[];
@@ -60,22 +60,28 @@ export interface McpServer {
 
 export interface McpResult {
   servers: McpServer[];
-  duplicates: Array<{ name: string; sources: string[] }>;
+  duplicates: Array<{
+    name: string;
+    locations: Array<{ scope: string; sourcePath: string }>;
+  }>;
 }
 
-export interface HookEntry {
+export interface HookEvent {
   event: string;
   scope: string;
-  source: string;
-  hooks: Array<{
-    type: string;
-    command?: string;
-    pattern?: string;
+  sourcePath: string;
+  matchers: Array<{
+    matcher?: string;
+    hooks: Array<{
+      type: string;
+      command: string;
+      async?: boolean;
+    }>;
   }>;
 }
 
 export interface HooksResult {
-  events: HookEntry[];
+  events: HookEvent[];
   availableEvents: string[];
   configuredEvents: string[];
   unconfiguredEvents: string[];
@@ -83,10 +89,8 @@ export interface HooksResult {
 
 export interface CommandEntry {
   name: string;
-  scope: string;
-  source: string;
-  type: string;
   path: string;
+  scope: string;
 }
 
 export interface CommandsResult {
