@@ -7,8 +7,11 @@
     "claude-ctl": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && vite build --config dashboard/vite.config.ts",
+    "build:cli": "tsup",
+    "build:dashboard": "vite build --config dashboard/vite.config.ts",
     "dev": "tsup --watch",
+    "dev:dashboard": "vite --config dashboard/vite.config.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
@@ -28,9 +31,18 @@
     "jsonc-parser": "^3.3.1"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.0",
     "@types/node": "^22.13.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.0",
+    "tailwindcss": "^4.2.0",
     "tsup": "^8.4.0",
     "typescript": "^5.7.3",
+    "vite": "^7.3.1",
     "vitest": "^4.0.18"
   }
 }
