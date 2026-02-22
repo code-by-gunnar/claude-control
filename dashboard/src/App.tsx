@@ -6,6 +6,8 @@ import { MemoryPage } from "./pages/MemoryPage";
 import { McpPage } from "./pages/McpPage";
 import { HooksPage } from "./pages/HooksPage";
 import { PermissionsPage } from "./pages/PermissionsPage";
+import { HealthPage } from "./pages/HealthPage";
+import { ProjectsPage } from "./pages/ProjectsPage";
 
 export function App() {
   return (
@@ -18,6 +20,8 @@ export function App() {
           <Route path="/mcp" element={<McpPage />} />
           <Route path="/hooks" element={<HooksPage />} />
           <Route path="/permissions" element={<PermissionsPage />} />
+          <Route path="/health" element={<HealthPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

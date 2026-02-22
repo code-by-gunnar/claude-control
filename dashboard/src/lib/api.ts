@@ -121,6 +121,92 @@ export interface PermissionsResult {
   effective: EffectivePermission[];
 }
 
+// --- Health types ---
+
+export interface HealthCheck {
+  id: string;
+  label: string;
+  category: string;
+  passed: boolean;
+  weight: number;
+  recommendation?: string;
+}
+
+export interface HealthCategory {
+  name: string;
+  score: number;
+  maxScore: number;
+  checks: HealthCheck[];
+}
+
+export interface HealthResult {
+  overallScore: number;
+  grade: string;
+  categories: HealthCategory[];
+  recommendations: string[];
+  summary: string;
+}
+
+// --- Memory import types ---
+
+export interface MemoryImport {
+  raw: string;
+  resolvedPath: string;
+  relativeTo: string;
+  exists: boolean;
+  error?: string;
+}
+
+export interface ResolvedMemoryFile {
+  path: string;
+  scope: string;
+  imports: MemoryImport[];
+  importChain: string[];
+  hasCircular: boolean;
+  circularAt?: string;
+}
+
+export interface MemoryImportResult {
+  files: ResolvedMemoryFile[];
+  brokenImports: MemoryImport[];
+  totalImports: number;
+  totalBroken: number;
+}
+
+// --- Workspace types ---
+
+export interface ProjectInfo {
+  path: string;
+  name: string;
+  hasClaudeDir: boolean;
+  hasClaudeMd: boolean;
+  hasMcpJson: boolean;
+  configFileCount: number;
+}
+
+export interface WorkspaceScan {
+  parentDir: string;
+  projects: ProjectInfo[];
+  totalProjects: number;
+  configuredProjects: number;
+}
+
+export interface ComparisonEntry {
+  key: string;
+  type: "setting" | "mcp" | "hook" | "permission" | "memory";
+  values: Record<string, unknown>;
+}
+
+export interface ComparisonResult {
+  projects: string[];
+  projectPaths: string[];
+  entries: ComparisonEntry[];
+  summary: {
+    totalDifferences: number;
+    uniqueToProject: Record<string, number>;
+  };
+}
+
 async function fetchJson<T>(endpoint: string): Promise<T> {
   const response = await fetch(`/api/${endpoint}`);
   if (!response.ok) {
@@ -159,4 +245,31 @@ export async function fetchCommands(): Promise<CommandsResult> {
 
 export async function fetchPermissions(): Promise<PermissionsResult> {
   return fetchJson<PermissionsResult>("permissions");
+}
+
+export async function fetchHealth(): Promise<HealthResult> {
+  return fetchJson<HealthResult>("health");
+}
+
+export async function fetchMemoryImports(): Promise<MemoryImportResult> {
+  return fetchJson<MemoryImportResult>("memory/imports");
+}
+
+export async function fetchProjects(dir: string): Promise<WorkspaceScan> {
+  const response = await fetch(`/api/projects?dir=${encodeURIComponent(dir)}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error ?? `API error: ${response.status}`);
+  }
+  return response.json() as Promise<WorkspaceScan>;
+}
+
+export async function fetchCompare(projectPaths: string[]): Promise<ComparisonResult> {
+  const query = projectPaths.map((p) => encodeURIComponent(p)).join(",");
+  const response = await fetch(`/api/compare?projects=${query}`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error((body as { error?: string }).error ?? `API error: ${response.status}`);
+  }
+  return response.json() as Promise<ComparisonResult>;
 }

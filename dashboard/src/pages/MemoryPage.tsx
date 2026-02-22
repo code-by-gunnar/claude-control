@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { fetchMemory, type MemoryFile } from "../lib/api";
+import {
+  fetchMemory,
+  fetchMemoryImports,
+  type MemoryFile,
+  type MemoryImportResult,
+  type ResolvedMemoryFile,
+} from "../lib/api";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -40,8 +46,61 @@ function formatSize(bytes?: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function MemoryCard({ file }: { file: MemoryFile }) {
+function ImportSection({ importData }: { importData: ResolvedMemoryFile }) {
+  const totalImports = importData.imports.length;
+  const brokenCount = importData.imports.filter((i) => !i.exists).length;
+
+  return (
+    <div className="border-t border-slate-100 px-4 py-3">
+      <div className="flex items-center gap-2 mb-2">
+        <p className="text-xs font-medium text-slate-500">Imports</p>
+        <span className="text-xs text-slate-400">
+          ({totalImports} file{totalImports !== 1 ? "s" : ""}
+          {brokenCount > 0 && (
+            <span className="text-red-500">, {brokenCount} broken</span>
+          )}
+          )
+        </span>
+        {importData.hasCircular && (
+          <span className="text-xs bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-medium">
+            circular
+          </span>
+        )}
+      </div>
+      <ul className="space-y-1">
+        {importData.imports.map((imp, idx) => (
+          <li key={idx} className="flex items-center gap-2 text-xs">
+            <span
+              className={`inline-block w-2 h-2 rounded-full shrink-0 ${
+                imp.exists ? "bg-emerald-500" : "bg-red-500"
+              }`}
+            />
+            <span
+              className="font-mono text-slate-600 truncate"
+              title={imp.resolvedPath}
+            >
+              {shortenPath(imp.resolvedPath)}
+            </span>
+            {!imp.exists && (
+              <span className="text-red-400 shrink-0">missing</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function MemoryCard({
+  file,
+  importData,
+}: {
+  file: MemoryFile;
+  importData?: ResolvedMemoryFile;
+}) {
   const [expanded, setExpanded] = useState(false);
+
+  const hasImports = importData && importData.imports.length > 0;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
@@ -60,6 +119,11 @@ function MemoryCard({ file }: { file: MemoryFile }) {
             </p>
             <p className="text-xs text-slate-400 mt-1">
               {formatSize(file.sizeBytes)}
+              {hasImports && (
+                <span className="ml-2">
+                  {importData.imports.length} import{importData.imports.length !== 1 ? "s" : ""}
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2 ml-3 shrink-0">
@@ -70,6 +134,9 @@ function MemoryCard({ file }: { file: MemoryFile }) {
           </div>
         </div>
       </button>
+
+      {/* Import section (always visible if imports exist) */}
+      {hasImports && <ImportSection importData={importData} />}
 
       {expanded && (
         <div className="border-t border-slate-100 p-4">
@@ -104,15 +171,20 @@ export function MemoryPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState<MemoryFile[]>([]);
+  const [importResult, setImportResult] = useState<MemoryImportResult | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadData() {
       try {
-        const result = await fetchMemory();
+        const [memoryResult, imports] = await Promise.all([
+          fetchMemory(),
+          fetchMemoryImports().catch(() => null),
+        ]);
         if (cancelled) return;
-        setFiles(result ?? []);
+        setFiles(memoryResult ?? []);
+        setImportResult(imports);
         setLoading(false);
       } catch (err) {
         if (cancelled) return;
@@ -145,10 +217,21 @@ export function MemoryPage() {
     <div>
       <h1 className="text-2xl font-semibold text-slate-900 mb-1">Memory</h1>
       <p className="text-sm text-slate-500 mb-6">
-        CLAUDE.md files
+        CLAUDE.md files and @import chains
         {!loading && (
           <span className="ml-1 text-slate-400">
-            ({files.length} file{files.length !== 1 ? "s" : ""})
+            ({files.length} file{files.length !== 1 ? "s" : ""}
+            {importResult && importResult.totalImports > 0 && (
+              <span>
+                , {importResult.totalImports} import{importResult.totalImports !== 1 ? "s" : ""}
+                {importResult.totalBroken > 0 && (
+                  <span className="text-red-400">
+                    , {importResult.totalBroken} broken
+                  </span>
+                )}
+              </span>
+            )}
+            )
           </span>
         )}
       </p>
@@ -176,9 +259,18 @@ export function MemoryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {files.map((file) => (
-            <MemoryCard key={file.path} file={file} />
-          ))}
+          {files.map((file) => {
+            const fileImports = importResult?.files.find(
+              (f) => f.path === file.path
+            );
+            return (
+              <MemoryCard
+                key={file.path}
+                file={file}
+                importData={fileImports}
+              />
+            );
+          })}
         </div>
       )}
     </div>

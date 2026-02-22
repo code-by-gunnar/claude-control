@@ -8,6 +8,7 @@ import {
   fetchMcp,
   fetchHooks,
   fetchPermissions,
+  fetchHealth,
   type StatusSummary,
   type ScanResult,
   type SettingsResult,
@@ -15,6 +16,7 @@ import {
   type McpResult,
   type HooksResult,
   type PermissionsResult,
+  type HealthResult,
 } from "../lib/api";
 
 interface CardData {
@@ -29,6 +31,7 @@ export function OverviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [cards, setCards] = useState<CardData[]>([]);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [health, setHealth] = useState<HealthResult | null>(null);
   const [configExpanded, setConfigExpanded] = useState(false);
 
   useEffect(() => {
@@ -36,7 +39,7 @@ export function OverviewPage() {
 
     async function loadData() {
       try {
-        const [scan, status, settings, memory, mcp, hooks, permissions] =
+        const [scan, status, settings, memory, mcp, hooks, permissions, healthResult] =
           await Promise.all([
             fetchScan(),
             fetchStatus(),
@@ -45,11 +48,13 @@ export function OverviewPage() {
             fetchMcp(),
             fetchHooks(),
             fetchPermissions(),
+            fetchHealth().catch(() => null),
           ]);
 
         if (cancelled) return;
 
         setScanResult(scan);
+        setHealth(healthResult);
         const settingsCount = settings.settings?.length ?? 0;
         const memoryCount = memory?.length ?? 0;
         const serversCount = mcp.servers?.length ?? 0;
@@ -94,6 +99,9 @@ export function OverviewPage() {
             link: "/permissions",
           },
         ];
+
+        // Health card is added separately since it has a special display
+        // (stored in health state, rendered below the grid)
 
         setCards(cardData);
         setLoading(false);
@@ -188,6 +196,69 @@ export function OverviewPage() {
               )
             )}
           </div>
+
+          {/* Health score card */}
+          {health && (
+            <Link
+              to="/health"
+              className="mt-4 bg-white rounded-lg shadow-sm border border-slate-200 p-5 hover:shadow-md hover:border-blue-200 transition-all group flex items-center gap-5"
+            >
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center ring-4 shrink-0 ${
+                  health.grade === "A" || health.grade === "B"
+                    ? "ring-emerald-100"
+                    : health.grade === "C"
+                      ? "ring-yellow-100"
+                      : "ring-red-100"
+                }`}
+              >
+                <span
+                  className={`text-2xl font-bold ${
+                    health.grade === "A" || health.grade === "B"
+                      ? "text-emerald-600"
+                      : health.grade === "C"
+                        ? "text-yellow-600"
+                        : "text-red-600"
+                  }`}
+                >
+                  {Math.round(health.overallScore)}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-slate-500 group-hover:text-blue-600 transition-colors">
+                    Health Score
+                  </p>
+                  <span
+                    className={`text-xs font-bold px-1.5 py-0.5 rounded ${
+                      health.grade === "A" || health.grade === "B"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : health.grade === "C"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {health.grade}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mt-1 truncate">{health.summary}</p>
+                {health.recommendations.length > 0 && (
+                  <p className="text-xs text-slate-400 mt-1">
+                    {health.recommendations.length} recommendation{health.recommendations.length !== 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
+              <svg
+                className="w-5 h-5 text-slate-400 shrink-0 group-hover:text-blue-500 transition-colors"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+              </svg>
+            </Link>
+          )}
 
           {configExpanded && scanResult && (
             <div className="mt-4 bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
