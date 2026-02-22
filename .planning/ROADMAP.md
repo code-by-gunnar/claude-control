@@ -106,8 +106,8 @@ Plans:
 
 Plans:
 - [x] 05-01: CLAUDE.md import resolver (@import chain parsing, dependency tree, broken import detection)
-- [ ] 05-02: Config health score (completeness scoring algorithm, gap detection, recommendations)
-- [ ] 05-03: Cross-project comparison (multi-project scanning, side-by-side comparison, diff view)
+- [x] 05-02: Config health score (completeness scoring algorithm, gap detection, recommendations)
+- [x] 05-03: Cross-project comparison (multi-project scanning, side-by-side comparison, diff view)
 
 ### Phase 6: Polish + Launch
 **Goal**: Production-ready open source release on npm
@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Settings + CLAUDE.md | 3/3 | Complete | 2026-02-22 |
 | 3. MCP + Hooks + Permissions | 3/3 | Complete | 2026-02-22 |
 | 4. Web Dashboard | 4/4 | Complete | 2026-02-22 |
-| 5. Advanced Features | 1/3 | In progress | — |
+| 5. Advanced Features | 3/4 | In progress | — |
 | 6. Polish + Launch | 0/2 | Not started | — |
