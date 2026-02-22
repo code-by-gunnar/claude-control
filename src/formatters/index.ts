@@ -1,6 +1,7 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
-import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatStatusJson } from "./json.js";
-import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatStatusTable } from "./table.js";
+import type { SettingsResult } from "../settings/types.js";
+import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 
 /**
  * Format a scan result for display.
@@ -49,6 +50,23 @@ export function formatMemoryContent(file: ConfigFile, json: boolean): string {
     : formatMemoryContentTable(file);
 }
 
+/**
+ * Format resolved settings for display.
+ *
+ * @param result - The resolved settings result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatSettings(
+  result: SettingsResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatSettingsJson(result)
+    : formatSettingsTable(result, projectDir);
+}
+
 // Re-export individual formatters for direct access
-export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatStatusJson } from "./json.js";
-export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatStatusTable } from "./table.js";
+export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";

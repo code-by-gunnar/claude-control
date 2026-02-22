@@ -1,4 +1,5 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import type { SettingsResult } from "../settings/types.js";
 
 /**
  * Strip content from credential-type files for defense in depth.
@@ -50,6 +51,18 @@ export function formatStatusJson(result: ScanResult): string {
     })),
   };
   return JSON.stringify(status, null, 2);
+}
+
+/**
+ * Format resolved settings as JSON.
+ *
+ * Returns the SettingsResult directly serialized as JSON.
+ * Paths are full (not shortened) for machine consumption.
+ *
+ * @param result - The resolved settings result
+ */
+export function formatSettingsJson(result: SettingsResult): string {
+  return JSON.stringify(result, null, 2);
 }
 
 /**

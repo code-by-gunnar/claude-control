@@ -2,6 +2,7 @@ import chalk from "chalk";
 import os from "node:os";
 import path from "node:path";
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import type { SettingsResult } from "../settings/types.js";
 
 const homeDir = os.homedir();
 
@@ -245,6 +246,85 @@ function getReason(file: ConfigFile): string {
   if (!file.exists) return "not configured";
   if (file.error) return file.error;
   return "";
+}
+
+/**
+ * Format a value for display in settings output.
+ * Objects are JSON-stringified, primitives are shown raw.
+ */
+function formatValue(value: unknown): string {
+  if (value === null || value === undefined) return String(value);
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+/**
+ * Format resolved settings as a human-readable table with override chain.
+ *
+ * Shows each setting's effective value, source scope, and file path.
+ * When a setting is defined at multiple scopes, the full override chain
+ * is displayed to show which scope wins.
+ *
+ * @param result - The resolved settings result
+ * @param projectDir - The project directory, or null for global-only scans
+ */
+export function formatSettingsTable(
+  result: SettingsResult,
+  projectDir: string | null
+): string {
+  const lines: string[] = [];
+
+  lines.push(chalk.bold("Claude Code Settings"));
+  lines.push(chalk.dim("=".repeat(20)));
+  lines.push("");
+
+  if (result.settings.length === 0) {
+    lines.push("No settings configured.");
+    return lines.join("\n");
+  }
+
+  for (const setting of result.settings) {
+    // Key name in bold cyan
+    lines.push(chalk.bold.cyan(setting.key));
+
+    // Effective value
+    const displayValue = formatValue(setting.effectiveValue);
+    lines.push(`  ${displayValue}`);
+
+    // Source scope and path
+    const displayPath = shortenPath(setting.effectiveSourcePath, projectDir);
+    lines.push(chalk.dim(`  from ${setting.effectiveScope} (${displayPath})`));
+
+    // Override chain (only when setting exists at multiple scopes)
+    if (setting.overrides.length > 1) {
+      lines.push(chalk.dim("  Override chain:"));
+
+      for (let i = 0; i < setting.overrides.length; i++) {
+        const override = setting.overrides[i];
+        const overridePath = shortenPath(override.path, projectDir);
+        const overrideValue = formatValue(override.value);
+        const isLast = i === setting.overrides.length - 1;
+        const connector = isLast ? "\u2514" : "\u251C";
+
+        if (i === 0) {
+          // Winning value — highlighted in green
+          lines.push(
+            chalk.green(`  ${connector} ${override.scope}: ${overrideValue} (${overridePath})`)
+          );
+        } else {
+          // Overridden value — dim
+          lines.push(
+            chalk.dim(`  ${connector} ${override.scope}: ${overrideValue} (${overridePath})`)
+          );
+        }
+      }
+    }
+
+    // Blank line between settings
+    lines.push("");
+  }
+
+  return lines.join("\n");
 }
 
 /**
