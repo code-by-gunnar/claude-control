@@ -150,7 +150,7 @@ apiRoutes.get("/api/plugins", async (c) => {
  */
 apiRoutes.get("/api/hooks", async (c) => {
   const result = await scan(projectDir);
-  const hooksResult = extractHooks(result.files);
+  const hooksResult = await extractHooks(result.files);
   return c.json(hooksResult);
 });
 

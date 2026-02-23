@@ -50,6 +50,20 @@ export interface CommandEntry {
 }
 
 /**
+ * A hook script file discovered in ~/.claude/hooks/.
+ */
+export interface HookScript {
+  /** Script filename (e.g., "deployment-check.sh") */
+  fileName: string;
+  /** Absolute path to the script */
+  path: string;
+  /** File size in bytes */
+  sizeBytes: number;
+  /** Script content */
+  content: string;
+}
+
+/**
  * The complete result of hooks extraction.
  */
 export interface HooksResult {
@@ -61,6 +75,8 @@ export interface HooksResult {
   configuredEvents: string[];
   /** Event names that have no hooks configured */
   unconfiguredEvents: string[];
+  /** Script files found in ~/.claude/hooks/ */
+  hookScripts: HookScript[];
 }
 
 /**

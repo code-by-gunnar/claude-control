@@ -80,11 +80,19 @@ export interface HookEvent {
   }>;
 }
 
+export interface HookScript {
+  fileName: string;
+  path: string;
+  sizeBytes: number;
+  content: string;
+}
+
 export interface HooksResult {
   events: HookEvent[];
   availableEvents: string[];
   configuredEvents: string[];
   unconfiguredEvents: string[];
+  hookScripts: HookScript[];
 }
 
 export interface CommandEntry {

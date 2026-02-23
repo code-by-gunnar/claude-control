@@ -23,7 +23,7 @@ export function hooksCommand(program: Command): void {
       const json = program.opts().json === true;
 
       const result = await scan(dir);
-      const hooksResult = extractHooks(result.files);
+      const hooksResult = await extractHooks(result.files);
 
       const output = formatHooks(hooksResult, result.projectDir, json);
       process.stdout.write(output + "\n");

@@ -59,10 +59,10 @@ async function extractMcpMap(
 /**
  * Extract configured hook events from a scan result.
  */
-function extractHooksMap(
+async function extractHooksMap(
   files: Awaited<ReturnType<typeof scan>>["files"]
-): Record<string, number> {
-  const hooksResult = extractHooks(files);
+): Promise<Record<string, number>> {
+  const hooksResult = await extractHooks(files);
   const map: Record<string, number> = {};
   for (const event of hooksResult.events) {
     map[event.event] = (map[event.event] ?? 0) + event.matchers.length;
@@ -143,7 +143,7 @@ export async function compareProjects(
   for (const result of scanResults) {
     settingsMaps.push(extractSettingsMap(result.files));
     mcpMaps.push(await extractMcpMap(result.files));
-    hooksMaps.push(extractHooksMap(result.files));
+    hooksMaps.push(await extractHooksMap(result.files));
     permissionsMaps.push(extractPermissionsMap(result.files));
     memoryMaps.push(extractMemoryMap(result.files));
   }

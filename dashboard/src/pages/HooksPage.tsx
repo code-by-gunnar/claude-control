@@ -3,6 +3,7 @@ import {
   fetchHooks,
   type HooksResult,
   type HookEvent,
+  type HookScript,
 } from "../lib/api";
 
 /** Scope badge color mapping */
@@ -146,10 +147,70 @@ function EventRow({
   );
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(1)} KB`;
+}
+
+function HookScriptCard({
+  script,
+  expanded,
+  onToggle,
+}: {
+  script: HookScript;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left p-4 hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-sm font-semibold text-slate-900">
+              {script.fileName}
+            </span>
+            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+              {script.fileName.endsWith(".sh")
+                ? "shell"
+                : script.fileName.endsWith(".js")
+                ? "javascript"
+                : "script"}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-slate-400">
+              {formatBytes(script.sizeBytes)}
+            </span>
+            <span className="text-slate-400 text-xs">
+              {expanded ? "\u25BC" : "\u25B6"}
+            </span>
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-slate-100">
+          <div className="p-3 bg-slate-50/50 text-xs text-slate-400 font-mono break-all">
+            {script.path}
+          </div>
+          <pre className="text-xs font-mono bg-slate-900 text-slate-100 p-4 overflow-auto max-h-96 whitespace-pre-wrap">
+            {script.content}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function HooksPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hooksData, setHooksData] = useState<HooksResult | null>(null);
+  const [expandedScript, setExpandedScript] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -185,6 +246,7 @@ export function HooksPage() {
   }
 
   const configuredCount = hooksData?.configuredEvents?.length ?? 0;
+  const hookScripts = hooksData?.hookScripts ?? [];
 
   if (error) {
     return (
@@ -266,6 +328,35 @@ export function HooksPage() {
             ))
           )}
         </div>
+      )}
+
+      {/* Hook Scripts Section */}
+      {!loading && hookScripts.length > 0 && (
+        <>
+          <h2 className="text-xl font-bold tracking-tight text-slate-900 mt-8 mb-1">
+            Hook Scripts
+          </h2>
+          <p className="text-sm text-slate-500 mb-4">
+            Script files in <code className="font-mono text-xs">~/.claude/hooks/</code>
+            <span className="ml-1 text-slate-400">
+              ({hookScripts.length} script{hookScripts.length !== 1 ? "s" : ""})
+            </span>
+          </p>
+          <div className="space-y-3">
+            {hookScripts.map((script) => (
+              <HookScriptCard
+                key={script.fileName}
+                script={script}
+                expanded={expandedScript === script.fileName}
+                onToggle={() =>
+                  setExpandedScript(
+                    expandedScript === script.fileName ? null : script.fileName
+                  )
+                }
+              />
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

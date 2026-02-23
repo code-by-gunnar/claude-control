@@ -22,16 +22,16 @@ function makeSettingsFile(
 }
 
 describe("extractHooks", () => {
-  it("returns empty events for empty files array", () => {
-    const result = extractHooks([]);
+  it("returns empty events for empty files array", async () => {
+    const result = await extractHooks([]);
 
     expect(result.events).toEqual([]);
     expect(result.configuredEvents).toEqual([]);
     expect(result.unconfiguredEvents).toEqual(result.availableEvents);
   });
 
-  it("lists all 6 known hook events in availableEvents", () => {
-    const result = extractHooks([]);
+  it("lists all 6 known hook events in availableEvents", async () => {
+    const result = await extractHooks([]);
 
     expect(result.availableEvents).toContain("PreToolUse");
     expect(result.availableEvents).toContain("PostToolUse");
@@ -42,7 +42,7 @@ describe("extractHooks", () => {
     expect(result.availableEvents).toHaveLength(6);
   });
 
-  it("extracts a simple hook with one matcher and one command", () => {
+  it("extracts a simple hook with one matcher and one command", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: [
@@ -55,7 +55,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toHaveLength(1);
     const event = result.events[0];
@@ -69,7 +69,7 @@ describe("extractHooks", () => {
     expect(event.matchers[0].hooks[0].type).toBe("command");
   });
 
-  it("extracts matcher pattern when specified", () => {
+  it("extracts matcher pattern when specified", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("project", {
         PreToolUse: [
@@ -83,12 +83,12 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events[0].matchers[0].matcher).toBe("Bash|Edit");
   });
 
-  it("extracts multiple matchers for a single event", () => {
+  it("extracts multiple matchers for a single event", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: [
@@ -107,7 +107,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events[0].matchers).toHaveLength(3);
     expect(result.events[0].matchers[0].matcher).toBe("Bash");
@@ -115,7 +115,7 @@ describe("extractHooks", () => {
     expect(result.events[0].matchers[2].matcher).toBeUndefined();
   });
 
-  it("extracts multiple hooks within a single matcher", () => {
+  it("extracts multiple hooks within a single matcher", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         SessionStart: [
@@ -129,7 +129,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     const hooks = result.events[0].matchers[0].hooks;
     expect(hooks).toHaveLength(2);
@@ -139,7 +139,7 @@ describe("extractHooks", () => {
     expect(hooks[1].async).toBe(true);
   });
 
-  it("tracks configured and unconfigured events correctly", () => {
+  it("tracks configured and unconfigured events correctly", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: [
@@ -151,7 +151,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.configuredEvents).toContain("PreToolUse");
     expect(result.configuredEvents).toContain("Stop");
@@ -164,7 +164,7 @@ describe("extractHooks", () => {
     expect(result.unconfiguredEvents).toHaveLength(4);
   });
 
-  it("extracts hooks from multiple scopes independently", () => {
+  it("extracts hooks from multiple scopes independently", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: [
@@ -178,7 +178,7 @@ describe("extractHooks", () => {
       }, "/proj/.claude/settings.json"),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     // Same event from different scopes produces separate event entries
     expect(result.events).toHaveLength(2);
@@ -190,7 +190,7 @@ describe("extractHooks", () => {
     expect(projEvent!.matchers[0].hooks[0].command).toBe("project-check");
   });
 
-  it("sorts events alphabetically by event name", () => {
+  it("sorts events alphabetically by event name", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         Stop: [
@@ -205,14 +205,14 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events[0].event).toBe("Notification");
     expect(result.events[1].event).toBe("PreToolUse");
     expect(result.events[2].event).toBe("Stop");
   });
 
-  it("skips non-settings files", () => {
+  it("skips non-settings files", async () => {
     const files: ConfigFile[] = [
       {
         scope: "user",
@@ -230,12 +230,12 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toHaveLength(1);
   });
 
-  it("skips files that are missing or unreadable", () => {
+  it("skips files that are missing or unreadable", async () => {
     const files: ConfigFile[] = [
       {
         scope: "user",
@@ -253,13 +253,13 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toHaveLength(1);
     expect(result.events[0].scope).toBe("project");
   });
 
-  it("skips settings files without hooks key", () => {
+  it("skips settings files without hooks key", async () => {
     const files: ConfigFile[] = [
       {
         scope: "user",
@@ -272,12 +272,12 @@ describe("extractHooks", () => {
       },
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toEqual([]);
   });
 
-  it("skips matcher entries with no valid hooks", () => {
+  it("skips matcher entries with no valid hooks", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: [
@@ -293,7 +293,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     // Matcher with no valid hooks still gets included (empty hooks array)
     // but the event will have a matcher with 0 hooks
@@ -301,7 +301,7 @@ describe("extractHooks", () => {
     expect(result.events[0].matchers[0].hooks).toHaveLength(0);
   });
 
-  it("skips non-array event config values", () => {
+  it("skips non-array event config values", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         PreToolUse: "not-an-array",
@@ -311,13 +311,13 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toHaveLength(1);
     expect(result.events[0].event).toBe("Stop");
   });
 
-  it("handles custom event names outside the known catalog", () => {
+  it("handles custom event names outside the known catalog", async () => {
     const files: ConfigFile[] = [
       makeSettingsFile("user", {
         CustomEvent: [
@@ -326,7 +326,7 @@ describe("extractHooks", () => {
       }),
     ];
 
-    const result = extractHooks(files);
+    const result = await extractHooks(files);
 
     expect(result.events).toHaveLength(1);
     expect(result.events[0].event).toBe("CustomEvent");

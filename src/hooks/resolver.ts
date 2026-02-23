@@ -7,9 +7,11 @@ import type {
   HookEntry,
   HookEvent,
   HookMatcher,
+  HookScript,
   HooksResult,
 } from "./types.js";
 import type { PluginInfo } from "../plugins/types.js";
+import { getGlobalClaudeDir } from "../scanner/paths.js";
 
 /**
  * All known Claude Code hook event names.
@@ -47,7 +49,7 @@ const SCOPE_PRIORITY: Record<string, number> = {
  * @param files - All scanned configuration files from a scan() call
  * @returns HooksResult with events, available/configured/unconfigured lists
  */
-export function extractHooks(files: ConfigFile[]): HooksResult {
+export async function extractHooks(files: ConfigFile[]): Promise<HooksResult> {
   const allEvents: HookEvent[] = [];
 
   // Filter for settings files that exist, are readable, and have content
@@ -143,11 +145,45 @@ export function extractHooks(files: ConfigFile[]): HooksResult {
     (e) => !configuredSet.has(e)
   ).sort();
 
+  // Scan ~/.claude/hooks/ for script files
+  const hookScripts: HookScript[] = [];
+  const hooksDir = nodePath.join(getGlobalClaudeDir(), "hooks");
+  try {
+    const entries = await fs.readdir(hooksDir, { withFileTypes: true });
+    const scriptPromises = entries
+      .filter((e) => e.isFile())
+      .map(async (entry) => {
+        const filePath = nodePath.join(hooksDir, entry.name);
+        try {
+          const [content, stat] = await Promise.all([
+            fs.readFile(filePath, "utf-8"),
+            fs.stat(filePath),
+          ]);
+          return {
+            fileName: entry.name,
+            path: filePath,
+            sizeBytes: stat.size,
+            content,
+          } satisfies HookScript;
+        } catch {
+          return null;
+        }
+      });
+    const results = await Promise.all(scriptPromises);
+    for (const script of results) {
+      if (script) hookScripts.push(script);
+    }
+    hookScripts.sort((a, b) => a.fileName.localeCompare(b.fileName));
+  } catch {
+    // hooks directory doesn't exist
+  }
+
   return {
     events: allEvents,
     availableEvents: [...KNOWN_HOOK_EVENTS].sort(),
     configuredEvents,
     unconfiguredEvents,
+    hookScripts,
   };
 }
 
