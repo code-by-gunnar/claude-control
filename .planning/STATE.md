@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 13 of 13 (Settings Boolean Toggles)
-Plan: 00 of TBD complete
-Status: Phase 12 verified and complete. Ready for Phase 13 planning.
-Last activity: 2026-02-23 — Phase 12 verified (6/6 must-haves passed)
+Plan: 01 of 01 complete
+Status: Phase 13 complete. All v1.1 phases done.
+Last activity: 2026-02-23 — Phase 13 plan 01 executed (2/2 tasks, 2m)
 
-Progress: █████████░ 90%
+Progress: ██████████ 100%
 
 ## Performance Metrics
 
@@ -25,9 +25,9 @@ Progress: █████████░ 90%
 - Lines of code: 9,362
 
 **v1.1 Velocity:**
-- Total plans completed: 8
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 9
+- Average duration: --
+- Total execution time: --
 
 ## Accumulated Context
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - addPermission writes to user-scope only (~/.claude/settings.json), never managed scope
 - Uses jsonc-parser modify/applyEdits pattern matching existing removePermission
 - Form uses triggerRefresh() from RefreshContext for immediate list update
+- setSetting writes to user-scope only (~/.claude/settings.json), never managed scope
+- All boolean settings toggleable regardless of effective scope (toggle writes user-scope override)
+- Toggle uses same jsonc-parser modify/applyEdits pattern as permissions writer
 
 ### Pending Todos
 
@@ -59,5 +62,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 12 complete. Ready for Phase 13 planning.
-Resume file: .planning/phases/12-permission-write-rules/12-VERIFICATION.md
+Stopped at: Completed 13-01-PLAN.md. Phase 13 complete. All v1.1 phases done.
+Resume file: .planning/phases/13-settings-toggles/13-01-SUMMARY.md

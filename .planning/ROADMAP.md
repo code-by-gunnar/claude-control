@@ -17,7 +17,7 @@ Dashboard UX and interactivity improvements. Better navigation (sidebar groups, 
 - [x] **Phase 10: Health Deeplinks & Error Recovery** - Health recommendation links + error retry
 - [x] **Phase 11: Keyboard Navigation & Breadcrumbs** - G+key combos + Projects breadcrumbs
 - [x] **Phase 12: Permission Write Rules** - Add rule form with user-scope writes
-- [ ] **Phase 13: Settings Boolean Toggles** - Toggle switches with user-scope writes
+- [x] **Phase 13: Settings Boolean Toggles** - Toggle switches with user-scope writes
 
 ## Phase Details
 
@@ -102,4 +102,4 @@ Phases execute in numeric order: 8 → 9 → 10 → 11 → 12 → 13
 | 10. Health Deeplinks & Error Recovery | 2/2 | Complete | 2026-02-23 |
 | 11. Keyboard Navigation & Breadcrumbs | 2/2 | Complete | 2026-02-23 |
 | 12. Permission Write Rules | 1/1 | Complete | 2026-02-23 |
-| 13. Settings Boolean Toggles | 0/TBD | Not started | - |
+| 13. Settings Boolean Toggles | 1/1 | Complete | 2026-02-23 |
