@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { RefreshProvider } from "./lib/refresh-context";
 import { Layout } from "./components/Layout";
 import { OverviewPage } from "./pages/OverviewPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -16,6 +17,7 @@ import { ProjectsPage } from "./pages/ProjectsPage";
 export function App() {
   return (
     <BrowserRouter>
+      <RefreshProvider>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<OverviewPage />} />
@@ -32,6 +34,7 @@ export function App() {
           <Route path="/projects" element={<ProjectsPage />} />
         </Route>
       </Routes>
+      </RefreshProvider>
     </BrowserRouter>
   );
 }

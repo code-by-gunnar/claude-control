@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useRefresh } from "../lib/refresh-context";
 import { fetchPlugins, type PluginsResult, type PluginInfo } from "../lib/api";
 
 /** Scope badge color mapping */
@@ -208,9 +209,13 @@ export function PluginsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PluginsResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -222,6 +227,8 @@ export function PluginsPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load plugins");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -229,7 +236,7 @@ export function PluginsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (

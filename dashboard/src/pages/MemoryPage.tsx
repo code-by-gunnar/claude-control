@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchMemory,
   fetchMemoryImports,
@@ -462,9 +463,13 @@ export function MemoryPage() {
     null
   );
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -484,6 +489,8 @@ export function MemoryPage() {
           err instanceof Error ? err.message : "Failed to load memory files"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -491,7 +498,7 @@ export function MemoryPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   // Match slots to files
   const slots = scanResult

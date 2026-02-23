@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchCommands,
   type CommandsResult,
@@ -289,9 +290,13 @@ export function SkillsPage() {
   const [error, setError] = useState<string | null>(null);
   const [commandsData, setCommandsData] = useState<CommandsResult | null>(null);
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -305,6 +310,8 @@ export function SkillsPage() {
           err instanceof Error ? err.message : "Failed to load commands data"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -312,7 +319,7 @@ export function SkillsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const commands = commandsData?.commands ?? [];
   const customCommands = commands.filter((c) => c.source === "command" && !c.name.includes(":"));

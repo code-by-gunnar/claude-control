@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import { fetchMcp, type McpResult, type McpServer } from "../lib/api";
 
 /** Scope badge color mapping */
@@ -221,9 +222,13 @@ export function McpPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<McpResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -237,6 +242,8 @@ export function McpPage() {
           err instanceof Error ? err.message : "Failed to load MCP data"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -244,7 +251,7 @@ export function McpPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const servers = data?.servers ?? [];
   const duplicates = data?.duplicates ?? [];

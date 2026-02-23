@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchPermissions,
   removePermission,
@@ -253,6 +254,7 @@ export function PermissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PermissionsResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   async function loadData() {
     try {
@@ -269,6 +271,9 @@ export function PermissionsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function initialLoad() {
       try {
@@ -282,6 +287,8 @@ export function PermissionsPage() {
           err instanceof Error ? err.message : "Failed to load permissions"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -289,7 +296,7 @@ export function PermissionsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const permissions = data?.effective ?? [];
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import { fetchHealth, type HealthResult, type HealthCategory } from "../lib/api";
 import { InfoBubble } from "../components/InfoBubble";
 
@@ -110,9 +111,13 @@ export function HealthPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [health, setHealth] = useState<HealthResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -124,6 +129,8 @@ export function HealthPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load health data");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -131,7 +138,7 @@ export function HealthPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (

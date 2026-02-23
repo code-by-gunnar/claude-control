@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchMarketplaces,
   type MarketplacesResult,
@@ -143,9 +144,13 @@ export function MarketplacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<MarketplacesResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -159,6 +164,8 @@ export function MarketplacesPage() {
           err instanceof Error ? err.message : "Failed to load marketplaces"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -166,7 +173,7 @@ export function MarketplacesPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (

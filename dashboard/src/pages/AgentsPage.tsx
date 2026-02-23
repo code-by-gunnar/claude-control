@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import { fetchAgents, type AgentsResult, type AgentInfo } from "../lib/api";
 
 function formatBytes(bytes: number): string {
@@ -267,9 +268,13 @@ export function AgentsPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<AgentsResult | null>(null);
   const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -281,6 +286,8 @@ export function AgentsPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load agents");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -288,7 +295,7 @@ export function AgentsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (

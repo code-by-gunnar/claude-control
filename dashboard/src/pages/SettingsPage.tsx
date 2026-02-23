@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchSettings,
   type ResolvedSetting,
@@ -146,9 +147,13 @@ export function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SettingsResult | null>(null);
   const [filter, setFilter] = useState("");
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -160,6 +165,8 @@ export function SettingsPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load settings");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -167,7 +174,7 @@ export function SettingsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const filteredSettings =
     data?.settings?.filter((s) =>

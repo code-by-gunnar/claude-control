@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchProjects,
   fetchCompare,
@@ -200,9 +201,15 @@ export function ProjectsPage() {
   const [workspace, setWorkspace] = useState<WorkspaceScan | null>(null);
   const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   // Prefill with parent of project dir from scan data
   useEffect(() => {
+    setRefreshing(true);
+    setWorkspace(null);
+    setComparison(null);
+    setError(null);
+
     async function getProjectDir() {
       try {
         const res = await fetch("/api/scan");
@@ -217,10 +224,12 @@ export function ProjectsPage() {
         }
       } catch {
         // ignore
+      } finally {
+        setRefreshing(false);
       }
     }
     getProjectDir();
-  }, []);
+  }, [refreshKey]);
 
   async function handleDiscover() {
     if (!parentDir.trim()) return;

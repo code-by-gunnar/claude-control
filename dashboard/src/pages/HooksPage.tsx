@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchHooks,
   type HooksResult,
@@ -211,9 +212,13 @@ export function HooksPage() {
   const [error, setError] = useState<string | null>(null);
   const [hooksData, setHooksData] = useState<HooksResult | null>(null);
   const [expandedScript, setExpandedScript] = useState<string | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -227,6 +232,8 @@ export function HooksPage() {
           err instanceof Error ? err.message : "Failed to load hooks data"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -234,7 +241,7 @@ export function HooksPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const allEvents = hooksData?.availableEvents ?? [];
   const events = hooksData?.events ?? [];

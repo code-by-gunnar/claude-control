@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchStatus,
   fetchScan,
@@ -21,9 +22,13 @@ export function OverviewPage() {
   const [cards, setCards] = useState<CardData[]>([]);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [configExpanded, setConfigExpanded] = useState(false);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -146,6 +151,8 @@ export function OverviewPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load data");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -153,7 +160,7 @@ export function OverviewPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (
