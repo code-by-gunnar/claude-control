@@ -1,6 +1,6 @@
 {
   "name": "claude-control",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "A unified dashboard and CLI tool for discovering, viewing, and managing Claude Code configuration",
   "type": "module",
   "bin": {

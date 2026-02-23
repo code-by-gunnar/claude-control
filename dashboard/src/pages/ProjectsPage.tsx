@@ -9,6 +9,7 @@ import {
   type ComparisonEntry,
 } from "../lib/api";
 import { EmptyState } from "../components/EmptyState";
+import { Breadcrumbs, type BreadcrumbItem } from "../components/Breadcrumbs";
 
 /** Group comparison entries by their type field */
 function groupEntries(entries: ComparisonEntry[]): Record<string, ComparisonEntry[]> {
@@ -100,10 +101,8 @@ function ProjectCard({
 
 function ComparisonTable({
   comparison,
-  onBack,
 }: {
   comparison: ComparisonResult;
-  onBack: () => void;
 }) {
   const grouped = groupEntries(comparison.entries);
   const typeLabels: Record<string, string> = {
@@ -116,17 +115,7 @@ function ComparisonTable({
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
-          Back to Discovery
-        </button>
+      <div className="mb-4">
         <span className="text-sm text-slate-500">
           Comparing {comparison.projects.length} projects &middot;{" "}
           {comparison.summary.totalDifferences} difference{comparison.summary.totalDifferences !== 1 ? "s" : ""}
@@ -277,29 +266,47 @@ export function ProjectsPage() {
     });
   }
 
-  // Comparison mode
-  if (comparison) {
-    return (
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
-        <p className="text-sm text-slate-500 mb-6">
-          Cross-project configuration comparison
-        </p>
-        <ComparisonTable
-          comparison={comparison}
-          onBack={() => setComparison(null)}
-        />
-      </div>
-    );
-  }
+  // Derive current step from state
+  type ProjectStep = "discover" | "select" | "compare";
+  const step: ProjectStep = comparison ? "compare" : workspace ? "select" : "discover";
 
-  // Discovery mode (default)
+  // Build breadcrumb items based on current step
+  const resetToDiscover = () => {
+    setWorkspace(null);
+    setSelectedPaths(new Set());
+    setComparison(null);
+  };
+  const resetToSelect = () => setComparison(null);
+
+  const breadcrumbItems: BreadcrumbItem[] =
+    step === "discover"
+      ? [{ label: "Discover" }]
+      : step === "select"
+        ? [{ label: "Discover", onClick: resetToDiscover }, { label: "Select" }]
+        : [
+            { label: "Discover", onClick: resetToDiscover },
+            { label: "Select", onClick: resetToSelect },
+            { label: "Compare" },
+          ];
+
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
-      <p className="text-sm text-slate-500 mb-6">
-        Discover and compare Claude Code configurations across projects
+      <p className="text-sm text-slate-500 mb-4">
+        {comparison
+          ? "Cross-project configuration comparison"
+          : "Discover and compare Claude Code configurations across projects"}
       </p>
+      <div className="mb-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      {/* Comparison view */}
+      {comparison && <ComparisonTable comparison={comparison} />}
+
+      {/* Discovery + selection view */}
+      {!comparison && (
+        <>
 
       {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
@@ -422,6 +429,8 @@ export function ProjectsPage() {
             </div>
           )}
         </>
+      )}
+      </>
       )}
     </div>
   );
