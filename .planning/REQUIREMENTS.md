@@ -19,15 +19,15 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 
 - [x] **GUIDE-01**: Every dashboard page shows contextual empty state when no data exists
 - [x] **GUIDE-02**: Empty states explain WHY nothing is configured and WHAT to do next
-- [ ] **GUIDE-03**: Health recommendations link directly to the relevant dashboard page
+- [x] **GUIDE-03**: Health recommendations link directly to the relevant dashboard page
 - [x] **GUIDE-04**: Overview page displays subscription type and rate limit tier prominently alongside stat cards
 
 ### Workflow
 
 - [x] **WORK-01**: Global refresh button in layout header re-fetches all data without full page reload
 - [x] **WORK-02**: Refresh button shows loading state during data fetch
-- [ ] **WORK-03**: Error states on each page include a retry button
-- [ ] **WORK-04**: Retry button re-fetches only the failed page's data
+- [x] **WORK-03**: Error states on each page include a retry button
+- [x] **WORK-04**: Retry button re-fetches only the failed page's data
 
 ### Write Capabilities
 
@@ -84,12 +84,12 @@ Which phases cover which requirements. Updated by create-roadmap.
 | NAV-05 | Phase 11 | Pending |
 | GUIDE-01 | Phase 9 | Complete |
 | GUIDE-02 | Phase 9 | Complete |
-| GUIDE-03 | Phase 10 | Pending |
+| GUIDE-03 | Phase 10 | Complete |
 | GUIDE-04 | Phase 9 | Complete |
 | WORK-01 | Phase 8 | Complete |
 | WORK-02 | Phase 8 | Complete |
-| WORK-03 | Phase 10 | Pending |
-| WORK-04 | Phase 10 | Pending |
+| WORK-03 | Phase 10 | Complete |
+| WORK-04 | Phase 10 | Complete |
 | WRITE-01 | Phase 12 | Pending |
 | WRITE-02 | Phase 12 | Pending |
 | WRITE-03 | Phase 12 | Pending |
@@ -104,4 +104,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after Phase 9 completion*
+*Last updated: 2026-02-23 after Phase 10 completion*
