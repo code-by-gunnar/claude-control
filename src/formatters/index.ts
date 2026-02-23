@@ -1,16 +1,24 @@
 import type { ConfigFile, ScanResult } from "../scanner/types.js";
+import type { AccountInfo } from "../account/resolver.js";
+import type { AgentsResult } from "../agents/types.js";
 import type { HealthResult } from "../health/types.js";
 import type { CommandsResult, HooksResult } from "../hooks/types.js";
+import type { MarketplacesResult } from "../marketplace/types.js";
 import type { McpResult } from "../mcp/types.js";
 import type { MemoryImportResult } from "../memory/types.js";
 import type { PermissionsResult } from "../permissions/types.js";
+import type { PluginsResult } from "../plugins/types.js";
 import type { SettingsResult } from "../settings/types.js";
+import { formatAccountJson, formatAccountTable } from "./account.js";
+import { formatAgentsJson, formatAgentsTable } from "./agents.js";
 import { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 import { formatHealthJson, formatHealthTable } from "./health.js";
 import { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+import { formatMarketplacesJson, formatMarketplacesTable } from "./marketplaces.js";
 import { formatMcpJson, formatMcpTable } from "./mcp.js";
 import { formatMemoryImportsJson, formatMemoryImportsTable } from "./memory.js";
 import { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
+import { formatPluginsJson, formatPluginsTable } from "./plugins.js";
 import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 
 /**
@@ -179,12 +187,61 @@ export function formatHealth(
     : formatHealthTable(result, projectDir);
 }
 
+/**
+ * Format agents extraction results for display.
+ *
+ * @param result - The agents extraction result
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatAgents(result: AgentsResult, json: boolean): string {
+  return json ? formatAgentsJson(result) : formatAgentsTable(result);
+}
+
+/**
+ * Format plugins extraction results for display.
+ *
+ * @param result - The plugins extraction result
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatPlugins(result: PluginsResult, json: boolean): string {
+  return json ? formatPluginsJson(result) : formatPluginsTable(result);
+}
+
+/**
+ * Format marketplaces extraction results for display.
+ *
+ * @param result - The marketplaces extraction result
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatMarketplaces(
+  result: MarketplacesResult,
+  json: boolean
+): string {
+  return json
+    ? formatMarketplacesJson(result)
+    : formatMarketplacesTable(result);
+}
+
+/**
+ * Format account info for display.
+ *
+ * @param result - The account info result
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatAccount(result: AccountInfo, json: boolean): string {
+  return json ? formatAccountJson(result) : formatAccountTable(result);
+}
+
 // Re-export individual formatters for direct access
+export { formatAccountJson, formatAccountTable } from "./account.js";
+export { formatAgentsJson, formatAgentsTable } from "./agents.js";
 export { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
 export { formatHealthJson, formatHealthTable } from "./health.js";
 export { formatMemoryContentJson, formatMemoryJson, formatScanJson, formatSettingsJson, formatStatusJson } from "./json.js";
+export { formatMarketplacesJson, formatMarketplacesTable } from "./marketplaces.js";
 export { formatMcpJson, formatMcpTable } from "./mcp.js";
 export { formatMemoryImportsJson, formatMemoryImportsTable } from "./memory.js";
 export { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
+export { formatPluginsJson, formatPluginsTable } from "./plugins.js";
 export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 export { formatDiscovery, formatCompare } from "./compare.js";

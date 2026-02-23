@@ -47,6 +47,10 @@ Or run without installing via `npx claude-control <command>`.
 | `claude-ctl hooks` | View configured hooks and the event catalog |
 | `claude-ctl commands` | List custom slash commands and skills |
 | `claude-ctl permissions` | Merged permissions audit with deny/ask/allow resolution |
+| `claude-ctl agents` | List custom agent definitions from ~/.claude/agents/ |
+| `claude-ctl plugins` | List installed plugins with status and MCP servers |
+| `claude-ctl marketplaces` | Browse plugin marketplace catalogs |
+| `claude-ctl account` | Show subscription type and rate limit tier |
 | `claude-ctl health` | Configuration health score with category breakdown |
 | `claude-ctl compare` | Cross-project configuration comparison |
 | `claude-ctl dashboard` | Launch the interactive web dashboard |
