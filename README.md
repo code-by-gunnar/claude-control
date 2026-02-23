@@ -153,10 +153,10 @@ This starts a local server and opens your browser at `http://localhost:3737`. Us
 claude-ctl dashboard --port 8080
 ```
 
-The dashboard includes pages for Overview, Settings, Memory, MCP Servers, Plugins, Marketplaces, Hooks, Agents, Skills, Permissions, Health, and Projects.
+The dashboard includes 12 pages covering every area of Claude Code configuration:
 
-<details>
-<summary><strong>Dashboard Screenshots</strong></summary>
+<details open>
+<summary><strong>View all dashboard pages (12 screenshots)</strong></summary>
 <br>
 
 #### Overview
