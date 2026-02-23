@@ -520,7 +520,7 @@ export function MemoryPage() {
       <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
         Memory
       </h1>
-      <p className="text-sm text-slate-500 mb-6">
+      <p className="text-sm text-slate-500 mb-4">
         CLAUDE.md files and @import chains
         {!loading && (
           <span className="ml-1 text-slate-400">
@@ -541,7 +541,6 @@ export function MemoryPage() {
         )}
       </p>
 
-      {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
         <p className="mb-2">
           <strong>CLAUDE.md</strong> files provide persistent instructions to

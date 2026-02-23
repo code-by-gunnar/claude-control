@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 import { fetchHealth, type HealthResult, type HealthCategory } from "../lib/api";
+import { InfoBubble } from "../components/InfoBubble";
+
+const categoryInfo: Record<string, string> = {
+  Memory: "Do you have CLAUDE.md project instructions to guide Claude?",
+  MCP: "Are MCP tool servers configured for Claude to use?",
+  Permissions: "Are tool permissions explicitly defined?",
+  Settings: "Are key behaviors configured?",
+  Hooks: "Are lifecycle hooks set up for automation?",
+};
 
 /** Map grade letter to Tailwind color classes */
 function gradeColors(grade: string): { text: string; bg: string; ring: string } {
@@ -47,7 +56,12 @@ function CategoryCard({ category }: { category: HealthCategory }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-5">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-slate-800">{category.name}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-sm font-semibold text-slate-800">{category.name}</h3>
+          {categoryInfo[category.name] && (
+            <InfoBubble text={categoryInfo[category.name]} />
+          )}
+        </div>
         <span className="text-sm font-mono text-slate-500">
           {Math.round(category.score)}/100
         </span>
@@ -134,40 +148,10 @@ export function HealthPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Health</h1>
-      <p className="text-sm text-slate-500 mb-6">Configuration health score and recommendations</p>
-
-      {/* Explainer */}
-      {!loading && health && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
-          <p className="mb-2">
-            <strong>Health score</strong> evaluates your Claude Code setup
-            against recommended best practices. Each category checks for
-            specific configuration patterns:
-          </p>
-          <ul className="list-disc pl-5 space-y-1 mb-2">
-            <li>
-              <strong>CLAUDE.md</strong> &mdash; do you have project instructions to guide Claude?
-            </li>
-            <li>
-              <strong>MCP servers</strong> &mdash; are tools configured for Claude to use?
-            </li>
-            <li>
-              <strong>Permissions</strong> &mdash; are tool permissions explicitly defined?
-            </li>
-            <li>
-              <strong>Settings</strong> &mdash; are key behaviors configured?
-            </li>
-            <li>
-              <strong>Hooks</strong> &mdash; are lifecycle hooks set up for automation?
-            </li>
-          </ul>
-          <p className="text-blue-700 text-xs">
-            A perfect score isn&rsquo;t required &mdash; the checks highlight
-            areas where adding configuration could improve your Claude Code
-            experience. Focus on the recommendations below.
-          </p>
-        </div>
-      )}
+      <p className="text-sm text-slate-500 mb-6">
+        Configuration health score and recommendations{" "}
+        <InfoBubble text="Evaluates your setup against best practices. A perfect score isn't required — focus on the recommendations to improve your experience." />
+      </p>
 
       {loading ? (
         <div className="space-y-6">

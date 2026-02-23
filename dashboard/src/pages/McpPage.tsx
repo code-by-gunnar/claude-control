@@ -277,7 +277,6 @@ export function McpPage() {
         )}
       </p>
 
-      {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
         <p>
           <strong>MCP servers</strong> provide tools that Claude can use (file access, web search, databases, etc.).
