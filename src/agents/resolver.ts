@@ -8,7 +8,7 @@ import type { AgentInfo, AgentsResult } from "./types.js";
  * Extracts key-value pairs between --- delimiters.
  * Simple regex-based parser (no external YAML dependency).
  */
-function parseFrontmatter(content: string): Record<string, string> {
+export function parseFrontmatter(content: string): Record<string, string> {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return {};
 
@@ -32,7 +32,7 @@ function parseFrontmatter(content: string): Record<string, string> {
 /**
  * Extract the first sentence from a description string for display.
  */
-function truncateToFirstSentence(text: string): string {
+export function truncateToFirstSentence(text: string): string {
   const periodIndex = text.indexOf(". ");
   if (periodIndex !== -1 && periodIndex < 200) {
     return text.slice(0, periodIndex + 1);

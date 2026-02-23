@@ -188,9 +188,56 @@ export async function extractHooks(files: ConfigFile[]): Promise<HooksResult> {
 }
 
 /**
+ * Parse YAML frontmatter from a markdown file.
+ * Returns extracted fields or empty object if no frontmatter.
+ */
+export function parseFrontmatter(content: string): Record<string, string> {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return {};
+  const fields: Record<string, string> = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    const colonIdx = line.indexOf(":");
+    if (colonIdx < 0) continue;
+    const key = line.slice(0, colonIdx).trim();
+    let value = line.slice(colonIdx + 1).trim();
+    // Strip surrounding quotes
+    if ((value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (key && value) fields[key] = value;
+  }
+  return fields;
+}
+
+/**
+ * Read a markdown file and extract metadata (frontmatter, content, size).
+ */
+async function readMdWithMeta(filePath: string): Promise<{
+  content: string;
+  sizeBytes: number;
+  description?: string;
+} | null> {
+  try {
+    const [content, stat] = await Promise.all([
+      fs.readFile(filePath, "utf-8"),
+      fs.stat(filePath),
+    ]);
+    const fm = parseFrontmatter(content);
+    return {
+      content,
+      sizeBytes: stat.size,
+      description: fm.description || undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Extract all custom commands and skills from scanned configuration files.
  *
- * Filters for commands-dir type files that exist and are readable,
+ * Scans commands-dir and skills-dir type entries from the file scan,
  * reads .md files from each directory, and creates CommandEntry objects.
  * Optionally also scans installed plugin directories for commands/skills.
  *
@@ -218,10 +265,16 @@ export async function extractCommands(
       for (const entry of entries) {
         if (entry.isFile() && entry.name.endsWith(".md")) {
           // Direct .md command file
+          const filePath = nodePath.join(dir.expectedPath, entry.name);
+          const meta = await readMdWithMeta(filePath);
           allCommands.push({
             name: entry.name.replace(/\.md$/, ""),
-            path: nodePath.join(dir.expectedPath, entry.name),
+            path: filePath,
             scope: dir.scope,
+            source: "command",
+            description: meta?.description,
+            content: meta?.content,
+            sizeBytes: meta?.sizeBytes,
           });
         } else if (entry.isDirectory()) {
           // Skill directory — check for .md files inside
@@ -233,14 +286,20 @@ export async function extractCommands(
 
             for (const skillEntry of skillEntries) {
               if (skillEntry.isFile() && skillEntry.name.endsWith(".md")) {
+                const filePath = nodePath.join(
+                  dir.expectedPath,
+                  entry.name,
+                  skillEntry.name
+                );
+                const meta = await readMdWithMeta(filePath);
                 allCommands.push({
                   name: `${entry.name}:${skillEntry.name.replace(/\.md$/, "")}`,
-                  path: nodePath.join(
-                    dir.expectedPath,
-                    entry.name,
-                    skillEntry.name
-                  ),
+                  path: filePath,
                   scope: dir.scope,
+                  source: "command",
+                  description: meta?.description,
+                  content: meta?.content,
+                  sizeBytes: meta?.sizeBytes,
                 });
               }
             }
@@ -251,6 +310,53 @@ export async function extractCommands(
       }
     } catch {
       // Skip unreadable commands directories
+    }
+  }
+
+  // Scan skills directories (e.g., ~/.claude/skills/)
+  const skillsDirs = files.filter(
+    (f) => f.type === "skills-dir" && f.exists && f.readable
+  );
+
+  for (const dir of skillsDirs) {
+    try {
+      const entries = await fs.readdir(dir.expectedPath, {
+        withFileTypes: true,
+      });
+
+      const skillPromises = entries
+        .filter((e) => e.isDirectory())
+        .map(async (entry) => {
+          // Each skill is a directory containing SKILL.md (or any .md file)
+          const skillDir = nodePath.join(dir.expectedPath, entry.name);
+          try {
+            const skillFiles = await fs.readdir(skillDir, { withFileTypes: true });
+            const mdFile = skillFiles.find(
+              (f) => f.isFile() && f.name.endsWith(".md")
+            );
+            if (!mdFile) return null;
+            const filePath = nodePath.join(skillDir, mdFile.name);
+            const meta = await readMdWithMeta(filePath);
+            return {
+              name: entry.name,
+              path: filePath,
+              scope: dir.scope,
+              source: "skill" as const,
+              description: meta?.description,
+              content: meta?.content,
+              sizeBytes: meta?.sizeBytes,
+            } satisfies CommandEntry;
+          } catch {
+            return null;
+          }
+        });
+
+      const results = await Promise.all(skillPromises);
+      for (const skill of results) {
+        if (skill) allCommands.push(skill);
+      }
+    } catch {
+      // Skip unreadable skills directories
     }
   }
 
@@ -268,10 +374,16 @@ export async function extractCommands(
           const entries = await fs.readdir(commandsDir, { withFileTypes: true });
           for (const entry of entries) {
             if (entry.isFile() && entry.name.endsWith(".md")) {
+              const filePath = nodePath.join(commandsDir, entry.name);
+              const meta = await readMdWithMeta(filePath);
               pluginCommands.push({
                 name: `${plugin.name}:${entry.name.replace(/\.md$/, "")}`,
-                path: nodePath.join(commandsDir, entry.name),
+                path: filePath,
                 scope: plugin.scope,
+                source: "plugin",
+                description: meta?.description,
+                content: meta?.content,
+                sizeBytes: meta?.sizeBytes,
               });
             }
           }
@@ -297,10 +409,16 @@ export async function extractCommands(
                 (f) => f.isFile() && f.name.endsWith(".md")
               );
               if (mdFile) {
+                const filePath = nodePath.join(skillsDir, skillDir.name, mdFile.name);
+                const meta = await readMdWithMeta(filePath);
                 pluginCommands.push({
                   name: skillName,
-                  path: nodePath.join(skillsDir, skillDir.name, mdFile.name),
+                  path: filePath,
                   scope: plugin.scope,
+                  source: "plugin",
+                  description: meta?.description,
+                  content: meta?.content,
+                  sizeBytes: meta?.sizeBytes,
                 });
                 seenNames.add(skillName);
               }

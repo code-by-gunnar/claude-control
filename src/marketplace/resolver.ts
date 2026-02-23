@@ -116,7 +116,7 @@ async function readBlocklist(globalDir: string): Promise<BlockedPlugin[]> {
 /**
  * Extract enabled plugin keys from settings files.
  */
-function getEnabledPluginKeys(files: ConfigFile[]): Set<string> {
+export function getEnabledPluginKeys(files: ConfigFile[]): Set<string> {
   const enabled = new Set<string>();
 
   const settingsFiles = files.filter(
