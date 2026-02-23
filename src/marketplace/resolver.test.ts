@@ -126,16 +126,16 @@ describe("extractMarketplaces", () => {
 
     vi.mocked(parseJsonc).mockImplementation(async (filePath: string) => {
       if (filePath.includes("known_marketplaces.json")) {
-        return { data: marketplaces, raw: "" };
+        return { data: marketplaces, errors: [] };
       }
       if (filePath.includes("install-counts-cache.json")) {
-        return { data: opts?.installCounts ?? {}, raw: "" };
+        return { data: opts?.installCounts ?? {}, errors: [] };
       }
       if (filePath.includes("blocklist.json")) {
-        return { data: opts?.blocklist ?? [], raw: "" };
+        return { data: opts?.blocklist ?? [], errors: [] };
       }
       if (filePath.includes("plugin.json")) {
-        return { data: { description: "A test plugin" }, raw: "" };
+        return { data: { description: "A test plugin" }, errors: [] };
       }
       throw new Error("ENOENT");
     });

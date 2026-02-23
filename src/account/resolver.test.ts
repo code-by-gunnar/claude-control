@@ -25,7 +25,7 @@ describe("extractAccountInfo", () => {
           accessToken: "secret-token",
         },
       },
-      raw: "",
+      errors: [],
     });
 
     const result = await extractAccountInfo();
@@ -37,7 +37,7 @@ describe("extractAccountInfo", () => {
   it("returns nulls when claudeAiOauth key is missing", async () => {
     vi.mocked(parseJsonc).mockResolvedValue({
       data: { someOtherKey: "value" },
-      raw: "",
+      errors: [],
     });
 
     const result = await extractAccountInfo();
@@ -63,7 +63,7 @@ describe("extractAccountInfo", () => {
           rateLimitTier: "tier",
         },
       },
-      raw: "",
+      errors: [],
     });
 
     const result = await extractAccountInfo();
@@ -79,7 +79,7 @@ describe("extractAccountInfo", () => {
           subscriptionType: "pro",
         },
       },
-      raw: "",
+      errors: [],
     });
 
     const result = await extractAccountInfo();
@@ -95,7 +95,7 @@ describe("extractAccountInfo", () => {
           rateLimitTier: "default",
         },
       },
-      raw: "",
+      errors: [],
     });
 
     const result = await extractAccountInfo();

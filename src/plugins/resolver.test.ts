@@ -78,7 +78,7 @@ describe("readInstalledPluginsRegistry", () => {
         ],
       },
     };
-    vi.mocked(parseJsonc).mockResolvedValue({ data: registry, raw: "" });
+    vi.mocked(parseJsonc).mockResolvedValue({ data: registry, errors: [] });
 
     const result = await readInstalledPluginsRegistry("/home/user/.claude");
 
@@ -88,7 +88,7 @@ describe("readInstalledPluginsRegistry", () => {
   });
 
   it("returns null when version is not 2", async () => {
-    vi.mocked(parseJsonc).mockResolvedValue({ data: { version: 1, plugins: {} }, raw: "" });
+    vi.mocked(parseJsonc).mockResolvedValue({ data: { version: 1, plugins: {} }, errors: [] });
 
     const result = await readInstalledPluginsRegistry("/home/user/.claude");
 
@@ -104,7 +104,7 @@ describe("readInstalledPluginsRegistry", () => {
   });
 
   it("returns null when plugins key is missing", async () => {
-    vi.mocked(parseJsonc).mockResolvedValue({ data: { version: 2 }, raw: "" });
+    vi.mocked(parseJsonc).mockResolvedValue({ data: { version: 2 }, errors: [] });
 
     const result = await readInstalledPluginsRegistry("/home/user/.claude");
 
@@ -192,7 +192,7 @@ describe("extractPlugins", () => {
         ],
       },
     };
-    vi.mocked(parseJsonc).mockResolvedValue({ data: registry, raw: "" });
+    vi.mocked(parseJsonc).mockResolvedValue({ data: registry, errors: [] });
     vi.mocked(fs.stat).mockImplementation(async (p: any) => {
       const pathStr = String(p);
       if (pathStr === "/installed/path") {
