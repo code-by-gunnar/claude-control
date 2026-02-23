@@ -9,7 +9,7 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 
 ### Navigation
 
-- [ ] **NAV-01**: Dashboard sidebar groups items under section headers (Configuration, Extensions, Workspace) instead of flat list
+- [x] **NAV-01**: Dashboard sidebar groups items under section headers (Configuration, Extensions, Workspace) instead of flat list
 - [ ] **NAV-02**: Keyboard combos (G+S, G+M, etc.) navigate to any dashboard page without mouse
 - [ ] **NAV-03**: Keyboard shortcut help overlay shows all available combos
 - [ ] **NAV-04**: Projects page shows breadcrumb trail for discover → select → compare flow
@@ -24,8 +24,8 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 
 ### Workflow
 
-- [ ] **WORK-01**: Global refresh button in layout header re-fetches all data without full page reload
-- [ ] **WORK-02**: Refresh button shows loading state during data fetch
+- [x] **WORK-01**: Global refresh button in layout header re-fetches all data without full page reload
+- [x] **WORK-02**: Refresh button shows loading state during data fetch
 - [ ] **WORK-03**: Error states on each page include a retry button
 - [ ] **WORK-04**: Retry button re-fetches only the failed page's data
 
@@ -77,7 +77,7 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 8 | Pending |
+| NAV-01 | Phase 8 | Complete |
 | NAV-02 | Phase 11 | Pending |
 | NAV-03 | Phase 11 | Pending |
 | NAV-04 | Phase 11 | Pending |
@@ -86,8 +86,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | GUIDE-02 | Phase 9 | Pending |
 | GUIDE-03 | Phase 10 | Pending |
 | GUIDE-04 | Phase 9 | Pending |
-| WORK-01 | Phase 8 | Pending |
-| WORK-02 | Phase 8 | Pending |
+| WORK-01 | Phase 8 | Complete |
+| WORK-02 | Phase 8 | Complete |
 | WORK-03 | Phase 10 | Pending |
 | WORK-04 | Phase 10 | Pending |
 | WRITE-01 | Phase 12 | Pending |
