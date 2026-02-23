@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRefresh } from "../lib/refresh-context";
 import { fetchAgents, type AgentsResult, type AgentInfo } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -354,9 +355,16 @@ export function AgentsPage() {
           ))}
         </div>
       ) : agents.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-          No agents found. Create agent files in <code className="font-mono text-xs">~/.claude/agents/</code>
-        </div>
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+            </svg>
+          }
+          title="No custom agents found"
+          description="Agent files define specialized Claude behaviors with custom system prompts, tool sets, and model preferences."
+          action={<>Create <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">.md</code> files in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">~/.claude/agents/</code> with YAML frontmatter</>}
+        />
       ) : (
         <div className="space-y-3">
           {agents.map((agent) => (

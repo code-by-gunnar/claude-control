@@ -6,6 +6,7 @@ import {
   type PermissionsResult,
   type EffectivePermission,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -374,9 +375,16 @@ export function PermissionsPage() {
           ))}
         </div>
       ) : permissions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-          No permissions configured
-        </div>
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+            </svg>
+          }
+          title="No permission rules configured"
+          description="Permission rules control which tools Claude can run automatically, with prompting, or not at all."
+          action={<>Add rules in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">permissions</code> key with <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">allow</code>, <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">deny</code>, or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">ask</code> arrays</>}
+        />
       ) : (
         <>
           <div className="bg-white rounded-lg shadow-sm border border-slate-200">

@@ -6,6 +6,7 @@ import {
   type HookEvent,
   type HookScript,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -322,9 +323,16 @@ export function HooksPage() {
           </div>
 
           {allEvents.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
-              No hook events available
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                </svg>
+              }
+              title="No hooks configured"
+              description="Hooks run shell commands when Claude Code events occur, like after editing files or before committing."
+              action={<>Add hooks in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">hooks</code> key</>}
+            />
           ) : (
             allEvents.map((eventName) => (
               <EventRow

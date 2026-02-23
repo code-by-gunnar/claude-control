@@ -8,6 +8,7 @@ import {
   type ComparisonResult,
   type ComparisonEntry,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 /** Group comparison entries by their type field */
 function groupEntries(entries: ComparisonEntry[]): Record<string, ComparisonEntry[]> {
@@ -398,9 +399,16 @@ export function ProjectsPage() {
           </div>
 
           {workspace.projects.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-              No Claude Code projects found in this directory
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                </svg>
+              }
+              title="No Claude Code projects found"
+              description="Project discovery scans the parent directory for folders that contain Claude Code configuration."
+              action={<>Make sure sibling directories have <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">.claude/</code> folders or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">CLAUDE.md</code> files</>}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {workspace.projects.map((project) => (

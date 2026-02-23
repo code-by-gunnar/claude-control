@@ -5,6 +5,7 @@ import {
   type CommandsResult,
   type CommandEntry,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -431,9 +432,16 @@ export function SkillsPage() {
               )}
             </h2>
             {allCustomCommands.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-                No custom commands configured
-              </div>
+              <EmptyState
+                icon={
+                  <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m6.75 7.5 3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                }
+                title="No custom commands configured"
+                description="Custom commands are slash commands you define for frequently used prompts or workflows."
+                action={<>Create command files in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">~/.claude/commands/</code> or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">.claude/commands/</code></>}
+              />
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200">
                 <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">

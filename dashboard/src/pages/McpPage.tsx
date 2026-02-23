@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRefresh } from "../lib/refresh-context";
 import { fetchMcp, type McpResult, type McpServer } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -312,9 +313,16 @@ export function McpPage() {
           <DuplicateWarning duplicates={duplicates} />
 
           {servers.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-              No MCP servers configured
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                </svg>
+              }
+              title="No MCP servers configured"
+              description="MCP servers extend Claude with external tools and data sources like databases, APIs, and file systems."
+              action={<>Add servers in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">~/.claude/settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">mcpServers</code> key</>}
+            />
           ) : (
             <div className="bg-white rounded-lg shadow-sm border border-slate-200">
               {/* Header */}
