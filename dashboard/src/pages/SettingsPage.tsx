@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRefresh } from "../lib/refresh-context";
 import {
   fetchSettings,
+  setSetting,
   type ResolvedSetting,
   type SettingsResult,
 } from "../lib/api";
@@ -47,10 +48,41 @@ function shortenPath(fullPath: string): string {
   return fullPath;
 }
 
-function SettingRow({ setting }: { setting: ResolvedSetting }) {
+function ToggleSwitch({
+  checked,
+  onChange,
+  disabled,
+}: {
+  checked: boolean;
+  onChange: (newValue: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 ${
+        checked ? "bg-blue-600" : "bg-slate-300"
+      } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+          checked ? "translate-x-4" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+}
+
+function SettingRow({ setting, triggerRefresh }: { setting: ResolvedSetting; triggerRefresh: () => void }) {
   const [expanded, setExpanded] = useState(false);
+  const [toggling, setToggling] = useState(false);
   const hasOverrides = setting.overrides.length > 1;
   const isObjectValue = typeof setting.effectiveValue === "object" && setting.effectiveValue !== null;
+  const isBooleanValue = typeof setting.effectiveValue === "boolean";
 
   return (
     <div className="border-b border-slate-100 last:border-b-0">
@@ -74,6 +106,25 @@ function SettingRow({ setting }: { setting: ResolvedSetting }) {
             formatValue(setting.effectiveValue)
           )}
         </span>
+        {isBooleanValue && (
+          <span className="shrink-0" onClick={(e) => e.stopPropagation()}>
+            <ToggleSwitch
+              checked={setting.effectiveValue as boolean}
+              disabled={toggling}
+              onChange={async (newVal) => {
+                setToggling(true);
+                try {
+                  await setSetting(setting.key, newVal);
+                  triggerRefresh();
+                } catch {
+                  // silently fail - the refresh will show original value
+                } finally {
+                  setToggling(false);
+                }
+              }}
+            />
+          </span>
+        )}
         <ScopeBadge scope={setting.effectiveScope} />
         <span
           className="text-xs text-slate-400 hidden lg:inline truncate max-w-[200px]"
@@ -344,7 +395,7 @@ export function SettingsPage() {
               </div>
 
               {filteredSettings.map((setting) => (
-                <SettingRow key={setting.key} setting={setting} />
+                <SettingRow key={setting.key} setting={setting} triggerRefresh={triggerRefresh} />
               ))}
             </div>
           )}
@@ -353,6 +404,11 @@ export function SettingsPage() {
             {filteredSettings.length} of {data?.settings?.length ?? 0} settings
             {filter ? ` matching "${filter}"` : ""}
           </p>
+          {filteredSettings.some((s) => typeof s.effectiveValue === "boolean") && (
+            <p className="text-xs text-slate-400 mt-1">
+              Boolean settings can be toggled. Changes write to user-scope (~/.claude/settings.json).
+            </p>
+          )}
         </>
       )}
     </div>
