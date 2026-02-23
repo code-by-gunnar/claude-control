@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useRefresh } from "../lib/refresh-context";
-import { fetchHealth, type HealthResult, type HealthCategory } from "../lib/api";
+import { fetchHealth, type HealthResult, type HealthCategory, type HealthCheck } from "../lib/api";
 import { InfoBubble } from "../components/InfoBubble";
 import { EmptyState } from "../components/EmptyState";
 
@@ -203,21 +204,41 @@ export function HealthPage() {
           </div>
 
           {/* Recommendations */}
-          {health.recommendations.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-4">Recommendations</h2>
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">
-                {health.recommendations.map((rec, i) => (
-                  <div key={i} className="flex items-start gap-3 px-5 py-3">
-                    <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
-                      {i + 1}
-                    </span>
-                    <p className="text-sm text-slate-700">{rec}</p>
-                  </div>
-                ))}
+          {(() => {
+            const recs: HealthCheck[] = health.categories
+              .flatMap((cat) => cat.checks)
+              .filter((check) => !check.passed && check.recommendation)
+              .sort((a, b) => b.weight - a.weight);
+            if (recs.length === 0) return null;
+            return (
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800 mb-4">Recommendations</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">
+                  {recs.map((check, i) => (
+                    <div key={check.id} className="flex items-start gap-3 px-5 py-3">
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 flex items-start justify-between gap-3">
+                        <p className="text-sm text-slate-700">{check.recommendation}</p>
+                        {check.deeplink && (
+                          <Link
+                            to={check.deeplink}
+                            className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100"
+                          >
+                            View {check.category}
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       ) : (
         <EmptyState

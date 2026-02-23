@@ -146,6 +146,7 @@ export interface HealthCheck {
   passed: boolean;
   weight: number;
   recommendation?: string;
+  deeplink?: string;
 }
 
 export interface HealthCategory {
