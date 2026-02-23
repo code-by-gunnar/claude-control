@@ -6,6 +6,7 @@ import {
   type SettingsResult,
 } from "../lib/api";
 import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -148,7 +149,7 @@ export function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SettingsResult | null>(null);
   const [filter, setFilter] = useState("");
-  const { refreshKey, setRefreshing } = useRefresh();
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
@@ -188,10 +189,11 @@ export function SettingsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Settings
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading settings</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading settings"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }

@@ -7,6 +7,7 @@ import {
   type MarketplacePlugin,
 } from "../lib/api";
 import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 function formatDate(iso: string): string {
   try {
@@ -145,7 +146,7 @@ export function MarketplacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<MarketplacesResult | null>(null);
-  const { refreshKey, setRefreshing } = useRefresh();
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
@@ -182,10 +183,11 @@ export function MarketplacesPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Marketplaces
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading marketplaces</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading marketplaces"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }

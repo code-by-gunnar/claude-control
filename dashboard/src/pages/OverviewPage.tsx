@@ -17,6 +17,7 @@ import {
   type AccountInfo,
 } from "../lib/api";
 import { InfoBubble } from "../components/InfoBubble";
+import { ErrorState } from "../components/ErrorState";
 
 function subscriptionBadgeColors(sub: string | null): string {
   if (!sub) return "bg-slate-100 text-slate-500";
@@ -34,7 +35,7 @@ export function OverviewPage() {
   const [configExpanded, setConfigExpanded] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [accountLoading, setAccountLoading] = useState(true);
-  const { refreshKey, setRefreshing } = useRefresh();
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
@@ -193,10 +194,11 @@ export function OverviewPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Overview
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading dashboard data</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading dashboard data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }

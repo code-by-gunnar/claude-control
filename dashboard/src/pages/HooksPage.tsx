@@ -7,6 +7,7 @@ import {
   type HookScript,
 } from "../lib/api";
 import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -213,7 +214,7 @@ export function HooksPage() {
   const [error, setError] = useState<string | null>(null);
   const [hooksData, setHooksData] = useState<HooksResult | null>(null);
   const [expandedScript, setExpandedScript] = useState<string | null>(null);
-  const { refreshKey, setRefreshing } = useRefresh();
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
@@ -260,17 +261,11 @@ export function HooksPage() {
     return (
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">Hooks</h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading hooks data</p>
-          <p className="text-sm mt-1">{error}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="mt-2 text-sm text-red-600 underline hover:text-red-800"
-          >
-            Retry
-          </button>
-        </div>
+        <ErrorState
+          title="Error loading hooks data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
