@@ -373,6 +373,25 @@ export async function fetchProjects(dir: string): Promise<WorkspaceScan> {
   return response.json() as Promise<WorkspaceScan>;
 }
 
+export async function addPermission(
+  tool: string,
+  rule: string,
+  pattern?: string
+): Promise<{ success: boolean; added: string }> {
+  const response = await fetch("/api/permissions/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tool, rule, pattern: pattern || undefined }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error ?? `Failed to add permission (${response.status})`
+    );
+  }
+  return response.json() as Promise<{ success: boolean; added: string }>;
+}
+
 export async function removePermission(
   sourcePath: string,
   rule: "allow" | "deny" | "ask",

@@ -1,9 +1,15 @@
 import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { parse, modify, applyEdits } from "jsonc-parser";
 
 export interface RemoveResult {
   success: true;
   removed: string;
+}
+
+export interface AddResult {
+  added: string;
 }
 
 /**
@@ -83,6 +89,99 @@ export async function removePermission(
   await fs.writeFile(sourcePath, result, "utf-8");
 
   return { success: true, removed: raw };
+}
+
+/**
+ * Add a single permission entry to the user-scope settings.json file.
+ *
+ * Uses jsonc-parser's modify() + applyEdits() to make surgical edits
+ * that preserve comments, formatting, BOM, and trailing commas.
+ * Creates the file and parent directory if they don't exist.
+ *
+ * @throws If inputs are invalid, the entry already exists, or the file cannot be written.
+ */
+export async function addPermission(
+  tool: string,
+  rule: "allow" | "deny" | "ask",
+  pattern?: string
+): Promise<AddResult> {
+  // Validate inputs
+  const trimmedTool = tool.trim();
+  if (!trimmedTool) {
+    throw new Error("Tool name is required");
+  }
+  if (!["allow", "deny", "ask"].includes(rule)) {
+    throw new Error('Rule must be "allow", "deny", or "ask"');
+  }
+
+  // Build the permission string
+  const trimmedPattern = pattern?.trim();
+  const permString = trimmedPattern
+    ? `${trimmedTool}(${trimmedPattern})`
+    : trimmedTool;
+
+  // Determine user-scope settings path
+  const userSettingsPath = path.join(os.homedir(), ".claude", "settings.json");
+
+  // Read existing file or start with empty object
+  let text: string;
+  try {
+    text = await fs.readFile(userSettingsPath, "utf-8");
+  } catch {
+    text = "{}";
+  }
+
+  // Parse to check for duplicates
+  const data = parse(text, undefined, {
+    allowTrailingComma: true,
+    disallowComments: false,
+  }) as Record<string, unknown> | null;
+
+  const permissions = (data?.permissions ?? {}) as Record<string, unknown[]>;
+  const existing = permissions[rule];
+  if (Array.isArray(existing) && existing.includes(permString)) {
+    throw new Error("Permission already exists");
+  }
+
+  const formatOptions = { tabSize: 2, insertSpaces: true };
+
+  // Ensure permissions object exists
+  let result = text;
+  if (!data || !data.permissions) {
+    const edits = modify(result, ["permissions"], {}, {
+      formattingOptions: formatOptions,
+    });
+    result = applyEdits(result, edits);
+  }
+
+  // Ensure permissions[rule] array exists
+  const parsedAfter = parse(result, undefined, {
+    allowTrailingComma: true,
+    disallowComments: false,
+  }) as Record<string, unknown>;
+  const permsAfter = parsedAfter?.permissions as Record<string, unknown> | undefined;
+  if (!permsAfter || !Array.isArray(permsAfter[rule])) {
+    const edits = modify(result, ["permissions", rule], [], {
+      formattingOptions: formatOptions,
+    });
+    result = applyEdits(result, edits);
+  }
+
+  // Append the new entry (index -1 = append)
+  const edits = modify(result, ["permissions", rule, -1], permString, {
+    formattingOptions: formatOptions,
+    isArrayInsertion: true,
+  });
+  result = applyEdits(result, edits);
+
+  // Ensure directory exists
+  const dirPath = path.dirname(userSettingsPath);
+  await fs.mkdir(dirPath, { recursive: true });
+
+  // Write file
+  await fs.writeFile(userSettingsPath, result, "utf-8");
+
+  return { added: permString };
 }
 
 /**
