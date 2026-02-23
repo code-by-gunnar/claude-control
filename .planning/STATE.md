@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 10 — Health Deeplinks & Error Recovery
+**Current focus:** Phase 11 — Keyboard Navigation & Breadcrumbs
 
 ## Current Position
 
-Phase: 10 of 13 (Health Deeplinks & Error Recovery)
-Plan: 10-02 complete (2 of 2 plans) — phase complete
-Status: Phase 10 complete — health deeplinks + error recovery
-Last activity: 2026-02-23 — Plan 10-02 executed (error retry buttons across all pages)
+Phase: 11 of 13 (Keyboard Navigation & Breadcrumbs)
+Plan: 11-02 complete (2 of 2 plans) — phase complete
+Status: Phase 11 complete — keyboard nav + breadcrumbs
+Last activity: 2026-02-23 — Plan 11-02 executed (breadcrumb navigation for Projects page)
 
-Progress: ███░░░░░░░ 50%
+Progress: ████░░░░░░ 67%
 
 ## Performance Metrics
 
@@ -25,7 +25,7 @@ Progress: ███░░░░░░░ 50%
 - Lines of code: 9,362
 
 **v1.1 Velocity:**
-- Total plans completed: 4
+- Total plans completed: 6
 - Average duration: —
 - Total execution time: —
 
@@ -41,6 +41,8 @@ Recent decisions affecting current work:
 - No new dependencies for keyboard shortcuts (vanilla key events)
 - Health deeplinks derive recommendations from category checks instead of top-level string array (preserves CLI backward compatibility)
 - Error retry uses RefreshContext.triggerRefresh() not window.location.reload() — re-fetches only current page data
+- Breadcrumbs show only items up to current step (no greyed-out future steps)
+- ComparisonTable back button replaced by breadcrumbs — single navigation pattern
 
 ### Pending Todos
 
@@ -53,5 +55,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 10 complete, ready for phase 11
-Resume file: .planning/phases/10-health-deeplinks-error-recovery/10-02-SUMMARY.md
+Stopped at: Phase 11 complete, ready for phase 12
+Resume file: .planning/phases/11-keyboard-nav-breadcrumbs/11-02-SUMMARY.md
