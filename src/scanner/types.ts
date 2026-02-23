@@ -15,6 +15,7 @@ export type ConfigFileType =
   | "settings"
   | "claude-md"
   | "commands-dir"
+  | "skills-dir"
   | "mcp"
   | "hooks"
   | "credentials"

@@ -24,6 +24,22 @@ function ScopeBadge({ scope }: { scope: string }) {
   );
 }
 
+function SourceBadge({ source }: { source?: string }) {
+  if (!source) return null;
+  const colors: Record<string, string> = {
+    command: "bg-amber-100 text-amber-700",
+    skill: "bg-teal-100 text-teal-700",
+    plugin: "bg-indigo-100 text-indigo-700",
+  };
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colors[source] ?? "bg-slate-100 text-slate-600"}`}
+    >
+      {source}
+    </span>
+  );
+}
+
 /** Shorten a file path by replacing home directory with ~ */
 function shortenPath(fullPath: string): string {
   const home =
@@ -36,41 +52,198 @@ function shortenPath(fullPath: string): string {
   return fullPath;
 }
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(1)} KB`;
+}
 
-function CommandRow({ command, showPrefix }: { command: CommandEntry; showPrefix?: boolean }) {
-  const colonIdx = command.name.indexOf(":");
-  const displayName = showPrefix || colonIdx < 0 ? command.name : command.name.slice(colonIdx + 1);
+/** Simple markdown to HTML renderer */
+function markdownToHtml(md: string): string {
+  // Strip frontmatter
+  let text = md.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  // Headings
+  text = text.replace(/^#### (.+)$/gm, "<h4>$1</h4>");
+  text = text.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+  text = text.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+  text = text.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+  // Bold and italic
+  text = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  text = text.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  // Inline code
+  text = text.replace(/`([^`]+)`/g, '<code class="bg-slate-100 px-1 rounded text-xs">$1</code>');
+  // Unordered lists
+  text = text.replace(/^[-*] (.+)$/gm, "<li>$1</li>");
+  text = text.replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>");
+  // Paragraphs
+  text = text.replace(/\n{2,}/g, "</p><p>");
+  text = `<p>${text}</p>`;
+  text = text.replace(/<p>\s*<(h[1-4]|ul|li)/g, "<$1");
+  text = text.replace(/<\/(h[1-4]|ul|li)>\s*<\/p>/g, "</$1>");
+  return text;
+}
+
+function ContentViewer({ content }: { content: string }) {
+  const [viewMode, setViewMode] = useState<"rendered" | "raw">("rendered");
+
   return (
-    <div className="px-4 py-2.5 flex items-center gap-4 border-b border-slate-100 last:border-b-0">
-      <span className="font-mono text-sm text-slate-900 font-medium min-w-[140px]">
-        {displayName}
-      </span>
-      <span className="flex-1" />
-      <ScopeBadge scope={command.scope} />
+    <div>
+      <div className="flex gap-1 mb-2">
+        <button
+          type="button"
+          onClick={() => setViewMode("rendered")}
+          className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
+            viewMode === "rendered"
+              ? "bg-slate-700 text-white"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          Rendered
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode("raw")}
+          className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
+            viewMode === "raw"
+              ? "bg-slate-700 text-white"
+              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+          }`}
+        >
+          Raw
+        </button>
+      </div>
+      {viewMode === "rendered" ? (
+        <div
+          className="prose prose-sm prose-slate max-w-none max-h-80 overflow-auto text-sm [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mb-1 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_li]:mb-0.5 [&_p]:mb-2"
+          dangerouslySetInnerHTML={{ __html: markdownToHtml(content) }}
+        />
+      ) : (
+        <pre className="text-xs font-mono bg-slate-900 text-slate-100 p-4 rounded-lg overflow-auto max-h-80 whitespace-pre-wrap">
+          {content}
+        </pre>
+      )}
+    </div>
+  );
+}
+
+function SkillCard({
+  entry,
+  expanded,
+  onToggle,
+}: {
+  entry: CommandEntry;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left p-4 hover:bg-slate-50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-slate-400 text-xs w-4 shrink-0">
+            {expanded ? "\u25BC" : "\u25B6"}
+          </span>
+          <span className="font-mono text-sm font-semibold text-slate-900">
+            {entry.name}
+          </span>
+          <SourceBadge source={entry.source} />
+          <ScopeBadge scope={entry.scope} />
+          <span className="flex-1" />
+          {entry.sizeBytes != null && (
+            <span className="text-xs text-slate-400">
+              {formatBytes(entry.sizeBytes)}
+            </span>
+          )}
+        </div>
+        {entry.description && (
+          <p className="text-xs text-slate-500 mt-1.5 ml-7 line-clamp-2">
+            {entry.description}
+          </p>
+        )}
+      </button>
+
+      {expanded && entry.content && (
+        <div className="border-t border-slate-100 p-4 bg-slate-50/50">
+          <div className="text-xs text-slate-400 font-mono mb-3 break-all">
+            {shortenPath(entry.path)}
+          </div>
+          <ContentViewer content={entry.content} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CommandRow({ command }: { command: CommandEntry }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="border-b border-slate-100 last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="w-full text-left px-4 py-2.5 flex items-center gap-4 hover:bg-slate-50 transition-colors"
+      >
+        <span className="text-slate-400 text-xs w-4 shrink-0">
+          {command.content ? (expanded ? "\u25BC" : "\u25B6") : ""}
+        </span>
+        <span className="font-mono text-sm text-slate-900 font-medium min-w-[140px]">
+          {command.name}
+        </span>
+        {command.description && (
+          <span className="text-xs text-slate-500 truncate flex-1">
+            {command.description}
+          </span>
+        )}
+        {!command.description && <span className="flex-1" />}
+        {command.sizeBytes != null && (
+          <span className="text-xs text-slate-400 shrink-0">
+            {formatBytes(command.sizeBytes)}
+          </span>
+        )}
+        <ScopeBadge scope={command.scope} />
+      </button>
+      {expanded && command.content && (
+        <div className="px-4 pb-4 pl-12 bg-slate-50/50 border-t border-slate-100">
+          <div className="text-xs text-slate-400 font-mono mb-3 break-all mt-3">
+            {shortenPath(command.path)}
+          </div>
+          <ContentViewer content={command.content} />
+        </div>
+      )}
     </div>
   );
 }
 
 /** Group skills by prefix (part before `:`) */
-function groupSkills(skills: CommandEntry[]): { prefix: string; items: CommandEntry[] }[] {
+function groupByPrefix(items: CommandEntry[]): { prefix: string; items: CommandEntry[] }[] {
   const groups = new Map<string, CommandEntry[]>();
-  for (const skill of skills) {
-    const colonIdx = skill.name.indexOf(":");
-    const prefix = colonIdx > 0 ? skill.name.slice(0, colonIdx) : skill.name;
+  for (const item of items) {
+    const colonIdx = item.name.indexOf(":");
+    const prefix = colonIdx > 0 ? item.name.slice(0, colonIdx) : item.name;
     const existing = groups.get(prefix);
     if (existing) {
-      existing.push(skill);
+      existing.push(item);
     } else {
-      groups.set(prefix, [skill]);
+      groups.set(prefix, [item]);
     }
   }
-  // Sort groups alphabetically, but put larger groups first within same letter
   return Array.from(groups.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([prefix, items]) => ({ prefix, items }));
 }
 
-function SkillGroup({ group }: { group: { prefix: string; items: CommandEntry[] } }) {
+function PluginSkillGroup({
+  group,
+  expandedSkill,
+  onToggle,
+}: {
+  group: { prefix: string; items: CommandEntry[] };
+  expandedSkill: string | null;
+  onToggle: (name: string) => void;
+}) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -94,11 +267,15 @@ function SkillGroup({ group }: { group: { prefix: string; items: CommandEntry[] 
       </button>
 
       {expanded && (
-        <div className="bg-slate-50/50 border-t border-slate-100">
-          {group.items.map((cmd) => (
-            <CommandRow
-              key={`${cmd.name}-${cmd.scope}-${cmd.path}`}
-              command={cmd}
+        <div className="bg-slate-50/50 border-t border-slate-100 p-3 space-y-2">
+          {group.items.map((item) => (
+            <SkillCard
+              key={`${item.name}-${item.path}`}
+              entry={item}
+              expanded={expandedSkill === item.name}
+              onToggle={() =>
+                onToggle(expandedSkill === item.name ? "" : item.name)
+              }
             />
           ))}
         </div>
@@ -111,6 +288,7 @@ export function SkillsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [commandsData, setCommandsData] = useState<CommandsResult | null>(null);
+  const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -137,9 +315,18 @@ export function SkillsPage() {
   }, []);
 
   const commands = commandsData?.commands ?? [];
-  const customCommands = commands.filter((c) => !c.name.includes(":"));
-  const skills = commands.filter((c) => c.name.includes(":"));
-  const skillGroups = groupSkills(skills);
+  const customCommands = commands.filter((c) => c.source === "command" && !c.name.includes(":"));
+  const commandSkills = commands.filter((c) => c.source === "command" && c.name.includes(":"));
+  const userSkills = commands.filter((c) => c.source === "skill");
+  const pluginEntries = commands.filter((c) => c.source === "plugin");
+  const pluginGroups = groupByPrefix(pluginEntries);
+
+  // For backward compatibility — items without source field
+  const untaggedCommands = commands.filter((c) => !c.source && !c.name.includes(":"));
+  const untaggedSkills = commands.filter((c) => !c.source && c.name.includes(":"));
+  const allCustomCommands = [...customCommands, ...untaggedCommands];
+  const allCommandSkills = [...commandSkills, ...untaggedSkills];
+  const allCommandSkillGroups = groupByPrefix(allCommandSkills);
 
   if (error) {
     return (
@@ -161,11 +348,12 @@ export function SkillsPage() {
         Commands & Skills
       </h1>
       <p className="text-sm text-slate-500 mb-4">
-        Custom slash commands and skills
+        Custom slash commands, skills, and plugin capabilities
         {!loading && (
           <span className="ml-1 text-slate-400">
-            ({customCommands.length} command{customCommands.length !== 1 ? "s" : ""},
-            {" "}{skills.length} skill{skills.length !== 1 ? "s" : ""})
+            ({allCustomCommands.length} command{allCustomCommands.length !== 1 ? "s" : ""},
+            {" "}{userSkills.length} skill{userSkills.length !== 1 ? "s" : ""},
+            {" "}{pluginEntries.length + allCommandSkills.length} plugin)
           </span>
         )}
       </p>
@@ -173,11 +361,11 @@ export function SkillsPage() {
       {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
         <p>
-          <strong>Custom commands</strong> are prompt files in <code className="font-mono text-xs bg-blue-100 px-1 rounded">.claude/commands/</code> that
-          you invoke with <code className="font-mono text-xs bg-blue-100 px-1 rounded">/command-name</code>.
-          {" "}<strong>Skills</strong> (shown as <code className="font-mono text-xs bg-blue-100 px-1 rounded">name:skill</code>) come
-          from <strong>plugins</strong> and provide reusable capabilities.
-          Both are slash-command shortcuts for common workflows.
+          <strong>Commands</strong> are prompt files in <code className="font-mono text-xs bg-blue-100 px-1 rounded">.claude/commands/</code> invoked
+          with <code className="font-mono text-xs bg-blue-100 px-1 rounded">/command-name</code>.
+          {" "}<strong>Skills</strong> in <code className="font-mono text-xs bg-blue-100 px-1 rounded">.claude/skills/</code> are
+          reusable process guides (debugging, TDD, etc.) that Claude uses automatically.
+          {" "}<strong>Plugin skills</strong> come from installed plugins.
         </p>
       </div>
 
@@ -199,64 +387,116 @@ export function SkillsPage() {
         </div>
       ) : (
         <div className="space-y-8">
+          {/* User Skills Section */}
+          {userSkills.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 mb-3">
+                Skills
+                <span className="ml-2 text-sm font-normal text-slate-400">
+                  ({userSkills.length})
+                </span>
+              </h2>
+              <div className="space-y-2">
+                {userSkills.map((skill) => (
+                  <SkillCard
+                    key={`${skill.name}-${skill.path}`}
+                    entry={skill}
+                    expanded={expandedSkill === skill.name}
+                    onToggle={() =>
+                      setExpandedSkill(
+                        expandedSkill === skill.name ? null : skill.name
+                      )
+                    }
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Custom Commands Section */}
           <section>
             <h2 className="text-xl font-semibold text-slate-800 mb-3">
               Custom Commands
-              {customCommands.length > 0 && (
+              {allCustomCommands.length > 0 && (
                 <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({customCommands.length})
+                  ({allCustomCommands.length})
                 </span>
               )}
             </h2>
-            {customCommands.length === 0 ? (
+            {allCustomCommands.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
                 No custom commands configured
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200">
                 <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
+                  <span className="w-4" />
                   <span className="flex-1">Name</span>
                   <span className="shrink-0">Scope</span>
                 </div>
-                {customCommands.map((cmd) => (
+                {allCustomCommands.map((cmd) => (
                   <CommandRow
                     key={`${cmd.name}-${cmd.scope}-${cmd.path}`}
                     command={cmd}
-                    showPrefix
                   />
                 ))}
               </div>
             )}
           </section>
 
-          {/* Skills Section */}
-          <section>
-            <h2 className="text-xl font-semibold text-slate-800 mb-3">
-              Skills
-              {skills.length > 0 && (
+          {/* Command-dir Skills (e.g., gsd:*) */}
+          {allCommandSkillGroups.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 mb-3">
+                Command Groups
                 <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({skillGroups.length} group{skillGroups.length !== 1 ? "s" : ""}, {skills.length} total)
+                  ({allCommandSkillGroups.length} group{allCommandSkillGroups.length !== 1 ? "s" : ""}, {allCommandSkills.length} total)
                 </span>
-              )}
-            </h2>
-            {skills.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-                No skills configured
-              </div>
-            ) : (
+              </h2>
               <div className="bg-white rounded-lg shadow-sm border border-slate-200">
                 <div className="px-4 py-2 flex gap-3 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
                   <span className="w-4" />
                   <span className="flex-1">Group</span>
                   <span className="shrink-0">Scope</span>
                 </div>
-                {skillGroups.map((group) => (
-                  <SkillGroup key={group.prefix} group={group} />
+                {allCommandSkillGroups.map((group) => (
+                  <PluginSkillGroup
+                    key={group.prefix}
+                    group={group}
+                    expandedSkill={expandedSkill}
+                    onToggle={(name) => setExpandedSkill(name || null)}
+                  />
                 ))}
               </div>
-            )}
-          </section>
+            </section>
+          )}
+
+          {/* Plugin Skills Section */}
+          {pluginGroups.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 mb-3">
+                Plugin Skills
+                <span className="ml-2 text-sm font-normal text-slate-400">
+                  ({pluginGroups.length} plugin{pluginGroups.length !== 1 ? "s" : ""}, {pluginEntries.length} total)
+                </span>
+              </h2>
+              <div className="bg-white rounded-lg shadow-sm border border-slate-200">
+                <div className="px-4 py-2 flex gap-3 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
+                  <span className="w-4" />
+                  <span className="flex-1">Plugin</span>
+                  <span className="shrink-0">Scope</span>
+                </div>
+                {pluginGroups.map((group) => (
+                  <PluginSkillGroup
+                    key={group.prefix}
+                    group={group}
+                    expandedSkill={expandedSkill}
+                    onToggle={(name) => setExpandedSkill(name || null)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       )}
     </div>

@@ -35,7 +35,7 @@ describe("getConfigPaths", () => {
       expect(managed[0].type).toBe("settings");
     });
 
-    it("includes user settings, credentials, keybindings, claude-md, and commands-dir", () => {
+    it("includes user settings, credentials, keybindings, claude-md, commands-dir, and skills-dir", () => {
       const paths = getConfigPaths();
       const userTypes = paths
         .filter((p) => p.scope === "user")
@@ -48,13 +48,14 @@ describe("getConfigPaths", () => {
         "credentials",
         "keybindings",
         "settings",
+        "skills-dir",
       ]);
     });
 
-    it("returns 6 total entries without projectDir", () => {
+    it("returns 7 total entries without projectDir", () => {
       const paths = getConfigPaths();
-      // 1 managed + 5 user
-      expect(paths).toHaveLength(6);
+      // 1 managed + 6 user
+      expect(paths).toHaveLength(7);
     });
 
     it("user paths contain .claude directory segment", () => {
@@ -81,10 +82,10 @@ describe("getConfigPaths", () => {
       expect(scopes.has("local")).toBe(true);
     });
 
-    it("returns 12 total entries with projectDir", () => {
+    it("returns 13 total entries with projectDir", () => {
       const paths = getConfigPaths(projectDir);
-      // 1 managed + 5 user + 6 project/local
-      expect(paths).toHaveLength(12);
+      // 1 managed + 6 user + 6 project/local
+      expect(paths).toHaveLength(13);
     });
 
     it("project-scope paths contain the projectDir", () => {

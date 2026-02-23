@@ -41,8 +41,8 @@ async function scanFile(expectation: ConfigFileExpectation): Promise<ConfigFile>
     result.exists = true;
     result.sizeBytes = check.sizeBytes;
 
-    // For directories (commands-dir), just check existence
-    if (expectation.type === "commands-dir") {
+    // For directories (commands-dir, skills-dir), just check existence
+    if (expectation.type === "commands-dir" || expectation.type === "skills-dir") {
       if (check.isDirectory) {
         result.readable = true;
       } else {

@@ -38,7 +38,7 @@ export interface HookEvent {
 }
 
 /**
- * A custom command or skill discovered from a commands directory.
+ * A custom command or skill discovered from a commands or skills directory.
  */
 export interface CommandEntry {
   /** Command/skill name (filename without .md extension) */
@@ -47,6 +47,14 @@ export interface CommandEntry {
   path: string;
   /** Which scope this command belongs to (user or project) */
   scope: ConfigScope;
+  /** Description from YAML frontmatter (if present) */
+  description?: string;
+  /** Full markdown content */
+  content?: string;
+  /** File size in bytes */
+  sizeBytes?: number;
+  /** Source type: "command" for ~/.claude/commands, "skill" for ~/.claude/skills, "plugin" for plugin-provided */
+  source?: "command" | "skill" | "plugin";
 }
 
 /**

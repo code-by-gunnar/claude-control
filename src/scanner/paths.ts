@@ -117,6 +117,13 @@ export function getConfigPaths(projectDir?: string): ConfigFileExpectation[] {
     description: "User-level custom commands directory",
   });
 
+  expectations.push({
+    scope: "user",
+    type: "skills-dir",
+    expectedPath: path.join(globalClaudeDir, "skills"),
+    description: "User-level skills directory",
+  });
+
   // --- Project-level paths (only if projectDir provided) ---
 
   if (projectDir) {

@@ -99,6 +99,10 @@ export interface CommandEntry {
   name: string;
   path: string;
   scope: string;
+  description?: string;
+  content?: string;
+  sizeBytes?: number;
+  source?: "command" | "skill" | "plugin";
 }
 
 export interface CommandsResult {
