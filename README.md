@@ -153,69 +153,101 @@ This starts a local server and opens your browser at `http://localhost:3737`. Us
 claude-ctl dashboard --port 8080
 ```
 
-The dashboard includes 12 pages covering every area of Claude Code configuration:
+### Dashboard Pages
 
-<details open>
-<summary><strong>View all dashboard pages (12 screenshots)</strong></summary>
+The dashboard includes 12 pages covering every area of Claude Code configuration. Click any screenshot to expand.
+
+<details>
+<summary><strong>Overview</strong> — At-a-glance summary of your entire Claude Code configuration</summary>
 <br>
-
-#### Overview
-At-a-glance summary of your entire Claude Code configuration.
 
 ![Overview](docs/screenshots/overview.png)
 
-#### Settings
-Resolved settings table with scope origin tracking and override indicators.
+</details>
+
+<details>
+<summary><strong>Settings</strong> — Resolved settings table with scope origin tracking and override indicators</summary>
+<br>
 
 ![Settings](docs/screenshots/settings.png)
 
-#### Memory
-CLAUDE.md files with content preview and import chain visualization.
+</details>
+
+<details>
+<summary><strong>Memory</strong> — CLAUDE.md files with content preview and import chain visualization</summary>
+<br>
 
 ![Memory](docs/screenshots/memory.png)
 
-#### MCP Servers
-All configured MCP servers with environment variables and secrets masked.
+</details>
+
+<details>
+<summary><strong>MCP Servers</strong> — All configured MCP servers with environment variables and secrets masked</summary>
+<br>
 
 ![MCP Servers](docs/screenshots/mcp-servers.png)
 
-#### Plugins
-Installed plugin packages with their bundled MCP servers and skills.
+</details>
+
+<details>
+<summary><strong>Plugins</strong> — Installed plugin packages with their bundled MCP servers and skills</summary>
+<br>
 
 ![Plugins](docs/screenshots/plugins.png)
 
-#### Marketplaces
-Plugin repository catalog showing all available plugins across configured marketplaces.
+</details>
+
+<details>
+<summary><strong>Marketplaces</strong> — Plugin repository catalog showing all available plugins across configured marketplaces</summary>
+<br>
 
 ![Marketplaces](docs/screenshots/marketplaces.png)
 
-#### Hooks
-Hook configurations and the full event catalog.
+</details>
+
+<details>
+<summary><strong>Hooks</strong> — Hook configurations and the full event catalog</summary>
+<br>
 
 ![Hooks](docs/screenshots/hooks.png)
 
-#### Agents
-Custom AI agent definitions with tools, model configuration, and usage descriptions.
+</details>
+
+<details>
+<summary><strong>Agents</strong> — Custom AI agent definitions with tools, model configuration, and usage descriptions</summary>
+<br>
 
 ![Agents](docs/screenshots/agents.png)
 
-#### Commands & Skills
-Custom slash commands, skills, and plugin-provided capabilities.
+</details>
+
+<details>
+<summary><strong>Commands &amp; Skills</strong> — Custom slash commands, skills, and plugin-provided capabilities</summary>
+<br>
 
 ![Skills](docs/screenshots/skills.png)
 
-#### Permissions
-Permission rules with merged deny/ask/allow resolution. Includes inline removal for non-managed entries.
+</details>
+
+<details>
+<summary><strong>Permissions</strong> — Permission rules with merged deny/ask/allow resolution and inline removal</summary>
+<br>
 
 ![Permissions](docs/screenshots/permissions.png)
 
-#### Health
-Visual health score gauge with category breakdown and recommendations.
+</details>
+
+<details>
+<summary><strong>Health</strong> — Visual health score gauge with category breakdown and recommendations</summary>
+<br>
 
 ![Health](docs/screenshots/health.png)
 
-#### Projects
-Cross-project discovery and side-by-side configuration comparison.
+</details>
+
+<details>
+<summary><strong>Projects</strong> — Cross-project discovery and side-by-side configuration comparison</summary>
+<br>
 
 ![Projects](docs/screenshots/projects.png)
 
