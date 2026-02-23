@@ -99,13 +99,23 @@ Installed plugin packages with their bundled MCP servers and skills.
 
 ![Plugins](docs/screenshots/plugins.png)
 
+### Marketplaces
+Plugin repository catalog showing all available plugins across configured marketplaces.
+
+![Marketplaces](docs/screenshots/marketplaces.png)
+
 ### Hooks
 Hook configurations and the full event catalog.
 
 ![Hooks](docs/screenshots/hooks.png)
 
+### Agents
+Custom AI agent definitions with tools, model configuration, and usage descriptions.
+
+![Agents](docs/screenshots/agents.png)
+
 ### Commands & Skills
-Custom slash commands and plugin-provided skills.
+Custom slash commands, skills, and plugin-provided capabilities.
 
 ![Skills](docs/screenshots/skills.png)
 
