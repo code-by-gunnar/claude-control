@@ -17,10 +17,10 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 
 ### Guidance
 
-- [ ] **GUIDE-01**: Every dashboard page shows contextual empty state when no data exists
-- [ ] **GUIDE-02**: Empty states explain WHY nothing is configured and WHAT to do next
+- [x] **GUIDE-01**: Every dashboard page shows contextual empty state when no data exists
+- [x] **GUIDE-02**: Empty states explain WHY nothing is configured and WHAT to do next
 - [ ] **GUIDE-03**: Health recommendations link directly to the relevant dashboard page
-- [ ] **GUIDE-04**: Overview page displays subscription type and rate limit tier prominently alongside stat cards
+- [x] **GUIDE-04**: Overview page displays subscription type and rate limit tier prominently alongside stat cards
 
 ### Workflow
 
@@ -82,10 +82,10 @@ Which phases cover which requirements. Updated by create-roadmap.
 | NAV-03 | Phase 11 | Pending |
 | NAV-04 | Phase 11 | Pending |
 | NAV-05 | Phase 11 | Pending |
-| GUIDE-01 | Phase 9 | Pending |
-| GUIDE-02 | Phase 9 | Pending |
+| GUIDE-01 | Phase 9 | Complete |
+| GUIDE-02 | Phase 9 | Complete |
 | GUIDE-03 | Phase 10 | Pending |
-| GUIDE-04 | Phase 9 | Pending |
+| GUIDE-04 | Phase 9 | Complete |
 | WORK-01 | Phase 8 | Complete |
 | WORK-02 | Phase 8 | Complete |
 | WORK-03 | Phase 10 | Pending |
@@ -104,4 +104,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after roadmap creation*
+*Last updated: 2026-02-23 after Phase 9 completion*
