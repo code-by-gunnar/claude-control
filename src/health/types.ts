@@ -14,6 +14,8 @@ export interface HealthCheck {
   weight: number;
   /** Actionable recommendation shown when check fails */
   recommendation?: string;
+  /** Dashboard route path for navigating to the relevant page */
+  deeplink?: string;
 }
 
 /**
