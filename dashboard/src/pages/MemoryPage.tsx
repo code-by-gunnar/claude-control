@@ -190,7 +190,7 @@ const MEMORY_SLOTS: MemorySlot[] = [
       'Create ~/.claude/CLAUDE.md to set your personal baseline. Example: "Always use TypeScript strict mode, prefer functional patterns, use pnpm, write concise commit messages."',
     matchPath: (p) => {
       const norm = p.replace(/\\/g, "/");
-      return /\/\.claude\/CLAUDE\.md$/.test(norm) && !norm.includes("/.");
+      return /\/\.claude\/CLAUDE\.md$/.test(norm);
     },
   },
   {
@@ -236,8 +236,8 @@ function matchSlotsToFiles(
   const claudeMdFiles = scanFiles.filter((f) => f.type === "claude-md");
 
   return MEMORY_SLOTS.map((slot) => {
-    // Try to find a matching scan file
-    const scanFile = claudeMdFiles.find((f) => slot.matchPath(f.expectedPath)) ?? null;
+    // Try to find a matching scan file (scope + path pattern)
+    const scanFile = claudeMdFiles.find((f) => f.scope === slot.scope && slot.matchPath(f.expectedPath)) ?? null;
     // If found, also match the memory file for content
     const memoryFile = scanFile
       ? memoryFiles.find((m) => m.path === scanFile.expectedPath) ?? null
