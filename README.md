@@ -7,6 +7,14 @@ CLI + web dashboard for inspecting Claude Code configuration across all scope le
 
 ![Dashboard Overview](docs/screenshots/overview.png)
 
+## Why
+
+Claude Code is powerful, but its configuration is spread across dozens of files in four scope levels — `settings.json`, `.mcp.json`, `CLAUDE.md`, hooks, permissions, agents, skills, plugins, and more. There's no built-in way to see what's actually active, what's overriding what, or whether your setup is complete.
+
+For newer users, much of Claude Code's advanced functionality (custom agents, skills, hooks, MCP servers, plugin marketplaces) is buried in markdown files and JSON scattered across the file system. Discovering what's available means reading docs, running multiple CLI commands, or manually opening files in `~/.claude/`.
+
+`claude-ctl` puts everything in one place. A single dashboard where you can see all your configuration, explore what each feature does, and understand your setup without digging through directories.
+
 ## What It Does
 
 `claude-control` scans Claude Code configuration files across all four scope levels (managed, user, project, local), resolves settings with full override chains, and displays the effective merged state of your setup. It shows MCP servers with automatic secret masking, extracts hooks and permissions, discovers CLAUDE.md memory files with import chains, provides configuration health scoring, and supports cross-project comparison. Everything is available as a terminal CLI or an interactive web dashboard.
