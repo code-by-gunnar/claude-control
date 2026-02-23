@@ -157,6 +157,7 @@ The dashboard includes pages for Overview, Settings, Memory, MCP Servers, Plugin
 
 <details>
 <summary><strong>Dashboard Screenshots</strong></summary>
+<br>
 
 #### Overview
 At-a-glance summary of your entire Claude Code configuration.
