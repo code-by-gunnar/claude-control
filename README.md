@@ -1,6 +1,7 @@
 # claude-control
 
 [![CI](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml/badge.svg)](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/claude-control)](https://www.npmjs.com/package/claude-control)
 
 CLI + web dashboard for inspecting Claude Code configuration across all scope levels.
 
@@ -10,40 +11,21 @@ CLI + web dashboard for inspecting Claude Code configuration across all scope le
 
 `claude-control` scans Claude Code configuration files across all four scope levels (managed, user, project, local), resolves settings with full override chains, and displays the effective merged state of your setup. It shows MCP servers with automatic secret masking, extracts hooks and permissions, discovers CLAUDE.md memory files with import chains, provides configuration health scoring, and supports cross-project comparison. Everything is available as a terminal CLI or an interactive web dashboard.
 
-## Quick Start
-
-```bash
-# Discover all config file locations
-npx claude-control scan
-
-# Get a summary of configured vs missing files
-npx claude-control status
-
-# Launch the web dashboard
-npx claude-control dashboard
-```
-
-## Installation
-
-**Global install:**
+## Install
 
 ```bash
 npm install -g claude-control
 ```
 
-After installing globally, the `claude-ctl` command is available everywhere:
+Then use `claude-ctl` anywhere:
 
 ```bash
-claude-ctl scan
-claude-ctl dashboard
+claude-ctl scan          # Discover all config files
+claude-ctl status        # Summary of configured vs missing
+claude-ctl dashboard     # Launch web dashboard
 ```
 
-**Zero install (npx):**
-
-```bash
-npx claude-control scan
-npx claude-control dashboard
-```
+Or run without installing via `npx claude-control <command>`.
 
 ## CLI Commands
 
