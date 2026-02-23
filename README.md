@@ -153,67 +153,72 @@ This starts a local server and opens your browser at `http://localhost:3737`. Us
 claude-ctl dashboard --port 8080
 ```
 
-The dashboard includes these pages:
+The dashboard includes pages for Overview, Settings, Memory, MCP Servers, Plugins, Marketplaces, Hooks, Agents, Skills, Permissions, Health, and Projects.
 
-### Overview
-At-a-glance summary of your entire Claude Code configuration — config files found, settings, memory files, MCP servers, plugins, agents, skills, hooks, and permissions.
+<details>
+<summary><strong>Dashboard Screenshots</strong></summary>
+
+#### Overview
+At-a-glance summary of your entire Claude Code configuration.
 
 ![Overview](docs/screenshots/overview.png)
 
-### Settings
+#### Settings
 Resolved settings table with scope origin tracking and override indicators.
 
 ![Settings](docs/screenshots/settings.png)
 
-### Memory
+#### Memory
 CLAUDE.md files with content preview and import chain visualization.
 
 ![Memory](docs/screenshots/memory.png)
 
-### MCP Servers
+#### MCP Servers
 All configured MCP servers with environment variables and secrets masked.
 
 ![MCP Servers](docs/screenshots/mcp-servers.png)
 
-### Plugins
+#### Plugins
 Installed plugin packages with their bundled MCP servers and skills.
 
 ![Plugins](docs/screenshots/plugins.png)
 
-### Marketplaces
+#### Marketplaces
 Plugin repository catalog showing all available plugins across configured marketplaces.
 
 ![Marketplaces](docs/screenshots/marketplaces.png)
 
-### Hooks
+#### Hooks
 Hook configurations and the full event catalog.
 
 ![Hooks](docs/screenshots/hooks.png)
 
-### Agents
+#### Agents
 Custom AI agent definitions with tools, model configuration, and usage descriptions.
 
 ![Agents](docs/screenshots/agents.png)
 
-### Commands & Skills
+#### Commands & Skills
 Custom slash commands, skills, and plugin-provided capabilities.
 
 ![Skills](docs/screenshots/skills.png)
 
-### Permissions
+#### Permissions
 Permission rules with merged deny/ask/allow resolution. Includes inline removal for non-managed entries.
 
 ![Permissions](docs/screenshots/permissions.png)
 
-### Health
+#### Health
 Visual health score gauge with category breakdown and recommendations.
 
 ![Health](docs/screenshots/health.png)
 
-### Projects
+#### Projects
 Cross-project discovery and side-by-side configuration comparison.
 
 ![Projects](docs/screenshots/projects.png)
+
+</details>
 
 ## Config Scopes
 
