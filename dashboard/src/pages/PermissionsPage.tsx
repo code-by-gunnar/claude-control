@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchPermissions,
   removePermission,
+  addPermission,
   type PermissionsResult,
   type EffectivePermission,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -253,6 +257,50 @@ export function PermissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PermissionsResult | null>(null);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
+
+  // Add Rule form state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addTool, setAddTool] = useState("");
+  const [addPattern, setAddPattern] = useState("");
+  const [addRule, setAddRule] = useState<"allow" | "deny" | "ask">("allow");
+  const [addSubmitting, setAddSubmitting] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+
+  function resetAddForm() {
+    setAddTool("");
+    setAddPattern("");
+    setAddRule("allow");
+    setAddError(null);
+    setAddSuccess(null);
+  }
+
+  async function handleAddSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setAddSubmitting(true);
+    setAddError(null);
+    setAddSuccess(null);
+
+    try {
+      const result = await addPermission(
+        addTool.trim(),
+        addRule,
+        addPattern.trim() || undefined
+      );
+      const display = result.added;
+      setAddSuccess(`Added: ${display} \u2192 ${addRule}`);
+      resetAddForm();
+      triggerRefresh();
+      setTimeout(() => setAddSuccess(null), 3000);
+    } catch (err) {
+      setAddError(
+        err instanceof Error ? err.message : "Failed to add permission"
+      );
+    } finally {
+      setAddSubmitting(false);
+    }
+  }
 
   async function loadData() {
     try {
@@ -269,6 +317,9 @@ export function PermissionsPage() {
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function initialLoad() {
       try {
@@ -282,6 +333,8 @@ export function PermissionsPage() {
           err instanceof Error ? err.message : "Failed to load permissions"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -289,7 +342,7 @@ export function PermissionsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const permissions = data?.effective ?? [];
 
@@ -310,26 +363,50 @@ export function PermissionsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Permissions
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading permissions</p>
-          <p className="text-sm mt-1">{error}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="mt-2 text-sm text-red-600 underline hover:text-red-800"
-          >
-            Retry
-          </button>
-        </div>
+        <ErrorState
+          title="Error loading permissions"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
-        Permissions
-      </h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+          Permissions
+        </h1>
+        <button
+          type="button"
+          onClick={() => {
+            setShowAddForm(!showAddForm);
+            if (showAddForm) resetAddForm();
+          }}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            showAddForm
+              ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          {showAddForm ? (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Close
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Add Rule
+            </>
+          )}
+        </button>
+      </div>
       <p className="text-sm text-slate-500 mb-4">
         Tool permission rules (deny &gt; ask &gt; allow)
         {!loading && (
@@ -338,6 +415,93 @@ export function PermissionsPage() {
           </span>
         )}
       </p>
+
+      {/* Add Rule form */}
+      {showAddForm && (
+        <div className="bg-white border border-slate-200 rounded-lg p-4 mb-6">
+          <form onSubmit={handleAddSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label htmlFor="add-tool" className="block text-xs font-medium text-slate-600 mb-1">
+                  Tool name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  id="add-tool"
+                  type="text"
+                  required
+                  value={addTool}
+                  onChange={(e) => setAddTool(e.target.value)}
+                  placeholder="e.g., Bash, Read, WebSearch"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="add-pattern" className="block text-xs font-medium text-slate-600 mb-1">
+                  Pattern <span className="text-slate-400">(optional)</span>
+                </label>
+                <input
+                  id="add-pattern"
+                  type="text"
+                  value={addPattern}
+                  onChange={(e) => setAddPattern(e.target.value)}
+                  placeholder="e.g., ls *, rm -rf * (optional)"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="add-rule" className="block text-xs font-medium text-slate-600 mb-1">
+                  Rule
+                </label>
+                <select
+                  id="add-rule"
+                  value={addRule}
+                  onChange={(e) => setAddRule(e.target.value as "allow" | "deny" | "ask")}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="allow">allow</option>
+                  <option value="deny">deny</option>
+                  <option value="ask">ask</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={addSubmitting || !addTool.trim()}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                {addSubmitting ? "Adding..." : "Add Permission"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  resetAddForm();
+                }}
+                className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+
+            {/* Feedback */}
+            {addSuccess && (
+              <p className="text-sm text-green-600">{addSuccess}</p>
+            )}
+            {addError && (
+              <p className="text-sm text-red-600">{addError}</p>
+            )}
+
+            <p className="text-xs text-slate-400">
+              Rules are saved to user-scope settings (~/.claude/settings.json)
+            </p>
+          </form>
+        </div>
+      )}
 
       {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
@@ -367,9 +531,16 @@ export function PermissionsPage() {
           ))}
         </div>
       ) : permissions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-          No permissions configured
-        </div>
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+            </svg>
+          }
+          title="No permission rules configured"
+          description="Permission rules control which tools Claude can run automatically, with prompting, or not at all."
+          action={<>Add rules in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">permissions</code> key with <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">allow</code>, <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">deny</code>, or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">ask</code> arrays</>}
+        />
       ) : (
         <>
           <div className="bg-white rounded-lg shadow-sm border border-slate-200">

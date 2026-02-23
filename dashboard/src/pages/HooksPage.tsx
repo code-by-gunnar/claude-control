@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchHooks,
   type HooksResult,
   type HookEvent,
   type HookScript,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -211,9 +214,13 @@ export function HooksPage() {
   const [error, setError] = useState<string | null>(null);
   const [hooksData, setHooksData] = useState<HooksResult | null>(null);
   const [expandedScript, setExpandedScript] = useState<string | null>(null);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -227,6 +234,8 @@ export function HooksPage() {
           err instanceof Error ? err.message : "Failed to load hooks data"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -234,7 +243,7 @@ export function HooksPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const allEvents = hooksData?.availableEvents ?? [];
   const events = hooksData?.events ?? [];
@@ -252,17 +261,11 @@ export function HooksPage() {
     return (
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">Hooks</h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading hooks data</p>
-          <p className="text-sm mt-1">{error}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="mt-2 text-sm text-red-600 underline hover:text-red-800"
-          >
-            Retry
-          </button>
-        </div>
+        <ErrorState
+          title="Error loading hooks data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
@@ -315,9 +318,16 @@ export function HooksPage() {
           </div>
 
           {allEvents.length === 0 ? (
-            <div className="p-8 text-center text-slate-400">
-              No hook events available
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                </svg>
+              }
+              title="No hooks configured"
+              description="Hooks run shell commands when Claude Code events occur, like after editing files or before committing."
+              action={<>Add hooks in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">hooks</code> key</>}
+            />
           ) : (
             allEvents.map((eventName) => (
               <EventRow

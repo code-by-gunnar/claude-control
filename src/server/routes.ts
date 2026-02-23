@@ -11,7 +11,8 @@ import { extractPlugins } from "../plugins/resolver.js";
 import { extractHooks, extractCommands } from "../hooks/resolver.js";
 import { resolveMemoryImports } from "../memory/resolver.js";
 import { resolvePermissions } from "../permissions/resolver.js";
-import { removePermission } from "../permissions/writer.js";
+import { removePermission, addPermission } from "../permissions/writer.js";
+import { setSetting } from "../settings/writer.js";
 import { discoverProjects } from "../workspace/discovery.js";
 import { compareProjects } from "../workspace/comparison.js";
 import { extractAgents } from "../agents/resolver.js";
@@ -102,6 +103,30 @@ apiRoutes.get("/api/settings", async (c) => {
 
   const resolved = resolveSettings(scopedSettings);
   return c.json(resolved);
+});
+
+/**
+ * POST /api/settings/set
+ * Sets a single top-level setting in user-scope settings.json.
+ */
+apiRoutes.post("/api/settings/set", async (c) => {
+  const body = await c.req.json<{ key?: string; value?: unknown }>();
+  const { key, value } = body;
+
+  if (!key || typeof key !== "string") {
+    return c.json({ error: "key is required" }, 400);
+  }
+  if (value === undefined) {
+    return c.json({ error: "value is required" }, 400);
+  }
+
+  try {
+    const result = await setSetting(key.trim(), value);
+    return c.json({ success: true, ...result });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to set setting";
+    return c.json({ error: msg }, 500);
+  }
 });
 
 /**
@@ -210,6 +235,38 @@ apiRoutes.post("/api/permissions/remove", async (c) => {
       err instanceof Error ? err.message : "Failed to remove permission";
     const status = message.includes("managed") ? 403 : 500;
     return c.json({ error: message }, status);
+  }
+});
+
+/**
+ * POST /api/permissions/add
+ * Adds a single permission entry to user-scope settings.json.
+ */
+apiRoutes.post("/api/permissions/add", async (c) => {
+  const body = await c.req.json<{
+    tool?: string;
+    rule?: string;
+    pattern?: string;
+  }>();
+  const { tool, rule, pattern } = body;
+
+  if (!tool || typeof tool !== "string") {
+    return c.json({ error: "tool is required" }, 400);
+  }
+  if (!rule || !["allow", "deny", "ask"].includes(rule)) {
+    return c.json({ error: "rule must be allow, deny, or ask" }, 400);
+  }
+
+  try {
+    const result = await addPermission(
+      tool.trim(),
+      rule as "allow" | "deny" | "ask",
+      pattern?.trim() || undefined
+    );
+    return c.json({ success: true, ...result });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Failed to add permission";
+    return c.json({ error: msg }, 500);
   }
 });
 

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchCommands,
   type CommandsResult,
   type CommandEntry,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
@@ -289,9 +292,13 @@ export function SkillsPage() {
   const [error, setError] = useState<string | null>(null);
   const [commandsData, setCommandsData] = useState<CommandsResult | null>(null);
   const [expandedSkill, setExpandedSkill] = useState<string | null>(null);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -305,6 +312,8 @@ export function SkillsPage() {
           err instanceof Error ? err.message : "Failed to load commands data"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -312,7 +321,7 @@ export function SkillsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   const commands = commandsData?.commands ?? [];
   const customCommands = commands.filter((c) => c.source === "command" && !c.name.includes(":"));
@@ -334,10 +343,11 @@ export function SkillsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Commands & Skills
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading commands data</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading commands data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
@@ -424,9 +434,16 @@ export function SkillsPage() {
               )}
             </h2>
             {allCustomCommands.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-                No custom commands configured
-              </div>
+              <EmptyState
+                icon={
+                  <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m6.75 7.5 3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0 0 21 18V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                }
+                title="No custom commands configured"
+                description="Custom commands are slash commands you define for frequently used prompts or workflows."
+                action={<>Create command files in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">~/.claude/commands/</code> or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">.claude/commands/</code></>}
+              />
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200">
                 <div className="px-4 py-2 flex gap-4 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">

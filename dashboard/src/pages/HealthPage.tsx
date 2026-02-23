@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import { fetchHealth, type HealthResult, type HealthCategory } from "../lib/api";
+import { Link } from "react-router-dom";
+import { useRefresh } from "../lib/refresh-context";
+import { fetchHealth, type HealthResult, type HealthCategory, type HealthCheck } from "../lib/api";
 import { InfoBubble } from "../components/InfoBubble";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 const categoryInfo: Record<string, string> = {
   Memory: "Do you have CLAUDE.md project instructions to guide Claude?",
@@ -110,9 +114,13 @@ export function HealthPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [health, setHealth] = useState<HealthResult | null>(null);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -124,6 +132,8 @@ export function HealthPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load health data");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -131,16 +141,17 @@ export function HealthPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">Health</h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading health data</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading health data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
@@ -176,7 +187,7 @@ export function HealthPage() {
             ))}
           </div>
         </div>
-      ) : health ? (
+      ) : health && health.categories.length > 0 ? (
         <div className="space-y-8">
           {/* Score gauge and summary */}
           <div className="flex flex-col items-center text-center">
@@ -195,23 +206,54 @@ export function HealthPage() {
           </div>
 
           {/* Recommendations */}
-          {health.recommendations.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-4">Recommendations</h2>
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">
-                {health.recommendations.map((rec, i) => (
-                  <div key={i} className="flex items-start gap-3 px-5 py-3">
-                    <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
-                      {i + 1}
-                    </span>
-                    <p className="text-sm text-slate-700">{rec}</p>
-                  </div>
-                ))}
+          {(() => {
+            const recs: HealthCheck[] = health.categories
+              .flatMap((cat) => cat.checks)
+              .filter((check) => !check.passed && check.recommendation)
+              .sort((a, b) => b.weight - a.weight);
+            if (recs.length === 0) return null;
+            return (
+              <div>
+                <h2 className="text-xl font-semibold text-slate-800 mb-4">Recommendations</h2>
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 divide-y divide-slate-100">
+                  {recs.map((check, i) => (
+                    <div key={check.id} className="flex items-start gap-3 px-5 py-3">
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1 flex items-start justify-between gap-3">
+                        <p className="text-sm text-slate-700">{check.recommendation}</p>
+                        {check.deeplink && (
+                          <Link
+                            to={check.deeplink}
+                            className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100"
+                          >
+                            View {check.category}
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
-      ) : null}
+      ) : (
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          }
+          title="No health data available"
+          description="Health scoring analyzes your Claude Code configuration for completeness and best practices."
+          action={<>Ensure you have at least one configuration file (<code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code>, <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">CLAUDE.md</code>, etc.)</>}
+        />
+      )}
     </div>
   );
 }

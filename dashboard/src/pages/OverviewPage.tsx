@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchStatus,
   fetchScan,
@@ -11,9 +12,20 @@ import {
   fetchPlugins,
   fetchAgents,
   fetchCommands,
+  fetchAccount,
   type ScanResult,
+  type AccountInfo,
 } from "../lib/api";
 import { InfoBubble } from "../components/InfoBubble";
+import { ErrorState } from "../components/ErrorState";
+
+function subscriptionBadgeColors(sub: string | null): string {
+  if (!sub) return "bg-slate-100 text-slate-500";
+  const lower = sub.toLowerCase();
+  if (lower.includes("max")) return "bg-purple-100 text-purple-700";
+  if (lower === "pro") return "bg-blue-100 text-blue-700";
+  return "bg-slate-100 text-slate-500";
+}
 
 export function OverviewPage() {
   const [loading, setLoading] = useState(true);
@@ -21,9 +33,28 @@ export function OverviewPage() {
   const [cards, setCards] = useState<CardData[]>([]);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [configExpanded, setConfigExpanded] = useState(false);
+  const [account, setAccount] = useState<AccountInfo | null>(null);
+  const [accountLoading, setAccountLoading] = useState(true);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
+
+    // Fetch account info separately — non-critical, should not block main data
+    setAccountLoading(true);
+    fetchAccount()
+      .then((info) => {
+        if (!cancelled) setAccount(info);
+      })
+      .catch(() => {
+        if (!cancelled) setAccount(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAccountLoading(false);
+      });
 
     async function loadData() {
       try {
@@ -146,6 +177,8 @@ export function OverviewPage() {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : "Failed to load data");
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -153,7 +186,7 @@ export function OverviewPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (
@@ -161,10 +194,11 @@ export function OverviewPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Overview
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading dashboard data</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading dashboard data"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
@@ -180,6 +214,37 @@ export function OverviewPage() {
           </span>
         )}
       </p>
+
+      {/* Account info bar */}
+      <div className="mb-4">
+        {accountLoading ? (
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-2.5 animate-pulse flex items-center gap-3">
+            <div className="h-3 bg-slate-200 rounded w-14" />
+            <div className="h-5 bg-slate-100 rounded w-16" />
+            <div className="h-5 bg-slate-100 rounded w-20" />
+          </div>
+        ) : account && (account.subscriptionType || account.rateLimitTier) ? (
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-2.5 flex items-center gap-3">
+            <span className="text-xs font-medium text-slate-500">Account</span>
+            {account.subscriptionType && (
+              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${subscriptionBadgeColors(account.subscriptionType)}`}>
+                {account.subscriptionType}
+              </span>
+            )}
+            {account.rateLimitTier && (
+              <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                {account.rateLimitTier}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 px-4 py-2.5">
+            <span className="text-xs text-slate-400">
+              Account info unavailable &mdash; sign in to Claude Code to see subscription details
+            </span>
+          </div>
+        )}
+      </div>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

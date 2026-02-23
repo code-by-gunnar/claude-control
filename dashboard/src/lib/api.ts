@@ -146,6 +146,7 @@ export interface HealthCheck {
   passed: boolean;
   weight: number;
   recommendation?: string;
+  deeplink?: string;
 }
 
 export interface HealthCategory {
@@ -370,6 +371,43 @@ export async function fetchProjects(dir: string): Promise<WorkspaceScan> {
     throw new Error((body as { error?: string }).error ?? `API error: ${response.status}`);
   }
   return response.json() as Promise<WorkspaceScan>;
+}
+
+export async function addPermission(
+  tool: string,
+  rule: string,
+  pattern?: string
+): Promise<{ success: boolean; added: string }> {
+  const response = await fetch("/api/permissions/add", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tool, rule, pattern: pattern || undefined }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error ?? `Failed to add permission (${response.status})`
+    );
+  }
+  return response.json() as Promise<{ success: boolean; added: string }>;
+}
+
+export async function setSetting(
+  key: string,
+  value: unknown
+): Promise<{ success: boolean; key: string; value: unknown }> {
+  const response = await fetch("/api/settings/set", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key, value }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      (body as { error?: string }).error ?? `Failed to set setting (${response.status})`
+    );
+  }
+  return response.json() as Promise<{ success: boolean; key: string; value: unknown }>;
 }
 
 export async function removePermission(

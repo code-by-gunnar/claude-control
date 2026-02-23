@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchMarketplaces,
   type MarketplacesResult,
   type MarketplaceInfo,
   type MarketplacePlugin,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
+import { ErrorState } from "../components/ErrorState";
 
 function formatDate(iso: string): string {
   try {
@@ -143,9 +146,13 @@ export function MarketplacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<MarketplacesResult | null>(null);
+  const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
+    setRefreshing(true);
 
     async function loadData() {
       try {
@@ -159,6 +166,8 @@ export function MarketplacesPage() {
           err instanceof Error ? err.message : "Failed to load marketplaces"
         );
         setLoading(false);
+      } finally {
+        if (!cancelled) setRefreshing(false);
       }
     }
 
@@ -166,7 +175,7 @@ export function MarketplacesPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshKey]);
 
   if (error) {
     return (
@@ -174,10 +183,11 @@ export function MarketplacesPage() {
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-6">
           Marketplaces
         </h1>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <p className="font-medium">Error loading marketplaces</p>
-          <p className="text-sm mt-1">{error}</p>
-        </div>
+        <ErrorState
+          title="Error loading marketplaces"
+          message={error}
+          onRetry={() => triggerRefresh()}
+        />
       </div>
     );
   }
@@ -242,10 +252,16 @@ export function MarketplacesPage() {
           ))}
         </div>
       ) : marketplaces.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-          No marketplaces found. Configure marketplaces with{" "}
-          <code className="font-mono text-xs">/plugin</code>
-        </div>
+        <EmptyState
+          icon={
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
+            </svg>
+          }
+          title="No marketplaces found"
+          description="Marketplaces are curated collections of plugins for Claude Code."
+          action="Marketplaces are configured automatically when you install plugins"
+        />
       ) : (
         <div className="space-y-4">
           {marketplaces.map((marketplace) => (

@@ -14,6 +14,19 @@ const CATEGORY_WEIGHTS: Record<string, number> = {
 };
 
 /**
+ * Dashboard route paths for each health category.
+ * Used to generate deeplinks so users can navigate directly from
+ * a health recommendation to the relevant dashboard page.
+ */
+const CATEGORY_ROUTES: Record<string, string> = {
+  Memory: "/memory",
+  Settings: "/settings",
+  MCP: "/mcp",
+  Hooks: "/hooks",
+  Permissions: "/permissions",
+};
+
+/**
  * Determine letter grade from a numeric score.
  */
 function gradeFromScore(score: number): string {
@@ -115,6 +128,7 @@ function checkMemory(files: ConfigFile[]): HealthCheck[] {
       weight: 3,
       recommendation:
         "Create a CLAUDE.md in your project root to give Claude project-specific context.",
+      deeplink: CATEGORY_ROUTES.Memory,
     },
     {
       id: "has-user-claude-md",
@@ -124,6 +138,7 @@ function checkMemory(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Create ~/.claude/CLAUDE.md with global instructions that apply to all projects.",
+      deeplink: CATEGORY_ROUTES.Memory,
     },
   ];
 }
@@ -141,6 +156,7 @@ function checkSettings(files: ConfigFile[]): HealthCheck[] {
       weight: 2,
       recommendation:
         "Create .claude/settings.json in your project for project-specific configuration.",
+      deeplink: CATEGORY_ROUTES.Settings,
     },
     {
       id: "has-user-settings",
@@ -150,6 +166,7 @@ function checkSettings(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Create ~/.claude/settings.json with your global preferences.",
+      deeplink: CATEGORY_ROUTES.Settings,
     },
   ];
 }
@@ -189,6 +206,7 @@ function checkMcp(files: ConfigFile[]): HealthCheck[] {
       weight: 2,
       recommendation:
         "Configure MCP servers in .mcp.json or install plugins to extend Claude's capabilities.",
+      deeplink: CATEGORY_ROUTES.MCP,
     },
     {
       id: "has-project-mcp",
@@ -198,6 +216,7 @@ function checkMcp(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Create .mcp.json in your project root for project-specific MCP servers.",
+      deeplink: CATEGORY_ROUTES.MCP,
     },
   ];
 }
@@ -215,6 +234,7 @@ function checkHooks(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Configure hooks in settings.json to automate actions on Claude events.",
+      deeplink: CATEGORY_ROUTES.Hooks,
     },
     {
       id: "has-commands-dir",
@@ -224,6 +244,7 @@ function checkHooks(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Create a .claude/commands/ directory with .md files to define custom slash commands.",
+      deeplink: CATEGORY_ROUTES.Hooks,
     },
   ];
 }
@@ -241,6 +262,7 @@ function checkPermissions(files: ConfigFile[]): HealthCheck[] {
       weight: 1,
       recommendation:
         "Configure permissions in settings.json to control which tools Claude can use.",
+      deeplink: CATEGORY_ROUTES.Permissions,
     },
   ];
 }

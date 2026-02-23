@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRefresh } from "../lib/refresh-context";
 import {
   fetchProjects,
   fetchCompare,
@@ -7,6 +8,8 @@ import {
   type ComparisonResult,
   type ComparisonEntry,
 } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
+import { Breadcrumbs, type BreadcrumbItem } from "../components/Breadcrumbs";
 
 /** Group comparison entries by their type field */
 function groupEntries(entries: ComparisonEntry[]): Record<string, ComparisonEntry[]> {
@@ -98,10 +101,8 @@ function ProjectCard({
 
 function ComparisonTable({
   comparison,
-  onBack,
 }: {
   comparison: ComparisonResult;
-  onBack: () => void;
 }) {
   const grouped = groupEntries(comparison.entries);
   const typeLabels: Record<string, string> = {
@@ -114,17 +115,7 @@ function ComparisonTable({
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-4">
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
-          Back to Discovery
-        </button>
+      <div className="mb-4">
         <span className="text-sm text-slate-500">
           Comparing {comparison.projects.length} projects &middot;{" "}
           {comparison.summary.totalDifferences} difference{comparison.summary.totalDifferences !== 1 ? "s" : ""}
@@ -200,9 +191,15 @@ export function ProjectsPage() {
   const [workspace, setWorkspace] = useState<WorkspaceScan | null>(null);
   const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
+  const { refreshKey, setRefreshing } = useRefresh();
 
   // Prefill with parent of project dir from scan data
   useEffect(() => {
+    setRefreshing(true);
+    setWorkspace(null);
+    setComparison(null);
+    setError(null);
+
     async function getProjectDir() {
       try {
         const res = await fetch("/api/scan");
@@ -217,10 +214,12 @@ export function ProjectsPage() {
         }
       } catch {
         // ignore
+      } finally {
+        setRefreshing(false);
       }
     }
     getProjectDir();
-  }, []);
+  }, [refreshKey]);
 
   async function handleDiscover() {
     if (!parentDir.trim()) return;
@@ -267,29 +266,47 @@ export function ProjectsPage() {
     });
   }
 
-  // Comparison mode
-  if (comparison) {
-    return (
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
-        <p className="text-sm text-slate-500 mb-6">
-          Cross-project configuration comparison
-        </p>
-        <ComparisonTable
-          comparison={comparison}
-          onBack={() => setComparison(null)}
-        />
-      </div>
-    );
-  }
+  // Derive current step from state
+  type ProjectStep = "discover" | "select" | "compare";
+  const step: ProjectStep = comparison ? "compare" : workspace ? "select" : "discover";
 
-  // Discovery mode (default)
+  // Build breadcrumb items based on current step
+  const resetToDiscover = () => {
+    setWorkspace(null);
+    setSelectedPaths(new Set());
+    setComparison(null);
+  };
+  const resetToSelect = () => setComparison(null);
+
+  const breadcrumbItems: BreadcrumbItem[] =
+    step === "discover"
+      ? [{ label: "Discover" }]
+      : step === "select"
+        ? [{ label: "Discover", onClick: resetToDiscover }, { label: "Select" }]
+        : [
+            { label: "Discover", onClick: resetToDiscover },
+            { label: "Select", onClick: resetToSelect },
+            { label: "Compare" },
+          ];
+
   return (
     <div>
       <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">Projects</h1>
-      <p className="text-sm text-slate-500 mb-6">
-        Discover and compare Claude Code configurations across projects
+      <p className="text-sm text-slate-500 mb-4">
+        {comparison
+          ? "Cross-project configuration comparison"
+          : "Discover and compare Claude Code configurations across projects"}
       </p>
+      <div className="mb-4">
+        <Breadcrumbs items={breadcrumbItems} />
+      </div>
+
+      {/* Comparison view */}
+      {comparison && <ComparisonTable comparison={comparison} />}
+
+      {/* Discovery + selection view */}
+      {!comparison && (
+        <>
 
       {/* Explainer */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-800">
@@ -389,9 +406,16 @@ export function ProjectsPage() {
           </div>
 
           {workspace.projects.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center text-slate-400">
-              No Claude Code projects found in this directory
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-12 h-12" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                </svg>
+              }
+              title="No Claude Code projects found"
+              description="Project discovery scans the parent directory for folders that contain Claude Code configuration."
+              action={<>Make sure sibling directories have <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">.claude/</code> folders or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">CLAUDE.md</code> files</>}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {workspace.projects.map((project) => (
@@ -405,6 +429,8 @@ export function ProjectsPage() {
             </div>
           )}
         </>
+      )}
+      </>
       )}
     </div>
   );
