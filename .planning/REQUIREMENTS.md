@@ -31,9 +31,9 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 
 ### Write Capabilities
 
-- [ ] **WRITE-01**: Permissions page has an "Add rule" form with tool name, pattern, and allow/deny/ask selection
-- [ ] **WRITE-02**: Permission rules write to user-scope settings.json only
-- [ ] **WRITE-03**: Added permission rules appear immediately in the permissions list without page reload
+- [x] **WRITE-01**: Permissions page has an "Add rule" form with tool name, pattern, and allow/deny/ask selection
+- [x] **WRITE-02**: Permission rules write to user-scope settings.json only
+- [x] **WRITE-03**: Added permission rules appear immediately in the permissions list without page reload
 - [ ] **WRITE-04**: Settings page shows toggle switches for boolean settings
 - [ ] **WRITE-05**: Boolean toggle writes to user-scope settings.json only
 - [ ] **WRITE-06**: Toggle change is reflected immediately in the settings display
@@ -90,9 +90,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | WORK-02 | Phase 8 | Complete |
 | WORK-03 | Phase 10 | Complete |
 | WORK-04 | Phase 10 | Complete |
-| WRITE-01 | Phase 12 | Pending |
-| WRITE-02 | Phase 12 | Pending |
-| WRITE-03 | Phase 12 | Pending |
+| WRITE-01 | Phase 12 | Complete |
+| WRITE-02 | Phase 12 | Complete |
+| WRITE-03 | Phase 12 | Complete |
 | WRITE-04 | Phase 13 | Pending |
 | WRITE-05 | Phase 13 | Pending |
 | WRITE-06 | Phase 13 | Pending |
@@ -104,4 +104,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after Phase 11 completion*
+*Last updated: 2026-02-23 after Phase 12 plan 01 completion*

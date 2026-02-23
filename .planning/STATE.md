@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 ## Current Position
 
 Phase: 12 of 13 (Permission Write Rules)
-Plan: Not started
-Status: Phase 11 verified and complete. Ready for Phase 12.
-Last activity: 2026-02-23 — Phase 11 verified (7/7 must-haves pass)
+Plan: 01 of 01 complete
+Status: Phase 12 plan 01 complete. Add permission write capability done.
+Last activity: 2026-02-23 — Phase 12 plan 01 executed (2/2 tasks)
 
-Progress: █████░░░░░ 75%
+Progress: ████████░░ 80%
 
 ## Performance Metrics
 
@@ -25,7 +25,7 @@ Progress: █████░░░░░ 75%
 - Lines of code: 9,362
 
 **v1.1 Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: —
 - Total execution time: —
 
@@ -44,6 +44,9 @@ Recent decisions affecting current work:
 - Keyboard shortcuts use two-key chord (G then letter) with 1s timeout, no external dependencies
 - Breadcrumbs show only items up to current step (no greyed-out future steps)
 - ComparisonTable back button replaced by breadcrumbs — single navigation pattern
+- addPermission writes to user-scope only (~/.claude/settings.json), never managed scope
+- Uses jsonc-parser modify/applyEdits pattern matching existing removePermission
+- Form uses triggerRefresh() from RefreshContext for immediate list update
 
 ### Pending Todos
 
@@ -56,5 +59,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 11 verified, ready for phase 12
-Resume file: .planning/phases/11-keyboard-nav-breadcrumbs/11-VERIFICATION.md
+Stopped at: Completed 12-01-PLAN.md
+Resume file: .planning/phases/12-permission-write-rules/12-01-SUMMARY.md
