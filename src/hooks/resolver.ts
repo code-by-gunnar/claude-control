@@ -9,6 +9,7 @@ import type {
   HookMatcher,
   HooksResult,
 } from "./types.js";
+import type { PluginInfo } from "../plugins/types.js";
 
 /**
  * All known Claude Code hook event names.
@@ -155,12 +156,15 @@ export function extractHooks(files: ConfigFile[]): HooksResult {
  *
  * Filters for commands-dir type files that exist and are readable,
  * reads .md files from each directory, and creates CommandEntry objects.
+ * Optionally also scans installed plugin directories for commands/skills.
  *
  * @param files - All scanned configuration files from a scan() call
+ * @param plugins - Optional list of plugins to scan for commands/skills
  * @returns CommandsResult with all discovered commands
  */
 export async function extractCommands(
-  files: ConfigFile[]
+  files: ConfigFile[],
+  plugins?: PluginInfo[]
 ): Promise<CommandsResult> {
   const allCommands: CommandEntry[] = [];
 
@@ -211,6 +215,73 @@ export async function extractCommands(
       }
     } catch {
       // Skip unreadable commands directories
+    }
+  }
+
+  // Scan installed plugin directories for commands and skills
+  if (plugins) {
+    const pluginPromises = plugins
+      .filter((p) => p.installed && p.enabled)
+      .map(async (plugin) => {
+        const pluginCommands: CommandEntry[] = [];
+        const pluginDir = plugin.pluginDir;
+
+        // Scan commands/*.md
+        try {
+          const commandsDir = nodePath.join(pluginDir, "commands");
+          const entries = await fs.readdir(commandsDir, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isFile() && entry.name.endsWith(".md")) {
+              pluginCommands.push({
+                name: `${plugin.name}:${entry.name.replace(/\.md$/, "")}`,
+                path: nodePath.join(commandsDir, entry.name),
+                scope: plugin.scope,
+              });
+            }
+          }
+        } catch {
+          // No commands directory
+        }
+
+        // Scan skills/*/*.md — use directory name as skill name, skip duplicates from commands/
+        const seenNames = new Set(pluginCommands.map((c) => c.name));
+        try {
+          const skillsDir = nodePath.join(pluginDir, "skills");
+          const skillDirs = await fs.readdir(skillsDir, { withFileTypes: true });
+          for (const skillDir of skillDirs) {
+            if (!skillDir.isDirectory()) continue;
+            const skillName = `${plugin.name}:${skillDir.name}`;
+            if (seenNames.has(skillName)) continue;
+            try {
+              const skillFiles = await fs.readdir(
+                nodePath.join(skillsDir, skillDir.name),
+                { withFileTypes: true }
+              );
+              const mdFile = skillFiles.find(
+                (f) => f.isFile() && f.name.endsWith(".md")
+              );
+              if (mdFile) {
+                pluginCommands.push({
+                  name: skillName,
+                  path: nodePath.join(skillsDir, skillDir.name, mdFile.name),
+                  scope: plugin.scope,
+                });
+                seenNames.add(skillName);
+              }
+            } catch {
+              // Skip unreadable skill subdirectory
+            }
+          }
+        } catch {
+          // No skills directory
+        }
+
+        return pluginCommands;
+      });
+
+    const pluginResults = await Promise.all(pluginPromises);
+    for (const commands of pluginResults) {
+      allCommands.push(...commands);
     }
   }
 

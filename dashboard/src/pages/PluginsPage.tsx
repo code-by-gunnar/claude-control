@@ -38,9 +38,40 @@ function StatusBadge({ enabled, installed }: { enabled: boolean; installed: bool
   }
   return (
     <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-      active
+      enabled
     </span>
   );
+}
+
+const pluginTypeColors: Record<string, string> = {
+  mcp: "bg-cyan-50 text-cyan-700",
+  skills: "bg-amber-50 text-amber-700",
+  hybrid: "bg-violet-50 text-violet-700",
+};
+
+function PluginTypeBadge({ pluginType }: { pluginType: string }) {
+  const colors = pluginTypeColors[pluginType] ?? "bg-slate-100 text-slate-600";
+  const label = pluginType === "mcp" ? "MCP" : pluginType === "skills" ? "Skills" : "Hybrid";
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colors}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+function formatDate(iso: string | null): string | null {
+  if (!iso) return null;
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
 }
 
 function PluginCard({ plugin }: { plugin: PluginInfo }) {
@@ -60,12 +91,28 @@ function PluginCard({ plugin }: { plugin: PluginInfo }) {
                 {plugin.name}
               </h3>
               <StatusBadge enabled={plugin.enabled} installed={plugin.installed} />
+              {plugin.installed && (
+                <PluginTypeBadge pluginType={plugin.pluginType} />
+              )}
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              {plugin.marketplace}
-            </p>
+            {plugin.description ? (
+              <p className="text-xs text-slate-500 mt-1 line-clamp-1">
+                {plugin.description}
+              </p>
+            ) : (
+              <p className="text-xs text-slate-400 mt-1">
+                {plugin.marketplace}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            {plugin.version && (
+              <span className="text-xs text-slate-400 font-mono">
+                {plugin.version.length > 12
+                  ? plugin.version.slice(0, 8) + "\u2026"
+                  : plugin.version}
+              </span>
+            )}
             <ScopeBadge scope={plugin.scope} />
             <span className="text-slate-400 text-xs">
               {expanded ? "\u25BC" : "\u25B6"}
@@ -94,6 +141,18 @@ function PluginCard({ plugin }: { plugin: PluginInfo }) {
       {expanded && (
         <div className="border-t border-slate-100 p-4 bg-slate-50/50">
           <dl className="space-y-2 text-sm">
+            {plugin.description && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-28 shrink-0">Description:</dt>
+                <dd className="text-slate-700">{plugin.description}</dd>
+              </div>
+            )}
+            {plugin.version && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-28 shrink-0">Version:</dt>
+                <dd className="font-mono text-xs text-slate-700">{plugin.version}</dd>
+              </div>
+            )}
             <div className="flex gap-2">
               <dt className="text-slate-500 font-medium w-28 shrink-0">Plugin key:</dt>
               <dd className="font-mono text-xs text-slate-700">{plugin.key}</dd>
@@ -109,7 +168,21 @@ function PluginCard({ plugin }: { plugin: PluginInfo }) {
             {plugin.installed && (
               <div className="flex gap-2">
                 <dt className="text-slate-500 font-medium w-28 shrink-0">Plugin dir:</dt>
-                <dd className="font-mono text-xs text-slate-400 break-all">{plugin.pluginDir}</dd>
+                <dd className="font-mono text-xs text-slate-400 break-all">
+                  {plugin.installPath ?? plugin.pluginDir}
+                </dd>
+              </div>
+            )}
+            {plugin.lastUpdated && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-28 shrink-0">Last updated:</dt>
+                <dd className="text-slate-700">{formatDate(plugin.lastUpdated)}</dd>
+              </div>
+            )}
+            {plugin.installedAt && (
+              <div className="flex gap-2">
+                <dt className="text-slate-500 font-medium w-28 shrink-0">Installed:</dt>
+                <dd className="text-slate-700">{formatDate(plugin.installedAt)}</dd>
               </div>
             )}
             {plugin.mcpServers.length > 0 && (
@@ -183,7 +256,7 @@ export function PluginsPage() {
         Installed plugin packages
         {!loading && (
           <span className="ml-1 text-slate-400">
-            ({data?.enabledCount ?? 0} active, {data?.totalCount ?? 0} total)
+            ({data?.enabledCount ?? 0} enabled, {data?.installedCount ?? 0} installed, {data?.totalCount ?? 0} total)
           </span>
         )}
       </p>

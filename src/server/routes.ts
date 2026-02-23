@@ -1,4 +1,7 @@
+import fsSync from "node:fs";
 import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Hono } from "hono";
 import { scan } from "../scanner/index.js";
 import { computeHealth } from "../health/resolver.js";
@@ -11,7 +14,27 @@ import { resolvePermissions } from "../permissions/resolver.js";
 import { removePermission } from "../permissions/writer.js";
 import { discoverProjects } from "../workspace/discovery.js";
 import { compareProjects } from "../workspace/comparison.js";
+import { extractAgents } from "../agents/resolver.js";
+import { extractMarketplaces } from "../marketplace/resolver.js";
+import { extractAccountInfo } from "../account/resolver.js";
 import type { ScopedSettings } from "../settings/types.js";
+
+// Read version from package.json at module load time.
+// Walk up from the current file to find the nearest package.json.
+const __filename = fileURLToPath(import.meta.url);
+let CLI_VERSION = "unknown";
+let searchDir = path.dirname(__filename);
+for (let i = 0; i < 5; i++) {
+  const candidate = path.join(searchDir, "package.json");
+  if (fsSync.existsSync(candidate)) {
+    const pkg = JSON.parse(fsSync.readFileSync(candidate, "utf-8")) as { version?: string };
+    if (pkg.version) {
+      CLI_VERSION = pkg.version;
+      break;
+    }
+  }
+  searchDir = path.dirname(searchDir);
+}
 
 /**
  * Module-level project directory, set by the server at startup.
@@ -137,7 +160,8 @@ apiRoutes.get("/api/hooks", async (c) => {
  */
 apiRoutes.get("/api/commands", async (c) => {
   const result = await scan(projectDir);
-  const commandsResult = await extractCommands(result.files);
+  const pluginsResult = await extractPlugins(result.files);
+  const commandsResult = await extractCommands(result.files, pluginsResult.plugins);
   return c.json(commandsResult);
 });
 
@@ -267,4 +291,40 @@ apiRoutes.get("/api/compare", async (c) => {
 
   const result = await compareProjects(paths);
   return c.json(result);
+});
+
+/**
+ * GET /api/agents
+ * Returns all agent .md files from ~/.claude/agents/.
+ */
+apiRoutes.get("/api/agents", async (c) => {
+  const result = await extractAgents();
+  return c.json(result);
+});
+
+/**
+ * GET /api/marketplaces
+ * Returns full marketplace catalog with plugin status.
+ */
+apiRoutes.get("/api/marketplaces", async (c) => {
+  const scanResult = await scan(projectDir);
+  const result = await extractMarketplaces(scanResult.files);
+  return c.json(result);
+});
+
+/**
+ * GET /api/account
+ * Returns non-secret account info (subscription type only).
+ */
+apiRoutes.get("/api/account", async (c) => {
+  const result = await extractAccountInfo();
+  return c.json(result);
+});
+
+/**
+ * GET /api/version
+ * Returns the CLI version from package.json.
+ */
+apiRoutes.get("/api/version", (c) => {
+  return c.json({ version: CLI_VERSION });
 });

@@ -211,6 +211,67 @@ export interface ComparisonResult {
   };
 }
 
+// --- Agent types ---
+
+export interface AgentInfo {
+  name: string;
+  fileName: string;
+  path: string;
+  description: string | null;
+  color: string | null;
+  tools: string[];
+  model: string | null;
+  sizeBytes: number;
+  content: string;
+}
+
+export interface AgentsResult {
+  agents: AgentInfo[];
+  totalCount: number;
+  agentsDir: string;
+}
+
+// --- Marketplace types ---
+
+export interface MarketplacePlugin {
+  name: string;
+  marketplace: string;
+  directory: "plugins" | "external_plugins";
+  description: string | null;
+  installed: boolean;
+  enabled: boolean;
+  blocked: boolean;
+  installCount: number | null;
+}
+
+export interface MarketplaceInfo {
+  id: string;
+  source: { source: string; repo: string };
+  installLocation: string;
+  lastUpdated: string;
+  pluginCount: number;
+  plugins: MarketplacePlugin[];
+}
+
+export interface MarketplacesResult {
+  marketplaces: MarketplaceInfo[];
+  totalPlugins: number;
+  blockedPlugins: { plugin: string; reason: string }[];
+}
+
+// --- Account types ---
+
+export interface AccountInfo {
+  subscriptionType: string | null;
+  rateLimitTier: string | null;
+}
+
+// --- Version types ---
+
+export interface VersionInfo {
+  version: string;
+}
+
 async function fetchJson<T>(endpoint: string): Promise<T> {
   const response = await fetch(`/api/${endpoint}`);
   if (!response.ok) {
@@ -255,6 +316,12 @@ export interface PluginInfo {
   pluginDir: string;
   installed: boolean;
   mcpServers: string[];
+  version: string | null;
+  installedAt: string | null;
+  lastUpdated: string | null;
+  pluginType: "mcp" | "skills" | "hybrid";
+  description: string | null;
+  installPath: string | null;
 }
 
 export interface PluginsResult {
@@ -320,4 +387,20 @@ export async function fetchCompare(projectPaths: string[]): Promise<ComparisonRe
     throw new Error((body as { error?: string }).error ?? `API error: ${response.status}`);
   }
   return response.json() as Promise<ComparisonResult>;
+}
+
+export async function fetchAgents(): Promise<AgentsResult> {
+  return fetchJson<AgentsResult>("agents");
+}
+
+export async function fetchMarketplaces(): Promise<MarketplacesResult> {
+  return fetchJson<MarketplacesResult>("marketplaces");
+}
+
+export async function fetchAccount(): Promise<AccountInfo> {
+  return fetchJson<AccountInfo>("account");
+}
+
+export async function fetchVersion(): Promise<VersionInfo> {
+  return fetchJson<VersionInfo>("version");
 }

@@ -4,6 +4,7 @@ import type { ConfigFile } from "../scanner/types.js";
 import { getGlobalClaudeDir } from "../scanner/paths.js";
 import { parseJsonc } from "../scanner/parser.js";
 import type { McpDuplicate, McpResult, McpServer } from "./types.js";
+import { readInstalledPluginsRegistry } from "../plugins/resolver.js";
 
 /**
  * Scope priority for sorting: project first (highest priority), then user, managed last.
@@ -204,12 +205,14 @@ export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult>
   }
 
   // 3. Extract from enabled Claude Code plugins
-  // Plugins store .mcp.json in ~/.claude/plugins/marketplaces/{marketplace}/external_plugins/{name}/
+  // Uses 3-tier lookup: registry installPath → external_plugins/ → plugins/
+  const globalDir = getGlobalClaudeDir();
+  const registry = await readInstalledPluginsRegistry(globalDir);
+
   for (const file of settingsFiles) {
     const content = file.content as Record<string, unknown>;
     if (content.enabledPlugins && typeof content.enabledPlugins === "object") {
       const enabledPlugins = content.enabledPlugins as Record<string, boolean>;
-      const globalDir = getGlobalClaudeDir();
 
       const pluginPromises = Object.entries(enabledPlugins)
         .filter(([, enabled]) => enabled)
@@ -220,23 +223,48 @@ export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult>
           const name = pluginKey.slice(0, atIndex);
           const marketplace = pluginKey.slice(atIndex + 1);
 
-          const pluginMcpPath = path.join(
-            globalDir, "plugins", "marketplaces", marketplace,
-            "external_plugins", name, ".mcp.json"
+          // 3-tier lookup for .mcp.json
+          const candidates: string[] = [];
+
+          // Tier 1: registry installPath (authoritative)
+          const registryEntries = registry?.plugins[pluginKey] ?? [];
+          const registryEntry = registryEntries[0] ?? null;
+          if (registryEntry?.installPath) {
+            candidates.push(
+              path.join(registryEntry.installPath, ".mcp.json")
+            );
+          }
+
+          // Tier 2: external_plugins/{name}/
+          candidates.push(
+            path.join(
+              globalDir, "plugins", "marketplaces", marketplace,
+              "external_plugins", name, ".mcp.json"
+            )
           );
 
-          try {
-            await fs.access(pluginMcpPath);
-            const { data } = await parseJsonc(pluginMcpPath);
-            if (data && typeof data === "object") {
-              return extractFromContent(
-                data as Record<string, unknown>,
-                "user",
-                pluginMcpPath
-              );
+          // Tier 3: plugins/{name}/
+          candidates.push(
+            path.join(
+              globalDir, "plugins", "marketplaces", marketplace,
+              "plugins", name, ".mcp.json"
+            )
+          );
+
+          for (const pluginMcpPath of candidates) {
+            try {
+              await fs.access(pluginMcpPath);
+              const { data } = await parseJsonc(pluginMcpPath);
+              if (data && typeof data === "object") {
+                return extractFromContent(
+                  data as Record<string, unknown>,
+                  "user",
+                  pluginMcpPath
+                );
+              }
+            } catch {
+              // This candidate doesn't exist — try next
             }
-          } catch {
-            // Plugin .mcp.json not found — skip
           }
           return [];
         });

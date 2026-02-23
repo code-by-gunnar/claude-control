@@ -74,10 +74,16 @@ function DuplicateWarning({
 /** Check if a server comes from a plugin based on its source path */
 function getPluginName(sourcePath: string): string | null {
   const normalized = sourcePath.replace(/\\/g, "/");
+  // Match both external_plugins/{name}/ and plugins/{name}/ under marketplaces
   const match = normalized.match(
-    /\/plugins\/marketplaces\/[^/]+\/external_plugins\/([^/]+)\//
+    /\/plugins\/marketplaces\/[^/]+\/(?:external_plugins|plugins)\/([^/]+)\//
   );
-  return match ? match[1] : null;
+  if (match) return match[1];
+  // Also match cache paths: cache/{marketplace}/{name}/
+  const cacheMatch = normalized.match(
+    /\/plugins\/cache\/[^/]+\/([^/]+)\//
+  );
+  return cacheMatch ? cacheMatch[1] : null;
 }
 
 function PluginBadge({ name }: { name: string }) {

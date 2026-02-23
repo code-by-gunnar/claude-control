@@ -5,7 +5,9 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { MemoryPage } from "./pages/MemoryPage";
 import { McpPage } from "./pages/McpPage";
 import { PluginsPage } from "./pages/PluginsPage";
+import { MarketplacesPage } from "./pages/MarketplacesPage";
 import { HooksPage } from "./pages/HooksPage";
+import { AgentsPage } from "./pages/AgentsPage";
 import { SkillsPage } from "./pages/SkillsPage";
 import { PermissionsPage } from "./pages/PermissionsPage";
 import { HealthPage } from "./pages/HealthPage";
@@ -21,7 +23,9 @@ export function App() {
           <Route path="/memory" element={<MemoryPage />} />
           <Route path="/mcp" element={<McpPage />} />
           <Route path="/plugins" element={<PluginsPage />} />
+          <Route path="/marketplaces" element={<MarketplacesPage />} />
           <Route path="/hooks" element={<HooksPage />} />
+          <Route path="/agents" element={<AgentsPage />} />
           <Route path="/skills" element={<SkillsPage />} />
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route path="/health" element={<HealthPage />} />
