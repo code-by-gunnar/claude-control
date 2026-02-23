@@ -103,7 +103,22 @@ export function Sidebar() {
             )}
           </svg>
         </button>
-        <h1 className="text-sm font-bold text-white ml-3 tracking-tight font-mono">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-6 h-6 ml-3 shrink-0">
+          <defs>
+            <linearGradient id="mobileLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: "#E8673A", stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: "#D94F26", stopOpacity: 1 }} />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="64" height="64" rx="14" ry="14" fill="url(#mobileLogoGrad)" />
+          <line x1="13" y1="22" x2="51" y2="22" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+          <circle cx="24" cy="22" r="5.5" fill="white" />
+          <line x1="13" y1="32" x2="51" y2="32" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+          <circle cx="40" cy="32" r="5.5" fill="white" />
+          <line x1="13" y1="42" x2="51" y2="42" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+          <circle cx="30" cy="42" r="5.5" fill="white" />
+        </svg>
+        <h1 className="text-sm font-bold text-white ml-2 tracking-tight font-mono">
           claude-ctl
         </h1>
         <span className="text-xs text-slate-500 ml-2">dashboard</span>
@@ -128,12 +143,31 @@ export function Sidebar() {
         `}
       >
         <div className="px-5 py-5 border-b border-slate-700">
-          <h1 className="text-lg font-bold text-white tracking-tight font-mono">
-            claude-ctl
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            configuration dashboard
-          </p>
+          <div className="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-8 h-8 shrink-0">
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: "#E8673A", stopOpacity: 1 }} />
+                  <stop offset="100%" style={{ stopColor: "#D94F26", stopOpacity: 1 }} />
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="64" height="64" rx="14" ry="14" fill="url(#logoGrad)" />
+              <line x1="13" y1="22" x2="51" y2="22" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+              <circle cx="24" cy="22" r="5.5" fill="white" />
+              <line x1="13" y1="32" x2="51" y2="32" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+              <circle cx="40" cy="32" r="5.5" fill="white" />
+              <line x1="13" y1="42" x2="51" y2="42" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.45" />
+              <circle cx="30" cy="42" r="5.5" fill="white" />
+            </svg>
+            <div>
+              <h1 className="text-lg font-bold text-white tracking-tight font-mono">
+                claude-ctl
+              </h1>
+              <p className="text-xs text-slate-500 mt-0.5">
+                configuration dashboard
+              </p>
+            </div>
+          </div>
         </div>
 
         <nav className="flex-1 py-3 px-3 overflow-y-auto">

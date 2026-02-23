@@ -1,19 +1,83 @@
-# claude-control
+<p align="center">
+  <img src="dashboard/public/favicon.svg" alt="claude-control logo" width="80" height="80" />
+</p>
 
-[![CI](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml/badge.svg)](https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/claude-control)](https://www.npmjs.com/package/claude-control)
+<h1 align="center">claude-control</h1>
 
-CLI + web dashboard for inspecting Claude Code configuration across all scope levels.
+<p align="center">
+  <a href="https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml"><img src="https://github.com/code-by-gunnar/claude-control/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://www.npmjs.com/package/claude-control"><img src="https://img.shields.io/npm/v/claude-control" alt="npm version" /></a>
+</p>
+
+<p align="center">
+  CLI + web dashboard for discovering, understanding, and managing Claude Code configuration across all scope levels.
+</p>
 
 ![Dashboard Overview](docs/screenshots/overview.png)
 
 ## Why
 
-Claude Code is powerful, but its configuration is spread across dozens of files in four scope levels — `settings.json`, `.mcp.json`, `CLAUDE.md`, hooks, permissions, agents, skills, plugins, and more. There's no built-in way to see what's actually active, what's overriding what, or whether your setup is complete.
+Claude Code is far more capable than most users realise. Beyond the basics, it supports
+custom agents, skills, hooks, MCP servers, plugin marketplaces, memory files with import
+chains, granular permission rules, and a four-level configuration hierarchy that merges
+settings from managed, user, project, and local scopes.
 
-For newer users, much of Claude Code's advanced functionality (custom agents, skills, hooks, MCP servers, plugin marketplaces) is buried in markdown files and JSON scattered across the file system. Discovering what's available means reading docs, running multiple CLI commands, or manually opening files in `~/.claude/`.
+Most of this is invisible by default.
 
-`claude-ctl` puts everything in one place. A single dashboard where you can see all your configuration, explore what each feature does, and understand your setup without digging through directories.
+Configuration lives across dozens of files scattered through `~/.claude/`, `.claude/`,
+`.claude.local/`, and system-wide managed paths. There's no built-in overview. No way to
+see what's active, what's overriding what, or what you're not using yet. Discovering that
+agents even exist means reading the docs. Figuring out which of your MCP servers is actually
+loading means opening three different JSON files and resolving the merge rules in your head.
+
+This creates two problems at once: a **visibility problem** for power users who know what
+they have but can't see the full resolved state, and a **discovery problem** for everyone
+else who doesn't know what Claude Code is capable of in the first place.
+
+`claude-ctl` solves both. It scans your entire Claude Code configuration across every scope
+level, resolves the full override hierarchy, and presents everything in one place — a CLI
+and web dashboard that shows you exactly what Claude Code sees, what's configured, what's
+available, and what's missing. The health score tells you how complete your setup is. The
+individual pages let you explore each feature area in detail.
+
+It's the control centre that makes Claude Code's full capability visible and understandable.
+
+## Why Not Just Open the Files?
+
+You can — but there's a catch: Claude Code's configuration isn't what's in any single file.
+It's the *result of merging* up to four layers together, where higher scopes silently override
+lower ones. A `deny` rule in your user settings will suppress an `allow` rule in your project
+settings, and you'd never know by looking at either file alone.
+
+`claude-ctl` resolves the full override chain and shows you the **effective** state — what
+Claude Code actually sees at runtime. It also surfaces things that are easy to miss when
+browsing files: which CLAUDE.md files are being imported by other CLAUDE.md files, which MCP
+server env vars are set vs. missing, which permissions are being overridden at which scope,
+and whether your overall setup matches recommended best practices.
+
+If your config is simple, opening files works fine. If you're running multiple MCP servers,
+custom agents, marketplace plugins, and project-level overrides, `claude-ctl` saves you from
+holding the whole picture in your head.
+
+## How It Fits In
+
+The Claude Code ecosystem has grown quickly. Here's how `claude-control` relates to other
+tools you might encounter:
+
+| Tool | What it does |
+|------|-------------|
+| **claude-control** *(this)* | Discovery + visibility layer. Shows the full Claude Code config landscape — what's configured, what's available, and what's missing. |
+| `claude-code-templates` | Installs pre-built agents, commands, hooks, and MCP configs into your setup |
+| `claude-flow` | Orchestrates multi-agent workflows and swarms |
+| `FleetCode` | Runs multiple Claude Code sessions in parallel with git worktree isolation |
+| `ductor` | Controls Claude Code remotely via Telegram with cron and webhook support |
+
+**`claude-control` is intentionally read-only.** It doesn't install plugins, modify settings,
+or change Claude Code's behaviour in any way. Think of it as `git status` for your Claude
+Code configuration — a safe way to understand what's there before you make changes.
+
+If you want to *change* your configuration, you'll do that by editing files directly or using
+the tools above. `claude-control` helps you understand what you have and whether it's set up correctly.
 
 ## What It Does
 
@@ -90,6 +154,11 @@ claude-ctl dashboard --port 8080
 ```
 
 The dashboard includes these pages:
+
+### Overview
+At-a-glance summary of your entire Claude Code configuration — config files found, settings, memory files, MCP servers, plugins, agents, skills, hooks, and permissions.
+
+![Overview](docs/screenshots/overview.png)
 
 ### Settings
 Resolved settings table with scope origin tracking and override indicators.
