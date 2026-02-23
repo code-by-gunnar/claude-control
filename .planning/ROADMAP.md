@@ -12,8 +12,8 @@ Dashboard UX and interactivity improvements. Better navigation (sidebar groups, 
 - v1.0 phases: 1-7 (complete)
 - v1.1 phases: 8-13
 
-- [ ] **Phase 8: Dashboard Layout** - Sidebar groups + global refresh button
-- [ ] **Phase 9: Empty States & Guidance** - Contextual help on every page + account info
+- [x] **Phase 8: Dashboard Layout** - Sidebar groups + global refresh button
+- [x] **Phase 9: Empty States & Guidance** - Contextual help on every page + account info
 - [ ] **Phase 10: Health Deeplinks & Error Recovery** - Health recommendation links + error retry
 - [ ] **Phase 11: Keyboard Navigation & Breadcrumbs** - G+key combos + Projects breadcrumbs
 - [ ] **Phase 12: Permission Write Rules** - Add rule form with user-scope writes
@@ -97,8 +97,8 @@ Phases execute in numeric order: 8 → 9 → 10 → 11 → 12 → 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 8. Dashboard Layout | 0/TBD | Not started | - |
-| 9. Empty States & Guidance | 0/TBD | Not started | - |
+| 8. Dashboard Layout | 1/1 | Complete | 2026-02-23 |
+| 9. Empty States & Guidance | 1/1 | Complete | 2026-02-23 |
 | 10. Health Deeplinks & Error Recovery | 0/TBD | Not started | - |
 | 11. Keyboard Navigation & Breadcrumbs | 0/TBD | Not started | - |
 | 12. Permission Write Rules | 0/TBD | Not started | - |
