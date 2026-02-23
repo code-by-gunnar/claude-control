@@ -10,10 +10,10 @@ Requirements for v1.1 Dashboard UX & Interactivity. Each maps to roadmap phases.
 ### Navigation
 
 - [x] **NAV-01**: Dashboard sidebar groups items under section headers (Configuration, Extensions, Workspace) instead of flat list
-- [ ] **NAV-02**: Keyboard combos (G+S, G+M, etc.) navigate to any dashboard page without mouse
-- [ ] **NAV-03**: Keyboard shortcut help overlay shows all available combos
-- [ ] **NAV-04**: Projects page shows breadcrumb trail for discover → select → compare flow
-- [ ] **NAV-05**: Breadcrumbs are clickable to navigate back to any prior step
+- [x] **NAV-02**: Keyboard combos (G+S, G+M, etc.) navigate to any dashboard page without mouse
+- [x] **NAV-03**: Keyboard shortcut help overlay shows all available combos
+- [x] **NAV-04**: Projects page shows breadcrumb trail for discover → select → compare flow
+- [x] **NAV-05**: Breadcrumbs are clickable to navigate back to any prior step
 
 ### Guidance
 
@@ -78,10 +78,10 @@ Which phases cover which requirements. Updated by create-roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | NAV-01 | Phase 8 | Complete |
-| NAV-02 | Phase 11 | Pending |
-| NAV-03 | Phase 11 | Pending |
-| NAV-04 | Phase 11 | Pending |
-| NAV-05 | Phase 11 | Pending |
+| NAV-02 | Phase 11 | Complete |
+| NAV-03 | Phase 11 | Complete |
+| NAV-04 | Phase 11 | Complete |
+| NAV-05 | Phase 11 | Complete |
 | GUIDE-01 | Phase 9 | Complete |
 | GUIDE-02 | Phase 9 | Complete |
 | GUIDE-03 | Phase 10 | Complete |
@@ -104,4 +104,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-02-23*
-*Last updated: 2026-02-23 after Phase 10 completion*
+*Last updated: 2026-02-23 after Phase 11 completion*

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-23)
 
 **Core value:** Visibility into your complete Claude Code setup — see everything configured across all levels, understand the effective merged state, and discover gaps in your setup without manually hunting through folders.
-**Current focus:** Phase 11 — Keyboard Navigation & Breadcrumbs
+**Current focus:** Phase 12 — Permission Write Rules
 
 ## Current Position
 
-Phase: 11 of 13 (Keyboard Navigation & Breadcrumbs)
-Plan: 11-02 complete (2 of 2 plans) — phase complete
-Status: Phase 11 complete — keyboard nav + breadcrumbs
-Last activity: 2026-02-23 — Plans 11-01 and 11-02 executed in parallel
+Phase: 12 of 13 (Permission Write Rules)
+Plan: Not started
+Status: Phase 11 verified and complete. Ready for Phase 12.
+Last activity: 2026-02-23 — Phase 11 verified (7/7 must-haves pass)
 
-Progress: ████░░░░░░ 67%
+Progress: █████░░░░░ 75%
 
 ## Performance Metrics
 
@@ -56,5 +56,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 11 complete, ready for phase 12
-Resume file: .planning/phases/11-keyboard-nav-breadcrumbs/11-02-SUMMARY.md
+Stopped at: Phase 11 verified, ready for phase 12
+Resume file: .planning/phases/11-keyboard-nav-breadcrumbs/11-VERIFICATION.md
