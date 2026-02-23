@@ -1,9 +1,15 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
+import { KeyboardShortcutsOverlay } from "./KeyboardShortcutsOverlay";
 import { useRefresh } from "../lib/refresh-context";
+import { useKeyboardNav } from "../hooks/useKeyboardNav";
 
 export function Layout() {
   const { triggerRefresh, isRefreshing } = useRefresh();
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  useKeyboardNav({ onToggleHelp: () => setShowShortcuts((prev) => !prev) });
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -34,6 +40,10 @@ export function Layout() {
         </div>
         <Outlet />
       </main>
+      <KeyboardShortcutsOverlay
+        open={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+      />
     </div>
   );
 }

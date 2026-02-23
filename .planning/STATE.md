@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-23)
 Phase: 11 of 13 (Keyboard Navigation & Breadcrumbs)
 Plan: 11-02 complete (2 of 2 plans) — phase complete
 Status: Phase 11 complete — keyboard nav + breadcrumbs
-Last activity: 2026-02-23 — Plan 11-02 executed (breadcrumb navigation for Projects page)
+Last activity: 2026-02-23 — Plans 11-01 and 11-02 executed in parallel
 
 Progress: ████░░░░░░ 67%
 
@@ -41,6 +41,7 @@ Recent decisions affecting current work:
 - No new dependencies for keyboard shortcuts (vanilla key events)
 - Health deeplinks derive recommendations from category checks instead of top-level string array (preserves CLI backward compatibility)
 - Error retry uses RefreshContext.triggerRefresh() not window.location.reload() — re-fetches only current page data
+- Keyboard shortcuts use two-key chord (G then letter) with 1s timeout, no external dependencies
 - Breadcrumbs show only items up to current step (no greyed-out future steps)
 - ComparisonTable back button replaced by breadcrumbs — single navigation pattern
 
