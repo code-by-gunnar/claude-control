@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish & Release
 
 on:
   push:
@@ -70,3 +70,47 @@ jobs:
 
       - name: Publish
         run: npm publish --provenance --access public
+
+  release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git tag --sort=-v:refname | head -2 | tail -1)
+          TAG=${GITHUB_REF#refs/tags/}
+          if [ "$PREV_TAG" != "$TAG" ]; then
+            echo "changes<<EOF" >> "$GITHUB_OUTPUT"
+            git log "$PREV_TAG".."$TAG" --pretty=format:"- %s" --no-merges >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes=Initial release" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## npm
+
+            ```bash
+            npm install -g claude-control@${{ github.ref_name }}
+            ```
+
+            ## Changes
+
+            ${{ steps.notes.outputs.changes }}
