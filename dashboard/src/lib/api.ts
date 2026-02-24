@@ -56,6 +56,8 @@ export interface McpServer {
   url?: string;
   headers?: Record<string, string>;
   env?: Record<string, string>;
+  isDuplicate?: boolean;
+  isActive?: boolean;
 }
 
 export interface McpResult {

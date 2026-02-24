@@ -4,6 +4,17 @@ import { fetchMcp, type McpResult, type McpServer } from "../lib/api";
 import { EmptyState } from "../components/EmptyState";
 import { ErrorState } from "../components/ErrorState";
 
+/** Shorten an absolute path for display: replace home dir with ~ */
+function shortenPath(p: string): string {
+  // Detect home dir heuristically from common patterns
+  const homePatterns = [/^(\/Users\/[^/]+)/, /^(\/home\/[^/]+)/, /^(C:\\Users\\[^\\]+)/];
+  for (const re of homePatterns) {
+    const m = p.match(re);
+    if (m) return "~" + p.slice(m[1].length).replace(/\\/g, "/");
+  }
+  return p;
+}
+
 /** Scope badge color mapping */
 const scopeColors: Record<string, string> = {
   managed: "bg-slate-200 text-slate-700",
@@ -53,18 +64,35 @@ function DuplicateWarning({
         <span className="text-amber-600 text-lg leading-none mt-0.5">
           {"\u26A0"}
         </span>
-        <div>
+        <div className="min-w-0 flex-1">
           <p className="font-medium text-amber-800 text-sm">
-            Duplicate servers detected
+            {duplicates.length} duplicate server{duplicates.length !== 1 ? "s" : ""} detected
           </p>
-          <ul className="mt-1 space-y-1">
+          <p className="text-xs text-amber-700 mt-0.5 mb-2">
+            The highest-priority scope wins (project &gt; local &gt; user &gt; managed). Remove the lower-priority definition to resolve.
+          </p>
+          <ul className="space-y-2">
             {duplicates.map((dup) => (
-              <li key={dup.name} className="text-xs text-amber-700">
-                <span className="font-mono font-medium">{dup.name}</span>
-                {" defined in "}
-                {dup.locations
-                  .map((loc) => `${loc.scope}: ${loc.sourcePath}`)
-                  .join(", ")}
+              <li key={dup.name} className="text-xs text-amber-800">
+                <span className="font-mono font-semibold">{dup.name}</span>
+                <ul className="mt-0.5 ml-3 space-y-0.5">
+                  {dup.locations.map((loc, i) => (
+                    <li key={`${loc.scope}-${loc.sourcePath}`} className="flex items-center gap-1.5">
+                      {i === 0 ? (
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-700">
+                          active ({loc.scope})
+                        </span>
+                      ) : (
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-500">
+                          shadowed ({loc.scope})
+                        </span>
+                      )}
+                      <span className="font-mono text-amber-700 truncate">
+                        {shortenPath(loc.sourcePath)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>
@@ -111,8 +139,10 @@ function ServerRow({ server }: { server: McpServer }) {
     (server.env && Object.keys(server.env).length > 0) ||
     (server.headers && Object.keys(server.headers).length > 0);
 
+  const isShadowed = server.isDuplicate && server.isActive === false;
+
   return (
-    <div className="border-b border-slate-100 last:border-b-0">
+    <div className={`border-b border-slate-100 last:border-b-0 ${isShadowed ? "opacity-60" : ""}`}>
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
@@ -128,6 +158,16 @@ function ServerRow({ server }: { server: McpServer }) {
           <TypeBadge type={server.type} />
           {pluginName && <PluginBadge name={pluginName} />}
           <ScopeBadge scope={server.scope} />
+          {server.isDuplicate && server.isActive === true && (
+            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+              active
+            </span>
+          )}
+          {isShadowed && (
+            <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-500">
+              shadowed
+            </span>
+          )}
         </div>
       </button>
 

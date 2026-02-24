@@ -157,8 +157,27 @@ function extractFromContent(
 export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult> {
   const allServers: McpServer[] = [];
 
+  // 0. Deduplicate input files by expectedPath.
+  //    When running from a directory like ~ (home), ~/.claude/settings.json can
+  //    appear as both "user" scope AND "project" scope. Keep only the entry with
+  //    the highest-priority scope (lowest SCOPE_PRIORITY index) for each path.
+  const pathBestFile = new Map<string, ConfigFile>();
+  for (const file of files) {
+    const existing = pathBestFile.get(file.expectedPath);
+    if (!existing) {
+      pathBestFile.set(file.expectedPath, file);
+    } else {
+      const existingPriority = SCOPE_PRIORITY[existing.scope] ?? 99;
+      const filePriority = SCOPE_PRIORITY[file.scope] ?? 99;
+      if (filePriority < existingPriority) {
+        pathBestFile.set(file.expectedPath, file);
+      }
+    }
+  }
+  const deduplicatedFiles = Array.from(pathBestFile.values());
+
   // 1. Extract from .mcp.json files
-  const mcpFiles = files.filter(
+  const mcpFiles = deduplicatedFiles.filter(
     (f) =>
       f.type === "mcp" &&
       f.exists &&
@@ -178,7 +197,7 @@ export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult>
   }
 
   // 2. Extract from settings.json files that have mcpServers key
-  const settingsFiles = files.filter(
+  const settingsFiles = deduplicatedFiles.filter(
     (f) =>
       f.type === "settings" &&
       f.exists &&
@@ -284,7 +303,7 @@ export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult>
     return a.name.localeCompare(b.name);
   });
 
-  // 4. Detect duplicates: server names appearing in 2+ files
+  // 5. Detect duplicates: server names appearing in 2+ files
   const nameMap = new Map<
     string,
     Array<{ scope: McpServer["scope"]; sourcePath: string }>
@@ -309,6 +328,22 @@ export async function extractMcpServers(files: ConfigFile[]): Promise<McpResult>
   for (const [name, locations] of nameMap) {
     if (locations.length > 1) {
       duplicates.push({ name, locations });
+    }
+  }
+
+  // 6. Annotate each server with isDuplicate / isActive so the UI can show
+  //    which instance wins (project > local > user > managed) and which are shadowed.
+  const duplicateNames = new Set(duplicates.map((d) => d.name));
+  const firstActiveForName = new Set<string>();
+  for (const server of allServers) {
+    if (duplicateNames.has(server.name)) {
+      server.isDuplicate = true;
+      if (!firstActiveForName.has(server.name)) {
+        server.isActive = true;
+        firstActiveForName.add(server.name);
+      } else {
+        server.isActive = false;
+      }
     }
   }
 

@@ -22,6 +22,18 @@ export interface McpServer {
   headers?: Record<string, string>;
   /** Environment variables with values masked */
   env?: Record<string, string>;
+  /**
+   * True if this server name appears in more than one config file.
+   * Only set after duplicate detection in extractMcpServers().
+   */
+  isDuplicate?: boolean;
+  /**
+   * True if this is the highest-priority instance of a duplicated server
+   * (project beats local beats user beats managed).
+   * False means it is shadowed by a higher-priority entry.
+   * Undefined for non-duplicate servers.
+   */
+  isActive?: boolean;
 }
 
 /**

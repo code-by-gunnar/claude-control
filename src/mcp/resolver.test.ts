@@ -368,6 +368,76 @@ describe("extractMcpServers", () => {
     expect(names).toContain("gamma");
   });
 
+  it("deduplicates input files with the same expectedPath, keeping highest-priority scope", async () => {
+    // Simulates running claude-ctl from ~: ~/.claude/settings.json appears as
+    // both "user" scope and "project" scope. Should only produce one set of servers.
+    const sharedPath = "/home/user/.claude/settings.json";
+    const files: ConfigFile[] = [
+      {
+        scope: "user",
+        type: "settings",
+        expectedPath: sharedPath,
+        description: "user settings",
+        exists: true,
+        readable: true,
+        content: { mcpServers: { dart: { command: "dart", args: ["mcp-server"] } } },
+      },
+      {
+        scope: "project",
+        type: "settings",
+        expectedPath: sharedPath, // same physical file
+        description: "project settings (same file)",
+        exists: true,
+        readable: true,
+        content: { mcpServers: { dart: { command: "dart", args: ["mcp-server"] } } },
+      },
+    ];
+
+    const result = await extractMcpServers(files);
+
+    // Should only appear once, kept as "project" (higher priority scope wins)
+    expect(result.servers).toHaveLength(1);
+    expect(result.servers[0].name).toBe("dart");
+    expect(result.servers[0].scope).toBe("project");
+    expect(result.duplicates).toHaveLength(0);
+  });
+
+  it("annotates duplicate servers with isDuplicate and isActive flags", async () => {
+    const files: ConfigFile[] = [
+      makeMcpFile("user", {
+        mcpServers: { shared: { command: "node", args: ["user.js"] } },
+      }, "/home/.claude/.mcp.json"),
+      makeMcpFile("project", {
+        mcpServers: { shared: { command: "node", args: ["project.js"] } },
+      }, "/proj/.mcp.json"),
+    ];
+
+    const result = await extractMcpServers(files);
+    const servers = result.servers;
+
+    // project scope is sorted first and wins
+    const projectEntry = servers.find((s) => s.scope === "project")!;
+    const userEntry = servers.find((s) => s.scope === "user")!;
+
+    expect(projectEntry.isDuplicate).toBe(true);
+    expect(projectEntry.isActive).toBe(true);
+    expect(userEntry.isDuplicate).toBe(true);
+    expect(userEntry.isActive).toBe(false);
+  });
+
+  it("does not set isDuplicate on non-duplicate servers", async () => {
+    const files: ConfigFile[] = [
+      makeMcpFile("user", {
+        mcpServers: { serverA: { command: "node", args: ["a.js"] } },
+      }),
+    ];
+
+    const result = await extractMcpServers(files);
+
+    expect(result.servers[0].isDuplicate).toBeUndefined();
+    expect(result.servers[0].isActive).toBeUndefined();
+  });
+
   it("skips non-object entries within server configs", async () => {
     const files: ConfigFile[] = [
       makeMcpFile("user", {
