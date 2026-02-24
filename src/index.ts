@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { accountCommand } from "./commands/account.js";
 import { agentsCommand } from "./commands/agents.js";
@@ -16,6 +19,21 @@ import { scanSkillsCommand } from "./commands/scan-skills.js";
 import { settingsCommand } from "./commands/settings.js";
 import { statusCommand } from "./commands/status.js";
 
+// Read version from package.json by walking up from the bundled entry point.
+let cliVersion = "0.0.0";
+let searchDir = path.dirname(fileURLToPath(import.meta.url));
+for (let i = 0; i < 5; i++) {
+  const candidate = path.join(searchDir, "package.json");
+  if (fs.existsSync(candidate)) {
+    const pkg = JSON.parse(fs.readFileSync(candidate, "utf-8")) as { version?: string };
+    if (pkg.version) {
+      cliVersion = pkg.version;
+      break;
+    }
+  }
+  searchDir = path.dirname(searchDir);
+}
+
 const program = new Command();
 
 program
@@ -23,7 +41,7 @@ program
   .description(
     "Discover, view, and manage Claude Code configuration across all levels"
   )
-  .version("0.1.0")
+  .version(cliVersion)
   .option("--json", "Output results as JSON", false);
 
 // Register commands

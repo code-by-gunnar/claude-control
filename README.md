@@ -277,6 +277,58 @@ Claude Code uses four configuration scope levels, listed from lowest to highest 
 
 **Permissions merge:** Permissions use a different strategy where `deny` always wins regardless of scope, then `ask` beats `allow`. This ensures security rules cannot be overridden by lower-priority scopes.
 
+## Troubleshooting
+
+### `claude-ctl: command not found` after installing
+
+This usually means the npm global bin directory isn't in your shell's `PATH`. Common on macOS with Homebrew-installed Node.
+
+**Check your setup:**
+
+```bash
+# Verify the package installed successfully
+npm ls -g claude-control
+
+# Check where npm puts global binaries
+npm bin -g
+
+# Check if that directory is in your PATH
+echo $PATH | tr ':' '\n' | grep npm
+```
+
+**Fix for macOS (Homebrew):**
+
+If `npm bin -g` shows `/opt/homebrew/lib` (incorrect), update the npm prefix:
+
+```bash
+npm config set prefix /opt/homebrew
+npm install -g claude-control
+```
+
+**Fix for nvm users:**
+
+Ensure your nvm initialisation is in your shell profile (`~/.zshrc` or `~/.bashrc`). After switching Node versions, reinstall global packages:
+
+```bash
+npm install -g claude-control
+```
+
+**Alternative — run without global install:**
+
+```bash
+npx claude-control scan
+npx claude-control dashboard
+```
+
+### Dashboard opens but shows a blank page
+
+If the dashboard server starts but the browser shows nothing, check the terminal output for errors. The most common cause is a port conflict:
+
+```bash
+# Use a different port
+claude-ctl dashboard --port 8080
+```
+
 ## Requirements
 
 - **Node.js 20** or later
