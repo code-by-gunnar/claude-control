@@ -9,6 +9,31 @@ import type {
 } from "./types.js";
 import { SCAN_RULES } from "./rules.js";
 
+/**
+ * Check whether a line carries a nosec suppression for a given rule.
+ *
+ * Supported formats (anywhere on the line):
+ *   <!-- nosec -->                      suppress all rules
+ *   <!-- nosec: rule-id -->             suppress one rule
+ *   <!-- nosec: rule-a, rule-b -->      suppress multiple rules
+ *   # nosec                             suppress all rules
+ *   # nosec: rule-id                    suppress one rule
+ */
+function isNosecSuppressed(line: string, ruleId: string): boolean {
+  // HTML comment: <!-- nosec --> or <!-- nosec: rule-id1, rule-id2 -->
+  const htmlMatch = line.match(/<!--\s*nosec(?::\s*([^>]*?))?\s*-->/i);
+  // Shell comment: # nosec or # nosec: rule-id1, rule-id2
+  const shellMatch = line.match(/#\s*nosec(?::\s*(.*))?$/i);
+
+  const match = htmlMatch ?? shellMatch;
+  if (!match) return false;
+
+  const ruleList = match[1];
+  if (!ruleList?.trim()) return true; // blanket nosec
+
+  return ruleList.trim().split(",").map((r) => r.trim()).includes(ruleId);
+}
+
 /** Severity ordering for sorting (higher index = more severe). */
 const SEVERITY_ORDER: Record<FindingSeverity, number> = {
   low: 0,
@@ -50,7 +75,7 @@ export function scanSkillContent(
     } else {
       // Test line by line
       for (let i = 0; i < lines.length; i++) {
-        if (rule.pattern.test(lines[i])) {
+        if (rule.pattern.test(lines[i]) && !isNosecSuppressed(lines[i], rule.id)) {
           findings.push({
             ruleId: rule.id,
             severity: rule.severity,

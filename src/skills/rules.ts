@@ -13,8 +13,10 @@ export const SCAN_RULES: ScanRule[] = [
   {
     id: "exfil-curl-secrets",
     severity: "critical",
-    message: "Potential data exfiltration: curl/wget piping secrets to external URL",
-    pattern: /\b(curl|wget)\b.*(\$\{?\w*(SECRET|TOKEN|KEY|PASS|API|AUTH)\w*\}?|\/etc\/passwd)/i,
+    message: "Potential data exfiltration: curl/wget sending secrets as request body",
+    // Requires a data-sending flag so that legitimate API auth headers like
+    // -H "Authorization: Bearer $TOKEN" are not flagged as exfiltration.
+    pattern: /\b(curl|wget)\b(?=.*\s(-d\b|--data\b|--data-\w+|-F\b|--form\b|--upload-file\b)).*\$\{?\w*(SECRET|TOKEN|KEY|PASS|API|AUTH)\w*\}?|\b(curl|wget)\b.*\/etc\/passwd/i,
   },
   {
     id: "exfil-env-dump",
