@@ -66,6 +66,9 @@ async function listSubdirs(dirPath: string): Promise<string[]> {
 
 /**
  * Read install counts cache file.
+ *
+ * The file has a wrapper structure:
+ * { version, fetchedAt, counts: [{ plugin, unique_installs }] }
  */
 async function readInstallCounts(
   globalDir: string,
@@ -74,7 +77,23 @@ async function readInstallCounts(
   try {
     const { data } = await parseJsonc(cachePath);
     if (data && typeof data === "object") {
-      return data as Record<string, number>;
+      const wrapper = data as Record<string, unknown>;
+      // Wrapped format: { counts: [{ plugin, unique_installs }] }
+      if (Array.isArray(wrapper.counts)) {
+        const result: Record<string, number> = {};
+        for (const entry of wrapper.counts) {
+          if (
+            entry &&
+            typeof entry === "object" &&
+            typeof (entry as Record<string, unknown>).plugin === "string" &&
+            typeof (entry as Record<string, unknown>).unique_installs === "number"
+          ) {
+            const e = entry as { plugin: string; unique_installs: number };
+            result[e.plugin] = e.unique_installs;
+          }
+        }
+        return result;
+      }
     }
   } catch {
     // Cache doesn't exist
@@ -84,33 +103,41 @@ async function readInstallCounts(
 
 /**
  * Read blocklist.json.
+ *
+ * The file has a wrapper structure:
+ * { fetchedAt, plugins: [{ plugin, reason, ... }] }
  */
 async function readBlocklist(globalDir: string): Promise<BlockedPlugin[]> {
   const blocklistPath = path.join(globalDir, "plugins", "blocklist.json");
   try {
     const { data } = await parseJsonc(blocklistPath);
+    // Direct array format
     if (Array.isArray(data)) {
-      return data
-        .filter((item) => item && typeof item === "object")
-        .map((item) => {
-          const entry = item as Record<string, unknown>;
-          return {
-            plugin: String(entry.plugin ?? entry.name ?? ""),
-            reason: String(entry.reason ?? ""),
-          };
-        });
+      return extractBlockedEntries(data);
     }
-    // May be an object with plugin names as keys
     if (data && typeof data === "object") {
-      return Object.entries(data as Record<string, unknown>).map(([key, val]) => ({
-        plugin: key,
-        reason: typeof val === "string" ? val : "",
-      }));
+      const wrapper = data as Record<string, unknown>;
+      // Wrapped format: { fetchedAt, plugins: [...] }
+      if (Array.isArray(wrapper.plugins)) {
+        return extractBlockedEntries(wrapper.plugins);
+      }
     }
   } catch {
     // No blocklist
   }
   return [];
+}
+
+function extractBlockedEntries(items: unknown[]): BlockedPlugin[] {
+  return items
+    .filter((item) => item && typeof item === "object")
+    .map((item) => {
+      const entry = item as Record<string, unknown>;
+      return {
+        plugin: String(entry.plugin ?? entry.name ?? ""),
+        reason: String(entry.reason ?? ""),
+      };
+    });
 }
 
 /**

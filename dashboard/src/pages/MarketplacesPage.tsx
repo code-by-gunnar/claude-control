@@ -59,7 +59,7 @@ function DirectoryBadge({ directory }: { directory: string }) {
 }
 
 function MarketplaceSection({ marketplace }: { marketplace: MarketplaceInfo }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">

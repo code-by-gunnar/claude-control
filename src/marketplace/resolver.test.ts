@@ -129,7 +129,13 @@ describe("extractMarketplaces", () => {
         return { data: marketplaces, errors: [] };
       }
       if (filePath.includes("install-counts-cache.json")) {
-        return { data: opts?.installCounts ?? {}, errors: [] };
+        // Wrap in the real file format: { counts: [{ plugin, unique_installs }] }
+        const raw = opts?.installCounts ?? {};
+        const counts = Object.entries(raw).map(([plugin, unique_installs]) => ({
+          plugin,
+          unique_installs,
+        }));
+        return { data: { version: 1, fetchedAt: "2024-01-01T00:00:00Z", counts }, errors: [] };
       }
       if (filePath.includes("blocklist.json")) {
         return { data: opts?.blocklist ?? [], errors: [] };

@@ -365,7 +365,7 @@ export function PermissionsPage() {
   const [data, setData] = useState<PermissionsResult | null>(null);
   const [filter, setFilter] = useState("");
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
-    () => new Set()
+    () => new Set(["deny", "ask"])
   );
   const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
 
