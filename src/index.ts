@@ -12,6 +12,7 @@ import { memoryCommand } from "./commands/memory.js";
 import { permissionsCommand } from "./commands/permissions.js";
 import { pluginsCommand } from "./commands/plugins.js";
 import { scanCommand } from "./commands/scan.js";
+import { scanSkillsCommand } from "./commands/scan-skills.js";
 import { settingsCommand } from "./commands/settings.js";
 import { statusCommand } from "./commands/status.js";
 
@@ -39,6 +40,7 @@ memoryCommand(program);
 permissionsCommand(program);
 pluginsCommand(program);
 scanCommand(program);
+scanSkillsCommand(program);
 settingsCommand(program);
 statusCommand(program);
 

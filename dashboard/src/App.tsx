@@ -12,6 +12,7 @@ import { AgentsPage } from "./pages/AgentsPage";
 import { SkillsPage } from "./pages/SkillsPage";
 import { PermissionsPage } from "./pages/PermissionsPage";
 import { HealthPage } from "./pages/HealthPage";
+import { ScanPage } from "./pages/ScanPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 
 export function App() {
@@ -31,6 +32,7 @@ export function App() {
           <Route path="/skills" element={<SkillsPage />} />
           <Route path="/permissions" element={<PermissionsPage />} />
           <Route path="/health" element={<HealthPage />} />
+          <Route path="/scan" element={<ScanPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
         </Route>
       </Routes>

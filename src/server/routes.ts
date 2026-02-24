@@ -18,6 +18,7 @@ import { compareProjects } from "../workspace/comparison.js";
 import { extractAgents } from "../agents/resolver.js";
 import { extractMarketplaces } from "../marketplace/resolver.js";
 import { extractAccountInfo } from "../account/resolver.js";
+import { scanAllSkills } from "../skills/scanner.js";
 import type { ScopedSettings } from "../settings/types.js";
 
 // Read version from package.json at module load time.
@@ -376,6 +377,18 @@ apiRoutes.get("/api/marketplaces", async (c) => {
 apiRoutes.get("/api/account", async (c) => {
   const result = await extractAccountInfo();
   return c.json(result);
+});
+
+/**
+ * GET /api/scan-skills
+ * Scans all skills and commands for potential security issues.
+ */
+apiRoutes.get("/api/scan-skills", async (c) => {
+  const result = await scan(projectDir);
+  const pluginsResult = await extractPlugins(result.files);
+  const commandsResult = await extractCommands(result.files, pluginsResult.plugins);
+  const skillScanResult = scanAllSkills(commandsResult.commands);
+  return c.json(skillScanResult);
 });
 
 /**

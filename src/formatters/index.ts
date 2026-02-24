@@ -9,6 +9,7 @@ import type { MemoryImportResult } from "../memory/types.js";
 import type { PermissionsResult } from "../permissions/types.js";
 import type { PluginsResult } from "../plugins/types.js";
 import type { SettingsResult } from "../settings/types.js";
+import type { SkillScanResult } from "../skills/types.js";
 import { formatAccountJson, formatAccountTable } from "./account.js";
 import { formatAgentsJson, formatAgentsTable } from "./agents.js";
 import { formatCommandsJson, formatCommandsTable, formatHooksJson, formatHooksTable } from "./hooks.js";
@@ -19,6 +20,7 @@ import { formatMcpJson, formatMcpTable } from "./mcp.js";
 import { formatMemoryImportsJson, formatMemoryImportsTable } from "./memory.js";
 import { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
 import { formatPluginsJson, formatPluginsTable } from "./plugins.js";
+import { formatSkillsScanJson, formatSkillsScanTable } from "./skills-scan.js";
 import { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
 
 /**
@@ -232,6 +234,23 @@ export function formatAccount(result: AccountInfo, json: boolean): string {
   return json ? formatAccountJson(result) : formatAccountTable(result);
 }
 
+/**
+ * Format skill scan results for display.
+ *
+ * @param result - The skill scan result
+ * @param projectDir - The project directory, or null for global-only scans
+ * @param json - If true, output JSON; otherwise output a human-readable table
+ */
+export function formatSkillsScan(
+  result: SkillScanResult,
+  projectDir: string | null,
+  json: boolean
+): string {
+  return json
+    ? formatSkillsScanJson(result)
+    : formatSkillsScanTable(result, projectDir);
+}
+
 // Re-export individual formatters for direct access
 export { formatAccountJson, formatAccountTable } from "./account.js";
 export { formatAgentsJson, formatAgentsTable } from "./agents.js";
@@ -244,4 +263,5 @@ export { formatMemoryImportsJson, formatMemoryImportsTable } from "./memory.js";
 export { formatPermissionsJson, formatPermissionsTable } from "./permissions.js";
 export { formatPluginsJson, formatPluginsTable } from "./plugins.js";
 export { formatMemoryContentTable, formatMemoryTable, formatScanTable, formatSettingsTable, formatStatusTable } from "./table.js";
+export { formatSkillsScanJson, formatSkillsScanTable } from "./skills-scan.js";
 export { formatDiscovery, formatCompare } from "./compare.js";

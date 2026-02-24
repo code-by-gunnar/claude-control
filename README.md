@@ -116,6 +116,7 @@ Or run without installing via `npx claude-control <command>`.
 | `claude-ctl marketplaces` | Browse plugin marketplace catalogs |
 | `claude-ctl account` | Show subscription type and rate limit tier |
 | `claude-ctl health` | Configuration health score with category breakdown |
+| `claude-ctl scan-skills` | Security scan of skills and commands for prompt injection and exfiltration |
 | `claude-ctl compare` | Cross-project configuration comparison |
 | `claude-ctl dashboard` | Launch the interactive web dashboard |
 
@@ -155,7 +156,7 @@ claude-ctl dashboard --port 8080
 
 ### Dashboard Pages
 
-The dashboard includes 12 pages covering every area of Claude Code configuration. Click any screenshot to expand.
+The dashboard includes 13 pages covering every area of Claude Code configuration. Click any screenshot to expand.
 
 <details>
 <summary><strong>Overview</strong> — At-a-glance summary of your entire Claude Code configuration</summary>
@@ -242,6 +243,14 @@ The dashboard includes 12 pages covering every area of Claude Code configuration
 <br>
 
 ![Health](docs/screenshots/health.png)
+
+</details>
+
+<details>
+<summary><strong>Skill Scan</strong> — Security scanner for skills, commands, and plugins detecting prompt injection and exfiltration patterns</summary>
+<br>
+
+![Skill Scan](docs/screenshots/skill-scan.png)
 
 </details>
 

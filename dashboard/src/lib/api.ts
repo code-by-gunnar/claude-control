@@ -279,6 +279,40 @@ export interface AccountInfo {
   rateLimitTier: string | null;
 }
 
+// --- Skill Scan types ---
+
+export type FindingSeverity = "critical" | "high" | "medium" | "low";
+
+export interface SkillFinding {
+  ruleId: string;
+  severity: FindingSeverity;
+  message: string;
+  line?: number;
+  snippet?: string;
+}
+
+export interface SkillScanEntry {
+  name: string;
+  path: string;
+  scope: string;
+  source?: "command" | "skill" | "plugin";
+  findings: SkillFinding[];
+  status: "clean" | "info" | "warning" | "danger";
+}
+
+export interface SkillScanSummary {
+  total: number;
+  clean: number;
+  info: number;
+  warning: number;
+  danger: number;
+}
+
+export interface SkillScanResult {
+  entries: SkillScanEntry[];
+  summary: SkillScanSummary;
+}
+
 // --- Version types ---
 
 export interface VersionInfo {
@@ -453,4 +487,8 @@ export async function fetchAccount(): Promise<AccountInfo> {
 
 export async function fetchVersion(): Promise<VersionInfo> {
   return fetchJson<VersionInfo>("version");
+}
+
+export async function fetchSkillsScan(): Promise<SkillScanResult> {
+  return fetchJson<SkillScanResult>("scan-skills");
 }
