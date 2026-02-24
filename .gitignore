@@ -6,3 +6,4 @@ dist/
 .vscode/
 .planning/
 CLAUDE.md
+firebase-debug.log

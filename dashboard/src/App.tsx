@@ -14,6 +14,7 @@ import { PermissionsPage } from "./pages/PermissionsPage";
 import { HealthPage } from "./pages/HealthPage";
 import { ScanPage } from "./pages/ScanPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
+import { HelpPage } from "./pages/HelpPage";
 
 export function App() {
   return (
@@ -34,6 +35,7 @@ export function App() {
           <Route path="/health" element={<HealthPage />} />
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/help" element={<HelpPage />} />
         </Route>
       </Routes>
       </RefreshProvider>
