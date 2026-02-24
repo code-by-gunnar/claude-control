@@ -142,17 +142,17 @@ function EventRow({
                   <div className="space-y-1.5">
                     {entry.matchers.map((matcherEntry, matcherIdx) => (
                       <div key={matcherIdx} className="space-y-1">
-                        {matcherEntry.matcher && (
-                          <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded inline-block">
-                            {matcherEntry.matcher}
-                          </span>
-                        )}
                         {matcherEntry.hooks.map((hook, hookIdx) => (
                           <div
                             key={hookIdx}
-                            className="flex items-start gap-2 text-sm"
+                            className="flex items-center gap-2"
                           >
-                            <span className="text-slate-400 text-xs mt-0.5 shrink-0">
+                            {matcherEntry.matcher && (
+                              <span className="font-mono text-xs bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded shrink-0">
+                                {matcherEntry.matcher}
+                              </span>
+                            )}
+                            <span className="text-slate-400 text-xs shrink-0">
                               {"\u2192"}
                             </span>
                             <span className="font-mono text-xs text-slate-800 break-all">

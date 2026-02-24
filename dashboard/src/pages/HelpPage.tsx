@@ -21,7 +21,7 @@ export function HelpPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 text-left">
-                  <th className="px-4 py-2 font-medium text-slate-600 w-24">Priority</th>
+                  <th className="px-4 py-2 font-medium text-slate-600 w-32">Priority</th>
                   <th className="px-4 py-2 font-medium text-slate-600 w-24">Scope</th>
                   <th className="px-4 py-2 font-medium text-slate-600">Location</th>
                   <th className="px-4 py-2 font-medium text-slate-600">Notes</th>
@@ -30,7 +30,7 @@ export function HelpPage() {
               <tbody className="divide-y divide-slate-100">
                 <tr>
                   <td className="px-4 py-2.5">
-                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">1 — highest</span>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap bg-green-100 text-green-700">1 — highest</span>
                   </td>
                   <td className="px-4 py-2.5 font-mono text-xs text-green-700 font-semibold">project</td>
                   <td className="px-4 py-2.5 font-mono text-xs text-slate-600">{"{project}/.claude/settings.json"}<br />{"{project}/.mcp.json"}</td>
@@ -54,7 +54,7 @@ export function HelpPage() {
                 </tr>
                 <tr>
                   <td className="px-4 py-2.5">
-                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-slate-200 text-slate-600">4 — lowest</span>
+                    <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-200 text-slate-600">4 — lowest</span>
                   </td>
                   <td className="px-4 py-2.5 font-mono text-xs text-slate-600 font-semibold">managed</td>
                   <td className="px-4 py-2.5 font-mono text-xs text-slate-600">/Library/Application Support/.claude/settings.json</td>
