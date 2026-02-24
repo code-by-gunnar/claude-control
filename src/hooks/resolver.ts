@@ -52,8 +52,26 @@ const SCOPE_PRIORITY: Record<string, number> = {
 export async function extractHooks(files: ConfigFile[]): Promise<HooksResult> {
   const allEvents: HookEvent[] = [];
 
+  // Deduplicate input files by expectedPath (same fix as MCP resolver).
+  // Running from ~ causes ~/.claude/settings.json to appear as both "user"
+  // and "project" scope, which would double all hook entries.
+  const pathBestFile = new Map<string, ConfigFile>();
+  for (const file of files) {
+    const existing = pathBestFile.get(file.expectedPath);
+    if (!existing) {
+      pathBestFile.set(file.expectedPath, file);
+    } else {
+      const existingPriority = SCOPE_PRIORITY[existing.scope] ?? 99;
+      const filePriority = SCOPE_PRIORITY[file.scope] ?? 99;
+      if (filePriority < existingPriority) {
+        pathBestFile.set(file.expectedPath, file);
+      }
+    }
+  }
+  const deduplicatedFiles = Array.from(pathBestFile.values());
+
   // Filter for settings files that exist, are readable, and have content
-  const settingsFiles = files.filter(
+  const settingsFiles = deduplicatedFiles.filter(
     (f) =>
       f.type === "settings" &&
       f.exists &&
