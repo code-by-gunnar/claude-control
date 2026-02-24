@@ -13,7 +13,7 @@
   CLI + web dashboard for discovering, understanding, and managing Claude Code configuration across all scope levels.
 </p>
 
-![Dashboard Overview](docs/screenshots/overview.png)
+![Dashboard Demo](docs/screenshots/demo.gif)
 
 ## Why
 
