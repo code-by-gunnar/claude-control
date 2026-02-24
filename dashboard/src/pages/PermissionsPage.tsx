@@ -253,11 +253,133 @@ function PermissionRow({
   );
 }
 
+/** Colors and labels for each rule-type section */
+const sectionConfig: Record<
+  string,
+  {
+    label: string;
+    borderColor: string;
+    headerBg: string;
+    textColor: string;
+    dotColor: string;
+    emptyMessage: string;
+  }
+> = {
+  deny: {
+    label: "Deny",
+    borderColor: "border-l-red-500",
+    headerBg: "bg-red-50",
+    textColor: "text-red-700",
+    dotColor: "bg-red-500",
+    emptyMessage: "No deny rules configured",
+  },
+  ask: {
+    label: "Ask",
+    borderColor: "border-l-amber-500",
+    headerBg: "bg-amber-50",
+    textColor: "text-amber-700",
+    dotColor: "bg-amber-500",
+    emptyMessage: "No ask rules configured",
+  },
+  allow: {
+    label: "Allow",
+    borderColor: "border-l-emerald-500",
+    headerBg: "bg-emerald-50",
+    textColor: "text-emerald-700",
+    dotColor: "bg-emerald-500",
+    emptyMessage: "No allow rules configured",
+  },
+};
+
+function RuleSection({
+  ruleType,
+  permissions,
+  collapsed,
+  onToggle,
+  onRemoved,
+}: {
+  ruleType: string;
+  permissions: EffectivePermission[];
+  collapsed: boolean;
+  onToggle: () => void;
+  onRemoved: () => void;
+}) {
+  const cfg = sectionConfig[ruleType];
+  if (!cfg) return null;
+
+  return (
+    <div
+      className={`bg-white rounded-lg shadow-sm border border-slate-200 border-l-4 ${cfg.borderColor} overflow-hidden`}
+    >
+      {/* Section header */}
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`w-full text-left px-4 py-3 flex items-center gap-3 ${cfg.headerBg} hover:brightness-95 transition-all`}
+      >
+        <span className="text-slate-400 text-xs w-4 shrink-0">
+          {collapsed ? "\u25B6" : "\u25BC"}
+        </span>
+        <span className={`inline-block w-2.5 h-2.5 rounded-full ${cfg.dotColor}`} />
+        <span className={`text-sm font-semibold ${cfg.textColor}`}>
+          {cfg.label}
+        </span>
+        <span className="text-xs font-medium text-slate-500 bg-white/70 px-2 py-0.5 rounded-full">
+          {permissions.length}
+        </span>
+      </button>
+
+      {/* Section body */}
+      {!collapsed && (
+        <div>
+          {permissions.length === 0 ? (
+            <p className="px-4 py-6 text-sm text-slate-400 text-center italic">
+              {cfg.emptyMessage}
+            </p>
+          ) : (
+            <>
+              {/* Column sub-header */}
+              <div className="px-4 py-2 flex gap-3 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 border-b border-slate-100">
+                <span className="w-4" />
+                <span className="flex-1">Tool / Pattern</span>
+                <span className="shrink-0">Rule / Scope</span>
+              </div>
+              {permissions.map((perm) => (
+                <PermissionRow
+                  key={`${perm.tool}-${perm.pattern ?? "*"}`}
+                  permission={perm}
+                  onRemoved={onRemoved}
+                />
+              ))}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PermissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PermissionsResult | null>(null);
+  const [filter, setFilter] = useState("");
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+    () => new Set()
+  );
   const { refreshKey, setRefreshing, triggerRefresh } = useRefresh();
+
+  function toggleSection(rule: string) {
+    setCollapsedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(rule)) {
+        next.delete(rule);
+      } else {
+        next.add(rule);
+      }
+      return next;
+    });
+  }
 
   // Add Rule form state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -346,15 +468,30 @@ export function PermissionsPage() {
 
   const permissions = data?.effective ?? [];
 
-  // Count rules
-  const allowCount = permissions.filter(
-    (p) => p.effectiveRule === "allow"
-  ).length;
-  const denyCount = permissions.filter(
+  // Filter by search
+  const lowerFilter = filter.toLowerCase();
+  const filtered = lowerFilter
+    ? permissions.filter(
+        (p) =>
+          p.tool.toLowerCase().includes(lowerFilter) ||
+          (p.pattern && p.pattern.toLowerCase().includes(lowerFilter))
+      )
+    : permissions;
+
+  // Group filtered permissions by rule type
+  const denyPerms = filtered.filter((p) => p.effectiveRule === "deny");
+  const askPerms = filtered.filter((p) => p.effectiveRule === "ask");
+  const allowPerms = filtered.filter((p) => p.effectiveRule === "allow");
+
+  // Total counts from unfiltered data (for footer)
+  const totalDenyCount = permissions.filter(
     (p) => p.effectiveRule === "deny"
   ).length;
-  const askCount = permissions.filter(
+  const totalAskCount = permissions.filter(
     (p) => p.effectiveRule === "ask"
+  ).length;
+  const totalAllowCount = permissions.filter(
+    (p) => p.effectiveRule === "allow"
   ).length;
 
   if (error) {
@@ -514,6 +651,19 @@ export function PermissionsPage() {
         </p>
       </div>
 
+      {/* Search filter — only when loaded and has permissions */}
+      {!loading && permissions.length > 0 && (
+        <div className="mb-4">
+          <input
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Filter by tool or pattern..."
+            className="w-full px-4 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      )}
+
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -541,47 +691,68 @@ export function PermissionsPage() {
           description="Permission rules control which tools Claude can run automatically, with prompting, or not at all."
           action={<>Add rules in <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">settings.json</code> under the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">permissions</code> key with <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">allow</code>, <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">deny</code>, or <code className="bg-slate-100 px-1.5 py-0.5 rounded text-xs font-mono text-slate-500">ask</code> arrays</>}
         />
+      ) : lowerFilter && filtered.length === 0 ? (
+        <p className="text-sm text-slate-400 text-center py-8 italic">
+          No permissions matching &ldquo;{filter}&rdquo;
+        </p>
       ) : (
         <>
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-            {/* Header */}
-            <div className="px-4 py-2 flex gap-3 text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50 rounded-t-lg">
-              <span className="w-4" />
-              <span className="flex-1">Tool / Pattern</span>
-              <span className="shrink-0">Rule / Scope</span>
-            </div>
-
-            {permissions.map((perm) => (
-              <PermissionRow
-                key={`${perm.tool}-${perm.pattern ?? "*"}`}
-                permission={perm}
+          <div className="space-y-4">
+            {/* Deny section — hidden when filter active and empty */}
+            {(!lowerFilter || denyPerms.length > 0) && (
+              <RuleSection
+                ruleType="deny"
+                permissions={denyPerms}
+                collapsed={collapsedSections.has("deny")}
+                onToggle={() => toggleSection("deny")}
                 onRemoved={loadData}
               />
-            ))}
+            )}
+            {/* Ask section */}
+            {(!lowerFilter || askPerms.length > 0) && (
+              <RuleSection
+                ruleType="ask"
+                permissions={askPerms}
+                collapsed={collapsedSections.has("ask")}
+                onToggle={() => toggleSection("ask")}
+                onRemoved={loadData}
+              />
+            )}
+            {/* Allow section */}
+            {(!lowerFilter || allowPerms.length > 0) && (
+              <RuleSection
+                ruleType="allow"
+                permissions={allowPerms}
+                collapsed={collapsedSections.has("allow")}
+                onToggle={() => toggleSection("allow")}
+                onRemoved={loadData}
+              />
+            )}
           </div>
 
           {/* Summary footer */}
           <div className="flex items-center gap-4 mt-3 text-xs text-slate-400">
             <span>
-              {permissions.length} permission
-              {permissions.length !== 1 ? "s" : ""}:
+              {lowerFilter
+                ? `${filtered.length} of ${permissions.length} matching \u201C${filter}\u201D`
+                : `${permissions.length} permission${permissions.length !== 1 ? "s" : ""}:`}
             </span>
-            {allowCount > 0 && (
+            {totalAllowCount > 0 && (
               <span className="flex items-center gap-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />
-                {allowCount} allow
+                {totalAllowCount} allow
               </span>
             )}
-            {denyCount > 0 && (
+            {totalDenyCount > 0 && (
               <span className="flex items-center gap-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-red-500" />
-                {denyCount} deny
+                {totalDenyCount} deny
               </span>
             )}
-            {askCount > 0 && (
+            {totalAskCount > 0 && (
               <span className="flex items-center gap-1">
                 <span className="inline-block w-2 h-2 rounded-full bg-amber-500" />
-                {askCount} ask
+                {totalAskCount} ask
               </span>
             )}
           </div>
