@@ -292,6 +292,7 @@ export function McpPage() {
           <strong>MCP servers</strong> provide tools that Claude can use (file access, web search, databases, etc.).
           They can come from <strong>plugins</strong>, or be configured directly in <code className="font-mono text-xs bg-blue-100 px-1 rounded">.mcp.json</code> and <code className="font-mono text-xs bg-blue-100 px-1 rounded">settings.json</code>.
           Plugin-sourced servers are tagged with a <span className="inline-block px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700">plugin</span> badge.
+          This view shows configuration only — to check live connection status, run <code className="font-mono text-xs bg-blue-100 px-1 rounded">/mcp</code> in Claude Code.
         </p>
       </div>
 
