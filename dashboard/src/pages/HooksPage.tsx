@@ -89,12 +89,39 @@ function EventRow({
         {configured && (
           <span className="text-xs text-slate-400">
             {entries.length} source{entries.length !== 1 ? "s" : ""}
+            {entries.length > 1 && " · all run"}
           </span>
         )}
       </button>
 
       {expanded && (
         <div className="px-4 pb-4 pl-12 bg-slate-50/50">
+          {/* Same-command duplicate warning */}
+          {(() => {
+            const allCmds = entries.flatMap((e) =>
+              e.matchers.flatMap((m) => m.hooks.map((h) => h.command))
+            );
+            const counts = allCmds.reduce<Record<string, number>>((acc, cmd) => {
+              acc[cmd] = (acc[cmd] ?? 0) + 1;
+              return acc;
+            }, {});
+            const dupes = Object.entries(counts).filter(([, n]) => n > 1);
+            if (dupes.length === 0) return null;
+            return (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3 text-xs text-amber-800">
+                <span className="font-medium">⚠ Same command appears in multiple sources</span>
+                {" — "}
+                {dupes.map(([cmd, n]) => (
+                  <span key={cmd}>
+                    <code className="font-mono bg-amber-100 px-1 rounded">{cmd}</code>
+                    {" will run "}
+                    <strong>{n}×</strong>
+                  </span>
+                ))}
+                . Remove the duplicate from the lower-priority scope to fix.
+              </div>
+            );
+          })()}
           <div className="space-y-3">
             {entries.map((entry, entryIdx) => (
               <div
@@ -289,6 +316,7 @@ export function HooksPage() {
           They are configured in <code className="font-mono text-xs bg-blue-100 px-1 rounded">settings.json</code> under
           the <code className="font-mono text-xs bg-blue-100 px-1 rounded">hooks</code> key.
           Green dots indicate events that have at least one hook configured.
+          Unlike MCP servers or settings, <strong>hooks are additive</strong> — when the same event is configured at multiple scopes, <strong>all of them run</strong> (project hooks first, then user hooks).
         </p>
       </div>
 
